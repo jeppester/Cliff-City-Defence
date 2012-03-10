@@ -1,0 +1,101 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>JsEngine Playground</title>
+
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+	<style type="text/css">
+		html {
+			font-family: Arial;
+			font-size:14px;
+			background-color:#222;
+			background-image:url('img/backgrounds/menuBg.png');
+		}
+		body {
+			margin:0px;
+			
+		}
+		#container {
+			width:710px;
+			height:750px;
+		}
+		/* An arena should not have a border (It messes with the mouse's coordinates)
+		   if you want a border, put it inside a container with a border. */
+		#arena {
+			position:relative;
+			float:left;
+		}
+		#console, #debug {
+			background-color:#000;
+			padding:5px;
+			font-size:12px;
+			text-align:left;
+			width:100px;
+			height:715px;
+			position:relative;
+			overflow:hidden;
+		}
+		#debug {
+			height:15px;
+		}
+	</style>
+</head>
+	<body>
+		<center>
+			<div id="container">
+				<div id="arena" style="width:600px;height:750px;"></div>
+				<div id="console"></div>
+				<div id="debug"></div>
+			</div>
+		</center>
+		
+		<!-- JsEngine -->
+		<script type="text/javascript" src="js/JsEngine/classes/Loader.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/Sprite.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/TextBlock.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/GameObject.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/GravityObject.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/Animator.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/Console.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/KeyboardIndex.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/MouseIndex.js"></script>
+		
+		<!-- Game classes -->
+		<script type="text/javascript" src="js/classes/Cloud.js"></script>
+		<script type="text/javascript" src="js/classes/Destroyable.js"></script>
+		<script type="text/javascript" src="js/classes/Building.js"></script>
+		<script type="text/javascript" src="js/classes/CannonBuilding.js"></script>
+		<script type="text/javascript" src="js/classes/AiGun.js"></script>
+		<script type="text/javascript" src="js/classes/Shield.js"></script>
+		<script type="text/javascript" src="js/classes/Button.js"></script>
+		<script type="text/javascript" src="js/classes/LevelController.js"></script>
+		<script type="text/javascript" src="js/classes/ScorePoints.js"></script>
+		<script type="text/javascript" src="js/classes/Player.js"></script>
+		
+		<!-- Rocks-->
+		<script type="text/javascript" src="js/classes/Rocks/Rock.js"></script>
+		<script type="text/javascript" src="js/classes/Rocks/RockOrange.js"></script>
+		<script type="text/javascript" src="js/classes/Rocks/RockMagnetic.js"></script>
+		
+		<!-- Bullets -->
+		<script type="text/javascript" src="js/classes/Rocket.js"></script>
+		<script type="text/javascript" src="js/classes/Explosion.js"></script>
+		<script type="text/javascript" src="js/classes/GunShot.js"></script>
+		
+		<!-- Menus -->
+		<script type="text/javascript" src="js/classes/MainMenu.js"></script>
+		<script type="text/javascript" src="js/classes/UpgradeMenu.js"></script>
+		<script type="text/javascript" src="js/classes/UpgradeIcon.js"></script>
+		<script type="text/javascript" src="js/classes/ShopCircle.js"></script>
+		<script type="text/javascript" src="js/classes/ShopIcon.js"></script>
+		<script type="text/javascript" src="js/classes/SpecialUpgrades.js"></script>
+		
+		<!-- Settings, ressources, main loop, game functions -->
+		<script type="text/javascript" src="js/settings.js"></script>
+		<script type="text/javascript" src="js/ressources.js"></script>
+		<script type="text/javascript" src="js/JsEngine/MainLoop.js"></script>
+		<script type="text/javascript" src="js/gameCore.js"></script>
+	</body>
+</html>

@@ -10,7 +10,8 @@ Requires;
 
 function GameObject(_src, _depth, _x, _y, _dir,_addOpt) {
 	//Extent sprite
-	Sprite.call(this, _src, _depth, _x, _y, _dir,_addOpt);
+	importClass(this,Sprite);
+	this.sprite(_src, _depth, _x, _y, _dir,_addOpt);
 
 	//Add object in update array
 	this.update=this.update?this.update:'onRunning';

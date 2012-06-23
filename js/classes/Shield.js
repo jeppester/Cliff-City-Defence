@@ -8,17 +8,21 @@ Requires;
     Loader
 */
 
-function Shield(_building, _x, _y) {
+function Shield(_building,_x,_y) {
+	// Import sprite
+	importClass(this,Sprite);
+
 	if (_building==undefined || _x===undefined || _y===undefined) {
 		throw new Error('Arguments: building, type, x or y missing');
 		return false;
 	}
 	this.enabled=false;
+	this.type=0;
 	this.building=_building;
 	_spr=pImg+'Building'+this.building+'Shield1.png';
 	
 	// Extent sprite
-	Sprite.call(this, _spr, 4, _x, _y, 0,{'bmSize':0});
+	this.sprite(_spr, 4, _x, _y, 0,{'bmSize':0});
 	
 	this.disable=function() {
 		this.animate({bmSize:2,opacity:0},{dur:300});
@@ -27,6 +31,11 @@ function Shield(_building, _x, _y) {
 
 	this.set=function(type) {
 		this.type=type;
+
+		if (this.type==0) {
+			this.disable();
+			return;
+		}
 	
 		// Set shield offset
 		switch (this.type) {

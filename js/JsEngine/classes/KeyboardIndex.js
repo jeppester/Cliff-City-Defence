@@ -8,10 +8,10 @@ No requirements
 function KeyboardIndex() {
 	document.addEventListener('keydown', function(event) {
 		keyboard.onKeyDown.call(keyboard, event)
-	});
+	},false);
 	document.addEventListener('keyup', function(event) {
 		keyboard.onKeyUp.call(keyboard, event)
-	});
+	},false);
 	
 	//Create key event array
 	this.events=new Array();

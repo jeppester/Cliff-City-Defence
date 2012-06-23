@@ -9,13 +9,13 @@ Requires:
 function MouseIndex() {
 	arena.addEventListener('mousedown', function(event) {
 		mouse.onMouseDown.call(mouse, event)
-	});
+	},false);
 	arena.addEventListener('mouseup', function(event) {
 		mouse.onMouseUp.call(mouse, event)
-	});
+	},false);
 	document.addEventListener('mousemove', function(event) {
 		mouse.onMouseMove.call(mouse, event)
-	});
+	},false);
 	
 	//Set x and y (the mouse position, relative to the arena)
 	this.x=0;
@@ -57,11 +57,14 @@ function MouseIndex() {
 	}
 	
 	this.onMouseMove = function(event) {
-		this.windowX=event.x;
-		this.windowY=event.y;
+		this.windowX=event.pageX;
+		this.windowY=event.pageY;
 		
-		this.x=event.x-arena.offsetLeft+document.body.scrollLeft;
-		this.y=event.y-arena.offsetTop+document.body.scrollTop;
+		this.x=this.windowX-arena.offsetLeft+document.body.scrollLeft;
+		this.y=this.windowY-arena.offsetTop+document.body.scrollTop;
+
+		this.x=this.x/arena.offsetWidth*canvasResX;
+		this.y=this.y/arena.offsetHeight*canvasResY;
 	}
 	
 	this.cleanUp = function(button) {
@@ -100,13 +103,13 @@ function MouseIndex() {
 				if (evt.frame==frames && evt.type=='pressed') {
 					return true;
 				}
-			}
+			} 
 		}
 		return false;
 	}
 	
 	this.outside= function() {
-		if (this.x<0 || this.x>arena.style.width.replace('px','') || this.y<0 || this.y>arena.style.height.replace('px','')) {
+		if (this.x<0 || this.x>arena.offsetWidth || this.y<0 || this.y>arena.offsetHeight) {
 			return true;
 		} else {
 			return false;

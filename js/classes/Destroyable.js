@@ -8,12 +8,15 @@ Requires:
 */
 
 function Destroyable(_src,_depth,_x,_y,_dir) {
+	// Import sprite
+	importClass(this,Sprite);
+
 	if (_src==undefined) {
 		return false;
 	}
 
 	//Extend Sprite
-	Sprite.call(this,_src,_depth,_x,_y,_dir);
+	this.sprite(_src,_depth,_x,_y,_dir);
 	
 	this.alive=true;
 	this.remove = function(time) {
@@ -38,6 +41,7 @@ function Destroyable(_src,_depth,_x,_y,_dir) {
 			cDist=this.bmWidth/2+cObj.bmWidth/2;
 			if (Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist) {
 				this.remove();
+				cObj.impacted=true;
 				cObj.remove();
 			}
 		}

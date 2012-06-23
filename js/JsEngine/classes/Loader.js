@@ -21,8 +21,8 @@ function Loader() {
 			this.images[fPath].onload = function() {
 				loader.loaded.images++;
 				if (loader.loaded.images==Object.keys(loader.images).length) {
-					console.write(loader.loaded.images+' images loaded');
-					onLoaded();
+					console.log(loader.loaded.images+' images loaded');
+					game.onLoaded();
 				}
 			}
 		}
@@ -35,7 +35,7 @@ function Loader() {
 			this.sounds[fPath] = new Audio(_paths[i]);
 			this.sounds[fPath].addEventListener("canplaythrough", function() {
 				loader.loaded.sounds++;
-			});
+			},false);
 		}
 	}
 }

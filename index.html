@@ -8,59 +8,36 @@
 	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
 	<style type="text/css">
 		html {
-			font-family: Arial;
-			font-size:14px;
 			background-color:#222;
-			background-image:url('img/backgrounds/menuBg.png');
+			background-image:url(img/Backgrounds/menuBg.png);
 		}
 		body {
 			margin:0px;
-			
 		}
-		#container {
-			width:710px;
-			height:750px;
+		#arena {
+			width:400px;
+			height:500px;
+			position:absolute;
 		}
 		/* An arena should not have a border (It messes with the mouse's coordinates)
 		   if you want a border, put it inside a container with a border. */
-		#arena {
-			position:relative;
-			float:left;
-		}
-		#console, #debug {
-			background-color:#000;
-			padding:5px;
-			font-size:12px;
-			text-align:left;
-			width:100px;
-			height:715px;
-			position:relative;
-			overflow:hidden;
-		}
-		#debug {
-			height:15px;
-		}
 	</style>
 </head>
 	<body>
-		<center>
-			<div id="container">
-				<div id="arena" style="width:600px;height:750px;"></div>
-				<div id="console"></div>
-				<div id="debug"></div>
-			</div>
-		</center>
+		<div id="arena"></div>
 		
 		<!-- JsEngine -->
 		<script type="text/javascript" src="js/JsEngine/classes/Loader.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/Animation.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/ObjectContainer.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/Sprite.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/TextBlock.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/GameObject.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/GravityObject.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/Animator.js"></script>
-		<script type="text/javascript" src="js/JsEngine/classes/Console.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/KeyboardIndex.js"></script>
 		<script type="text/javascript" src="js/JsEngine/classes/MouseIndex.js"></script>
+		<script type="text/javascript" src="js/JsEngine/classes/Particle.js"></script>
 		
 		<!-- Game classes -->
 		<script type="text/javascript" src="js/classes/Cloud.js"></script>
@@ -69,15 +46,10 @@
 		<script type="text/javascript" src="js/classes/CannonBuilding.js"></script>
 		<script type="text/javascript" src="js/classes/AiGun.js"></script>
 		<script type="text/javascript" src="js/classes/Shield.js"></script>
-		<script type="text/javascript" src="js/classes/Button.js"></script>
-		<script type="text/javascript" src="js/classes/LevelController.js"></script>
+		<script type="text/javascript" src="js/classes/StageController.js"></script>
 		<script type="text/javascript" src="js/classes/ScorePoints.js"></script>
 		<script type="text/javascript" src="js/classes/Player.js"></script>
-		
-		<!-- Rocks-->
-		<script type="text/javascript" src="js/classes/Rocks/Rock.js"></script>
-		<script type="text/javascript" src="js/classes/Rocks/RockOrange.js"></script>
-		<script type="text/javascript" src="js/classes/Rocks/RockMagnetic.js"></script>
+		<script type="text/javascript" src="js/classes/Rock.js"></script>
 		
 		<!-- Bullets -->
 		<script type="text/javascript" src="js/classes/Rocket.js"></script>
@@ -85,17 +57,60 @@
 		<script type="text/javascript" src="js/classes/GunShot.js"></script>
 		
 		<!-- Menus -->
-		<script type="text/javascript" src="js/classes/MainMenu.js"></script>
-		<script type="text/javascript" src="js/classes/UpgradeMenu.js"></script>
-		<script type="text/javascript" src="js/classes/UpgradeIcon.js"></script>
-		<script type="text/javascript" src="js/classes/ShopCircle.js"></script>
-		<script type="text/javascript" src="js/classes/ShopIcon.js"></script>
-		<script type="text/javascript" src="js/classes/SpecialUpgrades.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/CustomMenu.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/UpgradeMenu.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/UpgradeIcon.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/ShopCircle.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/ShopIcon.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/SpecialUpgrades.js"></script>
+		<script type="text/javascript" src="js/classes/Menus/Button.js"></script>
+		<script type="text/javascript" src="js/classes/SpriteButton.js"></script>
+		<script type="text/javascript" src="js/classes/FadeMessage.js"></script>
+
+		<!-- Editor -->
+		<script type="text/javascript" src="js/classes/Editor/Editor.js"></script>
+		<script type="text/javascript" src="js/classes/Editor/LevelServer.js"></script>
+		<script type="text/javascript" src="js/Settings/EditorSettings.js"></script>
 		
 		<!-- Settings, ressources, main loop, game functions -->
-		<script type="text/javascript" src="js/settings.js"></script>
-		<script type="text/javascript" src="js/ressources.js"></script>
+		<script type="text/javascript" src="js/Settings/EngineSettings.js"></script>
+		<script type="text/javascript" src="js/Data/Upgrades.js"></script>
+		<script type="text/javascript" src="js/Data/Levels.js"></script>
+		<script type="text/javascript" src="js/Data/Ressources.js"></script>
+		<script type="text/javascript" src="js/Data/Rocks.js"></script>
+
+		<script type="text/javascript" src="js/JsEngine/CoreFunctions.js"></script>
 		<script type="text/javascript" src="js/JsEngine/MainLoop.js"></script>
 		<script type="text/javascript" src="js/gameCore.js"></script>
+
+		<!-- Resize canvas to window size -->
+		<script type="text/javascript">
+			function resizeCanvas() {
+				// Check if the window is wider og heigher than the game's canvas
+				windowWH=window.innerWidth/window.innerHeight;
+				gameWH=canvasResX/canvasResY;
+				
+				if (windowWH>gameWH) {
+					var h=window.innerHeight;
+					var w=canvasResX/canvasResY*h;
+				} else {
+					var w=window.innerWidth;
+					var h=canvasResY/canvasResX*w;
+				}
+
+				w=Math.min(w,canvasResX);
+				h=Math.min(h,canvasResY);
+				
+				arena.style.top="50%";
+				arena.style.left="50%";
+				arena.style.marginTop=-h/2+"px";
+				arena.style.marginLeft=-w/2+"px";
+				arena.style.height=h+"px";
+				arena.style.width=w+"px";
+			}
+
+			window.addEventListener('resize',resizeCanvas,false)
+			resizeCanvas();
+		</script>
 	</body>
 </html>

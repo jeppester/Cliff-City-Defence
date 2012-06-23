@@ -9,6 +9,9 @@ Requires:
 */
 
 function Building(type,_depth,_x,_y,_dir) {
+	// Import sprite
+	importClass(this,Sprite);
+
 	if (type==undefined) {
 		return false;
 	}
@@ -42,7 +45,7 @@ function Building(type,_depth,_x,_y,_dir) {
 	break;
 	case 5:
 		this.spritePos={
-			'gunStand':{'x':-20,'y':-30,'dir':-45},
+			'gunStand':{'x':-20,'y':-30,'dir':-Math.PI/4},
 			'gun':{'x':-29,'y':-39}
 		};
 	break;
@@ -62,14 +65,15 @@ function Building(type,_depth,_x,_y,_dir) {
 	Sprite.call(this,pImg+'Building'+this.type+'.png',_depth,_x,_y,_dir);
 	
 	this.shield=new Shield(this.type,this.x,this.y);
+	this.gunType=0;
 
 	//Add to updated objects
 	updateObjects.onRunning[this.id]=this;
 	
-	this.alive=true;
+	this.life=2;
 	this.die = function(time) {
-		if (this.alive) {
-			this.alive = false;
+		if (this.life) {
+			this.life = 0;
 			time = time ? time : 200;
 			this.animate({"bmSize":1.5,"opacity":0},{'dur':time});
 			
@@ -77,9 +81,7 @@ function Building(type,_depth,_x,_y,_dir) {
 			this.gunStand.animate({"bmSize":1.5,"opacity":0},{'dur':time});
 			if (this.gun) {
 				this.gun.remove();
-			}
-			if (this.shield) {
-				this.shield.remove();
+				delete this.gun;
 			}
 			
 			return true;
@@ -90,7 +92,7 @@ function Building(type,_depth,_x,_y,_dir) {
 	this.update=function() {
 		//Use update to check for mouse clicks
 		cDist=this.bmWidth/2;
-		if (mouse.isPressed(1) && this.alive) {
+		if (mouse.isPressed(1) && this.life) {
 			if (Math.sqrt(Math.pow(mouse.x-this.x,2)+Math.pow(mouse.y-this.y,2))<cDist) {
 				if (typeof shopCircle!="undefined") {
 					if (shopCircle.building!=this) {
@@ -108,11 +110,12 @@ function Building(type,_depth,_x,_y,_dir) {
 		purge(this.shield);
 		purge(this.gunStand);
 		purge(this.gun);
+		purge(this);
 	}
 	
 	this.cols=function() {
-		//Check for collisions with invaders
-		if (!this.alive) {return;}
+		//Check for collisions with rocks
+		if (!this.life) {return;}
 		
 		for (var i in depth[5]) {
 			cObj=depth[5][i];
@@ -125,11 +128,35 @@ function Building(type,_depth,_x,_y,_dir) {
 						this.shield.disable();
 					}
 				} else {
-					this.die();
+					this.setLife(this.life-1);
 				}
+				cObj.impacted=true;
 				cObj.remove();
 			}
 		}
+	}
+
+	this.setLife=function(life) {
+		if (this.life===0) {
+			this.bmSize=0;
+			this.opacity=1;
+		}
+
+		switch (life) {
+			case 0:
+				this.die();
+				return;
+			break;
+			case 1:
+				this.bm=loader.images[pImg+'Building'+this.type+'Damaged.png'];
+			break;
+			case 2:
+				this.bm=loader.images[pImg+'Building'+this.type+'.png'];
+			break;
+		}
+
+		this.animate({"bmSize":1},{'dur':200});
+		this.life=life;
 	}
 	
 	//Upgrade functions
@@ -137,16 +164,22 @@ function Building(type,_depth,_x,_y,_dir) {
 		this.shield.set(type);
 	}
 	
-	this.shieldDisable=function() {
-		this.shield.animate({'opacity':0,'bmSize':1.5},{'dur':200});
-		this.currentShield=false;
-	}
-	
 	this.setGun=function(type) {
+		this.gunType=type
 		if (this.gun) {
 			this.gun.remove();
 		}
-		this.gun=new AiGun(type,this.x+this.spritePos.gun.x,this.y+this.spritePos.gun.y);
+
+		if (this.gunType==0) {
+			this.gunStand.animate({'opacity':0},{'dur':200});
+			if (this.gun) {
+				delete this.gun;
+			}
+			return
+		}
+
+		this.gun=new AiGun(type,this.x+this.spritePos.gun.x,this.y+this.spritePos.gun.y,this);
+		this.gunStand.bmSize=1;
 		this.gunStand.animate({'opacity':1},{'dur':200});
 	}
 }

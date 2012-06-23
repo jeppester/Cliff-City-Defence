@@ -1,14 +1,30 @@
+/*
+Rocket:
+A rocket fired from the main cannon
+
+Requires:
+	Sprite
+	Player
+	GravityObject
+	Explosion
+	Animator
+*/
+
 function Rocket(_dir) {	
 	//Extend GravityObject
 	var acc=20000;
-	var x=arena.style.width.replace('px','')/2;
-	var y=arena.style.height.replace('px','')-120;
-	var dX=Math.cos(_dir/180*Math.PI)*acc*loopSpeed/1000;
-	var dY=Math.sin(_dir/180*Math.PI)*acc*loopSpeed/1000;
-	GravityObject.call(this, 'img/nonScalable/Rocket.png', 3, x, y, _dir, {'dX':dX,'dY':dY,'gravity':300});
+	var x=canvasResX/2;
+	var y=canvasResY-120;
+	var dX=Math.cos(_dir)*acc*loopSpeed/1000;
+	var dY=Math.sin(_dir)*acc*loopSpeed/1000;
+	GravityObject.call(this, pImg+'Rocket.png', 3, x, y, _dir, {'dX':dX,'dY':dY,'gravity':300});
+
+	// Set the number of bounces
+	// Indicates how many times the rocket has hit a wall and bounced
+	this.bounces=0;
 
 	// Set blast range
-	switch (player.blastRangeLevel) {
+	switch (player.rocketBlastRangeLevel) {
 	case 1:
 		this.blastRange=10;
 	break;
@@ -28,20 +44,30 @@ function Rocket(_dir) {
 	
 	this.doBorders = function() {
 		var border = false;
-		if (this.x < 50 || this.x > (arena.style.width.replace('px', '') * 1) - 50) {
+		if (this.x < 50 || this.x > canvasResX - 50) {
 
-			while (this.x < this.bmSize / 2 || this.x > (arena.style.width.replace('px', '') * 1) - this.bmSize / 2) {
-				this.x -= this.dX * (now - last) / 1000;
+			// Bounce if the rocket has not already bounced the allowed number of times
+			if (this.bounces>=player.rocketBounces) {
+				this.remove();
+			}
+			this.bounces++;
+
+			// Move the rock untill it's outside the wall
+			while (this.x < this.bmSize / 2 || this.x > canvasResX - this.bmSize / 2) {
+				this.x -= this.dX / Math.abs(this.X);
 			}
 
+			// Negate the horisontal speed
 			this.dX = -this.dX;
 		}
 
-		if (this.y > arena.style.height.replace('px', '') - 200 && this.dY>0) {
+		// If the rocket is too close to the buildings, selfdestroy it
+		if (this.y > canvasResY - 200 && this.dY>0) {
 			this.remove();
 		}
 		
-		this.dir=Math.atan2(this.dY,this.dX)/Math.PI*180;
+		// Set the sprites direction to the direction of the rockets vector
+		this.dir=Math.atan2(this.dY,this.dX);
 	}
 	
 	this.cols=function() {
@@ -76,6 +102,7 @@ function Rocket(_dir) {
 							bObj.damage(150);
 						} else {
 							if (objDist<this.bmWidth+this.blastRange) {
+								// Damage the rock according to the distance
 								var blastDist=objDist-this.bmWidth;
 
 								if (blastDist<0) {
@@ -83,8 +110,6 @@ function Rocket(_dir) {
 								} else {
 									var dmg=150-blastDist/this.blastRange*150;
 								}
-								
-								// Damage the rock according to the distance
 								bObj.damage(dmg);
 							}
 						}

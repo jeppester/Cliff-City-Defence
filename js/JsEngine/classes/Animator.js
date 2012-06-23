@@ -9,7 +9,7 @@ No requirements
 
 function Animator() {
 	this.animations = new Array();
-	this.animations.push(new Object(), new Object());
+	this.animations.push(new Array(), new Array());
 
 	//updateAll updates all animations in a layer
 	this.updateAll = function(layer) {
@@ -20,6 +20,17 @@ function Animator() {
 		for (var i in this.animations[layer]) {
 			this.update(this.animations[layer][i], layer);
 		}
+	}
+
+	this.isAnimated = function(obj) {
+		for (var i=0; i < this.animations.length; i++) {			
+			for (var ii in this.animations[i]) {
+				if (this.animations[i][ii].obj==obj) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 
 	//update updates a single animation

@@ -171,9 +171,7 @@ game.spawnMainMenu=function() {
 				// Fetch levels from database
 				levelServer.getLevelCollection('',function(data) {
 					eval('var collection='+data);
-
-					console.log(collection);
-
+					
 					game.levels=collection.levels;
 					stageController.startLevel(game.levels[player.currentLevel],game.onLevelSucceed,game.onLevelFail);
 					game.showGameplayInstructions();

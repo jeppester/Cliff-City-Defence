@@ -1,0 +1,32 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+	<title>JsEngine Playground</title>
+
+	<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+	<style type="text/css">
+		html {
+			background-color:#222;
+			background-image:url(img/Backgrounds/menuBg.png);
+		}
+		body {
+			margin:0px;
+		}
+		#arena {
+			width:400px;
+			height:500px;
+			position:absolute;
+		}
+		/* An arena should not have a border (It messes with the mouse's coordinates)
+		   if you want a border, put it inside a container with a border. */
+	</style>
+</head>
+	<body>
+		<div id="arena"></div>
+		
+		<!-- Game -->
+		<script type="text/javascript" src="game.js"></script>
+	</body>
+</html>

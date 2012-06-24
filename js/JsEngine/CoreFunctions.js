@@ -63,13 +63,13 @@ jsonEncode=function(obj,ignore) {
 			// If string or number, save directly
 			case 'string':
 			case 'number':
-				//console.log('Wrote string/number:'+obj);
+				console.log('Wrote string/number:'+obj);
 				ret+='"'+obj+'",';
 			break;
 			// If object, check if array or object and do accordingly
 			case 'object':
 				if (obj instanceof Array) {
-					//console.log('Writing array')
+					console.log('Writing array')
 					ret+='['
 					for (var i=0; i<obj.length; i++) {
 						ret+=jsonIterate(obj[i],ignore);
@@ -77,7 +77,7 @@ jsonEncode=function(obj,ignore) {
 					ret+='],'
 				} else {
 					ret+='{';
-					//console.log('Writing object')
+					console.log('Writing object')
 					for (var i in obj) {
 						if (ignore.indexOf(i)!=-1) {continue};
 						ret+='"'+i+'":';

@@ -158,7 +158,47 @@ Editor.prototype.startTestMode=function() {
 
 Editor.prototype.testBeforeSave=function() {
 	// If the level does not contain any rocks, do nothing
-	if (this.rocks.length===0) {
+	if (this.rocks.length<10) {
+		// Disable all buttons
+		this.testModeStarted=true;
+		this.btnSave.disable();
+		this.btnMainMenu.disable();
+		this.btnTestMode.disable();
+		for (var i=0; i<this.rocks.length; i++) {
+			var rock=this.rocks[i];
+
+			for (var ii=0; ii<rock.markers.length; ii++) {
+				if (!rock.markers[ii].disable) {continue;}
+				rock.markers[ii].disable();
+			}
+		}
+		for (var i=0; i<this.rockButtons.length; i++) {
+			this.rockButtons[i].disable();
+		}
+
+		game.showDialog(
+			new Sprite(pBg+'EditorNotEnoughRocks.png',11,320,345,0,{opacity:0}),
+			new Button(11,320,421,0,'Back to editor',function() {
+				game.clearDialog();
+				
+				// Enable all buttons
+				editor.testModeStarted=false;
+				editor.btnSave.enable();
+				editor.btnMainMenu.enable();
+				editor.btnTestMode.enable();
+				for (var i=0; i<editor.rocks.length; i++) {
+					var rock=editor.rocks[i];
+
+					for (var ii=0; ii<rock.markers.length; ii++) {
+						if (!rock.markers[ii].enable) {continue;}
+						rock.markers[ii].enable();
+					}
+				}
+				for (var i=0; i<editor.rockButtons.length; i++) {
+					editor.rockButtons[i].enable();
+				}
+			})
+		)
 		return;
 	}
 

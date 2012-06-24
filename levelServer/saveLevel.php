@@ -4,6 +4,12 @@ require_once dirname(__FILE__).'/dbconnect.php';
 // Parse json data
 $level=json_decode(stripslashes($_REQUEST['json']));
 
+// Check that there are enough rocks in the level
+if (count($level->rocks)<10) {
+	echo 'Not enough rocks';
+	exit;
+}
+
 // Escape level data
 $name=$db->esc($level->name);
 $preparetime=$db->esc($level->prepareTime);

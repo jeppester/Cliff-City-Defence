@@ -12019,8 +12019,8 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:zoom="1"
-     inkscape:cx="3636.9368"
-     inkscape:cy="417.35972"
+     inkscape:cx="4003.8398"
+     inkscape:cy="430.78021"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
      showgrid="false"
@@ -12042,7 +12042,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -33989,7 +33989,7 @@
            style="font-size:12px"
            id="flowPara8507">Your level has been saved and will now appear among the other game levels.</flowPara><flowPara
            style="font-size:12px"
-           id="flowPara8511"></flowPara><flowPara
+           id="flowPara8511" /><flowPara
            style="font-size:12px"
            id="flowPara8513">The position of your level will be based on its difficulty.</flowPara></flowRoot>    </g>
     <image
@@ -34069,6 +34069,6 @@
            style="font-size:12px"
            id="flowPara8561" /><flowPara
            style="font-size:12px"
-           id="flowPara8565">A level needs to have at least 15 rocks, before it can be saved.</flowPara></flowRoot>    </g>
+           id="flowPara8565">A level needs to have at least 10 rocks, before it can be saved.</flowPara></flowRoot>    </g>
   </g>
 </svg>

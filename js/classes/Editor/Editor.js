@@ -205,13 +205,23 @@ Editor.prototype.testBeforeSave=function() {
 			levelServer.saveStats(data, stageController.calculateLevelStats());
 
 			stageController.destroyGame();
-			stageController.createDummies();
 			editor.remove();
+			stageController.createDummies();
+			stageController.prepareBackgrounds();
 
 			// Hide pause button
 			game.btnPause.animate({x:-30},{dur:200});
 
-			game.spawnMainMenu();
+			// Show "level saved" dialog
+			game.showDialog(
+				new Sprite(pBg+'EditorSaved.png',10,320,345,0,{opacity:0}),
+				new Button(10,320,421,0,'To main menu',function() {
+					game.clearDialog();
+					
+					// Spawn main menu again
+					game.spawnMainMenu();
+				})
+			)
 		});
 	});
 }

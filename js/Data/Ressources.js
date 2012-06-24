@@ -155,7 +155,9 @@ var images=new Array(
 	pImg+'Editor/Stop.png',
 	pImg+'Editor/Quit.png',
 	pImg+'Editor/Pause.png',
-	pBg+'EditorHelp.png'
+	pBg+'EditorHelp.png',
+	pBg+'EditorSaved.png',
+	pBg+'EditorNotEnoughRocks.png'
 )
 var sounds=new Array(
 	'sfx/astroid1.wav',

@@ -441,6 +441,8 @@ StageController.prototype.createDummies=function() {
 }
 
 StageController.prototype.removeDummies=function() {
+	if (typeof this.dummies=="undefined") {return;}
+
 	for (var i=0;i<this.dummies.length;i++) {
 		purge(this.dummies[i]);
 	}

@@ -148,8 +148,8 @@ AiGun.prototype.remove = function(time) {
 	if (this.alive) {
 		this.alive = false;
 		time = time ? time : 200;
-		this.parent.shieldType=0;
 		this.animate({"bmSize":0},{'dur':time,callback:"purge(depth["+this.depth+"]['"+this.id+"'])",'layer':1});
+		this.parent.gun=false;
 		return true;
 	}
 	return false;

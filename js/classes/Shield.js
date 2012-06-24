@@ -135,6 +135,7 @@ function Shield(_building,_x,_y) {
 		this.bmWidth=this.bm.width;
 		this.bmHeight=this.bm.height;
 		this.bmSize=0;
+		this.opacity=1;
 		this.animate({bmSize:1},{dur:300});
 	}
 }

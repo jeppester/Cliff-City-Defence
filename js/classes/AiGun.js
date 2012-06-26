@@ -150,6 +150,7 @@ AiGun.prototype.remove = function(time) {
 		time = time ? time : 200;
 		this.animate({"bmSize":0},{'dur':time,callback:"purge(depth["+this.depth+"]['"+this.id+"'])",'layer':1});
 		this.parent.gun=false;
+		this.parent.gunType=0;
 		return true;
 	}
 	return false;

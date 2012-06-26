@@ -95,11 +95,12 @@ for(var i in depth[5]){cObj=depth[5][i];if(!cObj.alive){continue;}
 cDist=this.bmWidth/2+cObj.bmWidth/2;if(Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist){this.remove();cObj.impacted=true;cObj.remove();}}}}
 function Building(type,_depth,_x,_y,_dir){importClass(this,Sprite);if(type==undefined){return false;}
 this.type=type;switch(type){case 1:this.spritePos={'gunStand':{'x':-13,'y':-28,'dir':0},'gun':{'x':-13,'y':-40}};break;case 2:this.spritePos={'gunStand':{'x':2,'y':-42,'dir':0},'gun':{'x':2,'y':-54}};break;case 3:this.spritePos={'gunStand':{'x':-4,'y':-36,'dir':0},'gun':{'x':-4,'y':-47}};break;case 4:this.spritePos={'gunStand':{'x':-4,'y':-32,'dir':0},'gun':{'x':-4,'y':-43}};break;case 5:this.spritePos={'gunStand':{'x':-20,'y':-30,'dir':-Math.PI/4},'gun':{'x':-29,'y':-39}};break;case 6:this.spritePos={'gunStand':{'x':0,'y':-36,'dir':0},'gun':{'x':0,'y':-48}};break;}
-this.gunStand=new Sprite(pImg+'BuildingGunStand.png',_depth-1,_x+this.spritePos.gunStand.x,_y+this.spritePos.gunStand.y,this.spritePos.gunStand.dir,{opacity:0});this.gun=false;Sprite.call(this,pImg+'Building'+this.type+'.png',_depth,_x,_y,_dir);this.shield=new Shield(this.type,this.x,this.y);this.gunType=0;updateObjects.onRunning[this.id]=this;this.life=2;this.die=function(time){if(this.life){this.life=0;time=time?time:200;this.animate({"bmSize":1.5,"opacity":0},{'dur':time});this.gunStand.animate({"bmSize":1.5,"opacity":0},{'dur':time});if(this.gun){this.gun.remove();delete this.gun;}
+this.gunStand=new Sprite(pImg+'BuildingGunStand.png',_depth-1,_x+this.spritePos.gunStand.x,_y+this.spritePos.gunStand.y,this.spritePos.gunStand.dir,{opacity:0});this.gun=false;Sprite.call(this,pImg+'Building'+this.type+'.png',_depth,_x,_y,_dir);this.shield=new Shield(this.type,this.x,this.y);this.gunType=0;updateObjects.onRunning[this.id]=this;this.life=2;this.die=function(time){if(this.life){this.life=0;time=time?time:200;this.animate({"bmSize":1.5,"opacity":0},{'dur':time});this.gunStand.animate({"bmSize":1.5,"opacity":0},{'dur':time});this.gunType=0;if(this.gun){this.gun.remove();delete this.gun;}
 return true;}
 return false;}
 this.update=function(){cDist=this.bmWidth/2;if(mouse.isPressed(1)&&this.life){if(Math.sqrt(Math.pow(mouse.x-this.x,2)+Math.pow(mouse.y-this.y,2))<cDist){if(typeof shopCircle!="undefined"){if(shopCircle.building!=this){shopCircle.remove();shopCircle=new ShopCircle(this);}}else{shopCircle=new ShopCircle(this);}}}}
-this.remove=function(){purge(this.shield);purge(this.gunStand);purge(this.gun);purge(this);}
+this.remove=function(){purge(this.shield);purge(this.gunStand);if(this.gun){purge(this.gun);}
+purge(this);}
 this.cols=function(){if(!this.life){return;}
 for(var i in depth[5]){cObj=depth[5][i];if(!cObj.alive){continue;}
 cDist=this.bmWidth/2+cObj.bmWidth/2;if(Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist){if(this.shield.enabled){this.shield.life-=cObj.life;if(this.shield.life<=0){this.shield.disable();}}else{this.setLife(this.life-1);}
@@ -119,12 +120,11 @@ this.cannon.dir=mDir;if(mouse.y>y){return}
 var shoot=player.cannonAutomatic?mouse.isDown(1):mouse.isPressed(1);if(shoot&&this.loadedAfter<=gameTime){new Rocket(this.cannon.dir);this.loadedAfter=gameTime+500;this.cannon.xOff=5;this.cannon.animate({'xOff':0},{'dur':300})}}
 this.cols=function(){if(!this.alive){return;}
 for(var i in depth[5]){cObj=depth[5][i];if(!cObj.alive){continue;}
-cDist=this.bmWidth/2+cObj.bmWidth/2;if(Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist){if(this.cannon.alive){this.setCannon(false);}else{this.die();}
-cObj.impacted=true;cObj.remove();}}}
+cDist=this.bmWidth/2+cObj.bmWidth/2;if(Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist){this.die();cObj.impacted=true;cObj.remove();}}}
 this.remove=function(time){purge(this.cannon);purge(this);}}
 CannonBuilding.prototype.revive=function(){this.bmSize=0;this.opacity=1
 this.cannon.bmSize=0;this.cannon.opacity=1;this.animate({"bmSize":1},{'dur':200});this.cannon.animate({"bmSize":1},{'dur':200});this.alive=true;}
-CannonBuilding.prototype.die=function(){this.animate({"bmSize":1.5,"opacity":0},{'dur':200});this.cannon.animate({"bmSize":1.5,"opacity":0},{'dur':200});this.alive=false;}
+CannonBuilding.prototype.die=function(){this.animate({"bmSize":1.5,"opacity":0},{'dur':200});this.cannon.animate({"bmSize":1.5,"opacity":0},{'dur':200});this.cannon.alive=false;this.alive=false;}
 CannonBuilding.prototype.setCannon=function(alive){this.cannon.alive=alive;if(this.cannon.alive==false){if(this.cannon.dir>-Math.PI/2){var deadDir=10/180*Math.PI;}else{var deadDir=-190/180*Math.PI;}
 this.cannon.animate({'dir':deadDir,'xOff':7},{'dur':200,'easing':'quadOut'});}else{this.cannon.animate({'xOff':0,bmSize:1,opacity:1},{dur:200});}}
 function AiGun(){importClass(this,Sprite);constructIfNew(this,this.aiGun,arguments);}
@@ -140,7 +140,7 @@ if(gameTime>this.loadedAfter){if(Math.abs(relDir)<this.rotSpeed){if(this.type<4)
 var lx=this.x+24*Math.cos(tDir);var ly=this.y+24*Math.sin(tDir);var beam=new Sprite(pImg+'GunShot4.png',10,lx,ly,0,{"opacity":0,"bmSize":0});beam.animate({"bmSize":0.5,"opacity":1},{'dur':100,easing:'quadIn',callback:function(){this.animate({"bmSize":0,"opacity":0},{"dur":100,easing:'quadOut',callback:function(){this.remove();}})}})
 t.damage(1000);}
 this.loadedAfter=gameTime+this.loadTime;}}}}
-AiGun.prototype.remove=function(time){if(this.alive){this.alive=false;time=time?time:200;this.animate({"bmSize":0},{'dur':time,callback:"purge(depth["+this.depth+"]['"+this.id+"'])",'layer':1});this.parent.gun=false;return true;}
+AiGun.prototype.remove=function(time){if(this.alive){this.alive=false;time=time?time:200;this.animate({"bmSize":0},{'dur':time,callback:"purge(depth["+this.depth+"]['"+this.id+"'])",'layer':1});this.parent.gun=false;this.parent.gunType=0;return true;}
 return false;}
 AiGun.prototype.cols=function(){if(!this.alive){return;}
 for(var i in depth[5]){var cObj=depth[5][i];if(!cObj.alive){continue;}

@@ -56,11 +56,15 @@ function CannonBuilding() {
 			if (!cObj.alive) {continue;}
 			cDist=this.bmWidth/2+cObj.bmWidth/2;
 			if (Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist) {
+				/*
 				if (this.cannon.alive) {
 					this.setCannon(false);
 				} else {
 					this.die();
 				}
+				*/
+
+				this.die();
 				cObj.impacted=true;
 				cObj.remove();
 			}
@@ -86,6 +90,7 @@ CannonBuilding.prototype.revive=function() {
 CannonBuilding.prototype.die=function() {
 	this.animate({"bmSize":1.5,"opacity":0},{'dur':200});
 	this.cannon.animate({"bmSize":1.5,"opacity":0},{'dur':200});
+	this.cannon.alive=false;
 	this.alive=false;
 }
 

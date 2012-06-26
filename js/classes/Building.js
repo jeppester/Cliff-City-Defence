@@ -79,6 +79,7 @@ function Building(type,_depth,_x,_y,_dir) {
 			
 			//Remove upgrades
 			this.gunStand.animate({"bmSize":1.5,"opacity":0},{'dur':time});
+			this.gunType=0;
 			if (this.gun) {
 				this.gun.remove();
 				delete this.gun;
@@ -109,7 +110,9 @@ function Building(type,_depth,_x,_y,_dir) {
 	this.remove=function() {
 		purge(this.shield);
 		purge(this.gunStand);
-		purge(this.gun);
+		if (this.gun) {
+			purge(this.gun);
+		}
 		purge(this);
 	}
 	

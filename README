@@ -1,1 +1,16 @@
-Open index.html with chrome to test the game
+PREREQUISITES:
+- A running web server with PHP5+
+- Access to a MySQL server
+
+SUCCESSFULLY TESTED IN:
+- IE9+
+- Firefox 4+
+- Chrome 8+
+- May work in other HTML5 capable browsers
+
+SETUP:
+- Copy all project files to your webserver
+- Setup a new database on your MySQL server for the games data.
+- From within your new MySQL database, run the SQL-scripts in /src/database (starting with the earliest), then run /srv/database/levels.sql to import levels and level data.
+- Change the content of /settings.empty.php to match your MySQL server settings and rename the file to /settings.php
+- The game is now fully set up and can be access by pointing your browser to your webserver.

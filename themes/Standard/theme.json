@@ -1,0 +1,252 @@
+{
+	"name":"Standard",
+	"inherit":"",
+	"music":{
+		"SpaceMusic":"",
+	},
+	"sfx":{
+		"Explosions":{
+			"Long1":"",
+			"Long2":"",
+		},
+		"Projectiles":{
+			"Laser1":"",
+			"Laser2":"",
+			"Laser3":"",
+			"Laser4":"",
+		},
+		"Rocks":{
+			"Boulder":"",
+		},
+		"Other":{
+			"Powerup":"",
+			"Shield":"",
+		},
+	},
+	"images":{
+		// Projectiles
+		"Projectiles":{
+			"Rocket":"",
+			"DrillRocket":"",
+			"FireRocket":"",
+			"ElectricRocket":"",
+			"NuclearRocket":"",
+			"GunShot1":"",
+			"GunShot2":"",
+			"GunShot3":"",
+			"BlastRangeIndicator0":"",
+			"BlastRangeIndicator1":"",
+			"BlastRangeIndicator2":"",
+			"BlastRangeIndicator3":"",
+			"BlastRangeIndicator4":"",
+		},
+
+		// Effects
+		"Effects":{
+			"Beam":"",
+			"Explosion":"",
+			"BlastWave":"",
+			"RockBlast":"",
+			"FireExplosion":"",
+			"ElectricExplosion":"",
+			"Lightning":"",
+			"NuclearExplosion":"",
+			"NuclearBlastRing":"",
+			"NuclearBlastRing2":"",
+			"NightOverlay":"",
+			"NightLight":"",
+			"LightBeam":"",
+			"FadeOut":"",
+		},
+
+		// Characters
+		"Characters":{
+			"Mayor":"",
+			"Scientist":"",
+			"ScientistHead":"",
+			"ScientistHeadSelected":"",
+			"Farmer":"",
+			"FarmerHead":"",
+			"FarmerHeadSelected":"",
+			"Woman":"",
+			"WomanHead":"",
+			"WomanHeadSelected":"",
+		},
+
+		// Menu and dialog stuff
+		"Dialog":{
+			"Button":"",
+			"ButtonSelected":"",
+			"ButtonDisabled":"",
+			"ButtonShadowless":"",
+			"ButtonShadowlessSelected":"",
+			"HeaderBox":"",
+			"TextBox":"",
+			"Bubble":"",
+			"Instructions":"",
+			"EnhancementInstructions":"",
+			"EditorDenial":"",
+			"GameLogo":"",
+			"GameLogoPipes":"",
+			"GameComplete":"",
+			"EditorHelp":"",
+			"EditorSaved":"",
+			"EditorNotEnoughRocks":"",
+		},
+
+		// Upgrades
+		"Upgrades":{
+			"btn0":"",
+			"btn1":"",
+			"btn1b":"",
+			"btn1c":"",
+			"btn2":"",
+			"btn2b":"",
+			"btn2c":"",
+			"btn3":"",
+
+			"Star1":"",
+			"Star2":"",
+			"Star3":"",
+			"RedCross":"",
+
+			"BlastRanges":{
+				"l01":"",
+				"l11":"",
+				"l21":"",
+				"l22":"",
+				"l31":"",
+				"l32":"",
+				"l41":"",
+				"l42":"",
+			},
+
+			"Weapons":{
+				"l01":"",
+				"l11":"",
+				"l21":"",
+				"l22":"",
+				"l31":"",
+				"l32":"",
+				"l41":"",
+				"l42":"",
+			},
+
+			"Shields":{
+				"l01":"",
+				"l11":"",
+				"l21":"",
+				"l22":"",
+				"l31":"",
+				"l32":"",
+				"l41":"",
+				"l42":"",
+			},
+
+			"FirePower":{
+				"l01":"",
+				"l11":"",
+				"l21":"",
+				"l22":"",
+				"l31":"",
+				"l32":"",
+				"l41":"",
+				"l42":"",
+			},
+
+			"AiGunAim":{
+				"l01":"",
+				"l11":"",
+				"l21":"",
+				"l22":"",
+				"l31":"",
+				"l32":"",
+				"l41":"",
+				"l42":"",
+			},
+		},
+
+		// Building enhancements
+		"BuildingEnhancements":{
+			"Building1Shield1":"",
+			"Building2Shield1":"",
+			"Building3Shield1":"",
+			"Building4Shield1":"",
+			"Building5Shield1":"",
+			"Building6Shield1":"",
+
+			"Building1Shield2":"",
+			"Building2Shield2":"",
+			"Building3Shield2":"",
+			"Building4Shield2":"",
+			"Building5Shield2":"",
+			"Building6Shield2":"",
+
+			"Building1Shield3":"",
+			"Building2Shield3":"",
+			"Building3Shield3":"",
+			"Building4Shield3":"",
+			"Building5Shield3":"",
+			"Building6Shield3":"",
+
+			"Building1Shield4":"",
+			"Building2Shield4":"",
+			"Building3Shield4":"",
+			"Building4Shield4":"",
+			"Building5Shield4":"",
+			"Building6Shield4":"",
+
+			"GunStand":"",
+			"Gun1":"",
+			"Gun2":"",
+			"Gun3":"",
+			"Gun4":"",
+		},
+
+		// Rocks
+		"Rocks":{
+			"Orange1":"",
+			"Orange1Cracks":"",
+			"Orange2":"",
+			"Orange2Cracks":"",
+			"Orange3":"",
+			"Orange3Cracks":"",
+			"Magnetic1":"",
+			"Magnetic1Cracks":"",
+			"Magnetic2":"",
+			"Magnetic2Cracks":"",
+			"Magnetic3":"",
+			"Magnetic3Cracks":"",
+			"Fast1":"",
+			"Fast1Cracks":"",
+			"Fast2":"",
+			"Fast2Cracks":"",
+			"Fast3":"",
+			"Fast3Cracks":"",
+		},
+
+		// Particles
+		"Particles":{
+			"MagneticFracture":"",
+			"OrangeFracture":"",
+		},
+
+		// Editor
+		"Editor":{
+			"SpawnArrow":"",
+			"RockButtonBackground":"",
+			"RockSelectorBox":"",
+			"EditorLine":"",
+			"Up":"",
+			"Down":"",
+			"IntervalTimer":"",
+			"Cross":"",
+			"Floppy":"",
+			"Play":"",
+			"Stop":"",
+			"Quit":"",
+			"Pause":"",
+			"NightDay":"",
+		}
+	}
+}

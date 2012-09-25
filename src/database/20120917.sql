@@ -1,0 +1,1 @@
+ALTER TABLE  `level` ADD  `theme` VARCHAR( 40 ) NULL DEFAULT  'Day' AFTER  `order`

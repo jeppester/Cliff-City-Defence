@@ -1,0 +1,40 @@
+{
+	"name":"Night",
+	"inherit":["Day","Standard"],
+
+	"music":{},
+	"sfx":{},
+	"images":{
+		// Buildings
+		"Buildings":{
+			"Building1":"",
+			"Building2":"",
+			"Building3":"",
+			"Building4":"",
+			"Building5":"",
+			"Building6":"",
+			"Building1Damaged":"",
+			"Building2Damaged":"",
+			"Building3Damaged":"",
+			"Building4Damaged":"",
+			"Building5Damaged":"",
+			"Building6Damaged":"",
+			"Cannon":"",
+			"RocketBuilding":"",
+		},
+
+		// Trees
+		"Trees":{
+			"Tree":"",
+			"AppleTree":"",
+		},
+
+		// Backgrounds
+		"Backgrounds":{
+			"Cloud":"",
+			"cliffCityGround":"",
+			"cliffCityRoad":"",
+			"cliffSide":"",
+		},
+	}
+}

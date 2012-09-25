@@ -6,7 +6,7 @@ function fetchLevel($level) {
 	global $db;
 
 	// Fetch level data
-	$q="select lid, name from level
+	$q="select lid, name, theme from level
 		where lid=$level";
 	$data=$db->selRow($q);
 	$data['rocks']=array();

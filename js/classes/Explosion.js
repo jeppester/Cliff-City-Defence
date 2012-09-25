@@ -7,16 +7,16 @@ Requires:
 	Animator
 */
 
-function Explosion(_x,_y,_radius,_dur) {
-	// Import sprite
-	importClass(this,Sprite);
+jseCreateClass('Explosion');
+jseExtend(Explosion, Sprite);
 
+Explosion.prototype.explosion = function (_spr, _x, _y, _radius, _dur) {
 	// Extend sprite
-	this.sprite(pImg+'Explosion.png',7,_x,_y,0,{bmSize:0,opacity:0});
-
-	this.animate({bmSize:_radius/100,opacity:1},{easing:'quadOut',dur:_dur/2,callback:function() {
-		this.animate({opacity:0},{dur:_dur/2,callback:function() {
+	this.sprite(_spr, _x, _y, Math.random() * Math.PI * 2, {bmSize: 0, opacity: 0});
+	
+	this.animate({bmSize: _radius / this.bmWidth, opacity: 1}, {easing: 'quadOut', dur: _dur / 2, callback: function () {
+		this.animate({opacity: 0}, {dur: _dur / 2, callback: function () {
 			this.remove();
-		}})
-	}})
-}
+		}});
+	}});
+};

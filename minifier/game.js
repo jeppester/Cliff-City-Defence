@@ -109,9 +109,8 @@ this.setLife=function(life){if(this.life===0){this.bmSize=0;this.opacity=1;}
 switch(life){case 0:this.die();return;break;case 1:this.bm=loader.images[pImg+'Building'+this.type+'Damaged.png'];break;case 2:this.bm=loader.images[pImg+'Building'+this.type+'.png'];break;}
 this.animate({"bmSize":1},{'dur':200});this.life=life;}
 this.setShield=function(type){this.shield.set(type);}
-this.setGun=function(type){this.gunType=type
-if(this.gun){this.gun.remove();}
-if(this.gunType==0){this.gunStand.animate({'opacity':0},{'dur':200});if(this.gun){delete this.gun;}
+this.setGun=function(type){if(this.gun){this.gun.remove();}
+this.gunType=type;if(this.gunType==0){this.gunStand.animate({'opacity':0},{'dur':200});if(this.gun){delete this.gun;}
 return}
 this.gun=new AiGun(type,this.x+this.spritePos.gun.x,this.y+this.spritePos.gun.y,this);this.gunStand.bmSize=1;this.gunStand.animate({'opacity':1},{'dur':200});}}
 function CannonBuilding(){importClass(this,Sprite);this.cannon=new Sprite(pImg+'Cannon.png',4,300,628,-90,{'xOff':0,'yOff':10});this.cannon.alive=true;this.sprite(pImg+'RocketBuilding.png',4,315,660);updateObjects.onRunning[this.id]=this;this.alive=true;this.loadedAfter=0;this.update=function(){if(this.cannon.alive==false){return;}
@@ -221,7 +220,8 @@ StageController.prototype.removeDummies=function(){if(typeof this.dummies=="unde
 for(var i=0;i<this.dummies.length;i++){purge(this.dummies[i]);}
 delete this.dummies;}
 function ScorePoints(){importClass(this,TextBlock);constructIfNew(this,this.scorePoints,arguments);}
-ScorePoints.prototype.scorePoints=function(points,_x,_y){this.points=points?points:0;this.textBlock("+"+this.points.toString()+"$",10,_x,_y,200,{'font':'bold 30px Verdana','align':'right','xOff':200,'yOff':40,'bmSize':0,'fillStyle':'#ff2200'});this.animate({'x':590,'y':700,'bmSize':1},{'dur':300,'easing':'quadOut','callback':function(){player.addPoints(this.points);this.animate({'opacity':0},{'dur':1000,'easing':'linear','callback':function(){this.remove();}});}});}
+ScorePoints.prototype.scorePoints=function(points,_x,_y){this.points=points?points:0;this.textBlock("+"+this.points.toString()+"$",10,_x,_y,200,{'font':'bold 30px Verdana','align':'right','xOff':200,'yOff':40,'bmSize':0,'fillStyle':'#ff2200'});this.animate({'x':590,'y':700,'bmSize':1},{'dur':300,'easing':'quadOut','callback':function(){if(typeof player!=="undefined"){player.addPoints(this.points);}
+this.animate({'opacity':0},{'dur':1000,'easing':'linear','callback':function(){this.remove();}});}});}
 function Player(){this.points=0;this.pointsTotal=0;this.rocksDestroyed=0;this.buildingsLost=0;this.buildingsDamaged=0;this.weaponsBought=0;this.shieldsBought=0;this.shieldsAvailable=0;this.weaponsAvailable=0;this.weaponIntelligence=0;this.rocketBlastRangeLevel=0;this.rocketDmgLevel=0;this.cannonAutomatic=0;this.rocketBounces=0;this.inGameScore=new TextBlock(this.points.toString()+"$",10,590,740,200,{'font':'bold 30px Verdana','align':'right','xOff':200,'yOff':40,'fillStyle':'#ff2200'});this.addPoints=function(points){this.points+=points;this.pointsTotal+=Math.max(0,points);this.inGameScore.setString(this.points.toString()+"$");}}
 function Rock(_spr,_dmgSpr,_x,_dir,_grav,_life,_value,_maxSpeed,_onStep,_onDestroy){if(_dmgSpr===undefined){throw new Error('Missing argument "dmgSpr"');}
 if(_life===undefined){throw new Error('Missing argument "life"');}
@@ -401,7 +401,8 @@ var inheritFrom=new Class;importerClass={};importerClass=Object.getPrototypeOf(i
 importer[i]=inheritFrom[i];}
 return true;}
 function constructIfNew(object,constructor,arguments){if(arguments.length>0){constructor.apply(object,arguments);}}
-function purge(obj){if(obj.bm!==undefined){delete obj.bm;}
+function purge(obj){if(!obj){return;}
+if(obj.bm!==undefined){delete obj.bm;}
 if(updateObjects['onRunning'][obj.id]!==undefined){delete updateObjects['onRunning'][obj.id];}
 if(updateObjects['onPaused'][obj.id]!==undefined){delete updateObjects['onPaused'][obj.id];}
 if(obj.depth!==undefined){delete depth[obj.depth][obj.id];}}

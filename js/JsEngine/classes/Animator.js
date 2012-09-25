@@ -7,120 +7,173 @@ The animator features different easing functions.
 No requirements
 */
 
-function Animator() {
-	this.animations = new Array();
-	this.animations.push(new Array(), new Array());
+jseCreateClass('Animator');
 
-	//updateAll updates all animations in a layer
-	this.updateAll = function(layer) {
-		//"layer" decides if the animation will run also when the game is paused
-		layer = layer ? layer : 0
-		
-		//Run through the layer an update all animations
-		for (var i in this.animations[layer]) {
-			this.update(this.animations[layer][i], layer);
-		}
-	}
+// Function for adding a new animation
+Animator.prototype.addAnimation = function (animation, loop) {
+	if (!animation) {throw new Error('Missing argument: animation'); }
+	if (!loop) {throw new Error('Missing argument: loop'); }
 
-	this.isAnimated = function(obj) {
-		for (var i=0; i < this.animations.length; i++) {			
-			for (var ii in this.animations[i]) {
-				if (this.animations[i][ii].obj==obj) {
-					return true;
+	loop = engine.loops[loop];
+	var anim = animation,
+		propList,
+		currentAnimations,
+		i,
+		cur,
+		propName;
+
+	anim.start = loop.time;
+
+	// If there are other animations of the same properties, stop the current animation of these properties
+	propList = Object.keys(anim.prop);
+	currentAnimations = this.getAnimationsOfObject(anim.obj);
+	for (i = 0; i < currentAnimations.length; i ++) {
+		cur = currentAnimations[i];
+		for (propName in cur.prop) {
+			if (cur.prop.hasOwnProperty(propName)) {
+				if (propList.indexOf(propName) !== -1) {
+					delete cur.prop[propName];
 				}
 			}
 		}
-		return false;
 	}
 
-	//update updates a single animation
-	this.update = function(animation, layer) {
-		var a = animation,
-			t;
+	loop.animations.push(anim);
+};
 
-		if (layer == 0) {
-			t = gameTime - a.start;
-		} else {
-			t = (new Date().getTime()) - a.start;
+Animator.prototype.updateAllLoops = function () {
+	for (var name in engine.loops) {
+		if (engine.loops.hasOwnProperty(name)) {
+			this.updateLoop(name);
 		}
-		
+	}
+};
+
+Animator.prototype.updateLoop = function (loop) {
+	if (!loop) {throw new Error('Missing argument: loop'); }
+	loop = engine.loops[loop];
+
+	// Run through the layer an update all animations
+	var animId,
+		a,
+		propId,
+		t;
+
+	for (animId = loop.animations.length - 1; animId > -1; animId --) {
+		a = loop.animations[animId];
+		t = loop.time - a.start;
+
 		if (t > a.dur) {
-			//If the animation has ended: delete it and set the animated properties to their end values
-			delete animator.animations[layer][a.obj.id];
-			for (var i = 0 in a.prop) {
-				a.obj[i] = a.prop[i].end;
+			// Delete animation
+			loop.animations.splice(animId, 1);
+
+			// If the animation has ended: delete it and set the animated properties to their end values
+			for (propId in a.prop) {
+				if (a.prop.hasOwnProperty(propId)) {
+					a.obj[propId] = a.prop[propId].end;
+				}
 			}
-			if (a.callback.length) {
+			if (typeof a.callback === "string") {
 				eval(a.callback);
 			} else {
 				a.callback.call(a.obj);
 			}
 		} else {
-			//If the animation is still running: Ease the animation of each property
-			for (var i = 0 in a.prop) {
-				a.obj[i] = this.ease(a.easing, t, a.prop[i].begin, a.prop[i].end - a.prop[i].begin, a.dur);
+			// If the animation is still running: Ease the animation of each property
+			for (propId in a.prop) {
+				if (a.prop.hasOwnProperty(propId)) {
+					a.obj[propId] = this.ease(a.easing, t, a.prop[propId].begin, a.prop[propId].end - a.prop[propId].begin, a.dur);
+				}
 			}
 		}
 	}
+};
 
-	//ease is used for easing the animation of a property
-	this.ease = function(type, t, b, c, d) {
-		switch (type) {
-		case "linear":
-			t /= d
-			return b + c * t;
-			break;
-		case "quadIn":
-			t /= d
-			return b + c * t * t;
-			break;
-		case "quadOut":
-			t /= d
-			return b - c * t * (t - 2);
-			break;
-		case "quadInOut":
-			t = t / d * 2;
-			if (t < 1) {
-				return b + c * t * t / 2;
-			} else {
-				t--;
-				return b + c * (1 - t * (t - 2)) / 2;
+Animator.prototype.isAnimated = function (obj) {
+	var name,
+		loop,
+		animId,
+		animation;
+
+	for (name in engine.loops) {
+		if (engine.loops.hasOwnProperty(name)) {
+			loop = engine.loops[name];
+			for (animId = loop.animations.length - 1; animId > -1; animId --) {
+				animation = loop.animations[animId];
+				if (animation.obj === obj) {
+					return true;
+				}
 			}
-			break;
-		case "powerIn":
-			t /= d;
-
-			//a determines if c is positive or negative
-			a = c / Math.abs(c);
-
-			return b + a * Math.pow(Math.abs(c), t);
-			break;
-		case "powerOut":
-			t /= d;
-
-			//a determines if c is positive or negative
-			a = c / Math.abs(c);
-
-			return b + c - a * Math.pow(Math.abs(c), 1 - t);
-			break;
-		case "powerInOut":
-			t = t / d * 2;
-
-			//a determines if c is positive or negative
-			a = c / Math.abs(c);
-
-			if (t < 1) {
-				return b + a * Math.pow(Math.abs(c), t) / 2;
-			} else {
-				t--;
-				return b + c - a * Math.pow(Math.abs(c), 1 - t) / 2;
-			}
-			break;
-		case "sinusInOut":
-			t /= d
-			return b + c * (1 + Math.cos(Math.PI * (1 + t))) / 2;
-			break;
 		}
-		return b + c;
 	}
-}
+	return false;
+};
+
+Animator.prototype.getAnimationsOfObject = function (obj) {
+	var animations = [],
+		name,
+		loop,
+		animId,
+		animation;
+	for (name in engine.loops) {
+		if (engine.loops.hasOwnProperty(name)) {
+			loop = engine.loops[name];
+			for (animId = loop.animations.length - 1; animId > -1; animId --) {
+				animation = loop.animations[animId];
+				if (animation.obj === obj) {
+					animations.push(animation);
+				}
+			}
+		}
+	}
+	return animations;
+};
+
+// ease is used for easing the animation of a property
+Animator.prototype.ease = function (type, t, b, c, d) {
+	var a;
+
+	switch (type) {
+	case "linear":
+		t /= d;
+		return b + c * t;
+	case "quadIn":
+		t /= d;
+		return b + c * t * t;
+	case "quadOut":
+		t /= d;
+		return b - c * t * (t - 2);
+	case "quadInOut":
+		t = t / d * 2;
+		if (t < 1) {
+			return b + c * t * t / 2;
+		} else {
+			t --;
+			return b + c * (1 - t * (t - 2)) / 2;
+		}
+	case "powerIn":
+		t /= d;
+		// a determines if c is positive or negative
+		a = c / Math.abs(c);
+		return b + a * Math.pow(Math.abs(c), t);
+	case "powerOut":
+		t /= d;
+		// a determines if c is positive or negative
+		a = c / Math.abs(c);
+		return b + c - a * Math.pow(Math.abs(c), 1 - t);
+	case "powerInOut":
+		t = t / d * 2;
+		// a determines if c is positive or negative
+		a = c / Math.abs(c);
+		if (t < 1) {
+			return b + a * Math.pow(Math.abs(c), t) / 2;
+		} else {
+			t --;
+			return b + c - a * Math.pow(Math.abs(c), 1 - t) / 2;
+		}
+	case "sinusInOut":
+		t /= d;
+		return b + c * (1 + Math.cos(Math.PI * (1 + t))) / 2;
+	}
+	return b + c;
+};

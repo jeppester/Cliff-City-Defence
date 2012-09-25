@@ -7,93 +7,106 @@ Requires:
 	Mouse
 */
 
-function UpgradeIcon() {
-	// Import sprite
-	importClass(this,Sprite);
-
-	constructIfNew(this,this.upgradeIcon,arguments);
-}
+jseCreateClass('UpgradeIcon');
+jseExtend(UpgradeIcon, Sprite);
 
 // Constructor
-UpgradeIcon.prototype.upgradeIcon=function(_upgradeType,_buttonType,_level,_depth,_x,_y,_animate) {
-	this.buttonType=_buttonType!=undefined ? _buttonType : 0;
-	this.upgradeType=_upgradeType?_upgradeType:false;
-	this.level=_level!=undefined?_level:false;
-	animate=_animate?_animate:0;
+UpgradeIcon.prototype.upgradeIcon = function (_upgradeType, _buttonType, _level, _x, _y, _animate) {
+	this.buttonType = _buttonType !== undefined  ?  _buttonType : 0;
+	this.upgradeType = _upgradeType ? _upgradeType: false;
+	this.level = _level !== undefined ? _level: false;
+	this.selected = false;
+	animate = _animate ? _animate: false;
 
 	// Use the right button background
 	var spr;
 	switch (this.buttonType) {
-		case 0:
-		spr='0';
-		this.name=this.upgradeType.name
-		this.description=this.upgradeType.description;
+	case 0:
+		spr = '0';
+		this.name = this.upgradeType.name;
+		this.description = this.upgradeType.description;
 		break;
-		case 1:
-		spr='1';
-		this.name=this.upgradeType.upgrades[this.level-1].name
-		this.description=this.upgradeType.upgrades[this.level-1].description;
+	case 1:
+		spr = '2';
+		this.name = this.upgradeType.upgrades[this.level - 1].name;
+		this.description = this.upgradeType.upgrades[this.level - 1].description;
 		break;
-		case 2:
-		this.name=this.upgradeType.upgrades[this.level-1].name+" ("+this.upgradeType.upgrades[this.level-1].price+"$)";
-		this.description=this.upgradeType.upgrades[this.level-1].description;
-		if (player.points<this.upgradeType.upgrades[this.level-1].price) {
-			this.name+=" - Insufficient funds";
-			spr='2c';
+	case 2:
+		this.name = this.upgradeType.upgrades[this.level - 1].name + " (" + this.upgradeType.upgrades[this.level - 1].price + "$)";
+		this.description = this.upgradeType.upgrades[this.level - 1].description;
+		if (player.points < this.upgradeType.upgrades[this.level - 1].price) {
+			this.name += " - Insufficient funds";
+			spr = '2b';
 		} else {
-			spr='2a';
+			spr = '1b';
 		}
 		break;
-		case 3:
-		spr='3';
-		this.name='Mysterious future upgrade';
-		this.description='A description of this upgrade is not available yet.';
+	case 3:
+		spr = '3';
+		this.name = 'Mysterious future upgrade';
+		this.description = 'A description of this upgrade is not available yet.';
 		break;
 	}
 
-	this.sprite(pImg+'Upgrades/btn'+spr+'.png', _depth, _x, _y, 0);
-	this.icon=this.addChild(
-		new Sprite(pImg+'Upgrades/'+this.upgradeType.folder+'/'+this.level+(this.buttonType==3?2:1)+'.png', _depth, _x, _y, 0)
-	);
+	this.sprite('Upgrades.btn' + spr, _x, _y, 0);
+	this.icon = new Sprite('Upgrades.' + this.upgradeType.folder + '.l' + this.level + (this.buttonType === 3 ? 2: 1), _x, _y, 0);
+	this.addChild(this.icon);
 
-	updateObjects.onPaused[this.id]=this;
+	engine.addActivityToLoop(this, this.update, 'onPaused');
 
 	if (animate) {
-		this.bmSize=0;
-		this.icon.bmSize=0;
+		this.bmSize = 0;
+		this.icon.bmSize = 0;
 
-		this.animate({bmSize:1},{dur:400});
-		this.icon.animate({bmSize:1},{dur:400});
+		this.animate({bmSize: 1}, {dur: 400});
+		this.icon.animate({bmSize: 1}, {dur: 400});
 	}
-}
+};
 
-UpgradeIcon.prototype.update = function() {
-	//Check for hover and click
-	if (Math.abs(mouse.x-this.x)<36 && Math.abs(mouse.y-this.y)<36) {
-		if (mouse.isPressed(1) && this.buttonType==2 && player.points>=this.upgradeType.upgrades[this.level-1].price) {
-			player[this.upgradeType.lockVar]++;
-			player.addPoints(-this.upgradeType.upgrades[this.level-1].price);
+UpgradeIcon.prototype.select = function () {
+	// Deselect all other buttons
+	var i = this.parent.icons.length;
+	while (i --) {
+		this.parent.icons[i].deselect();
+	}
 
-			upgradeMenu.makeUpgradeTree();
+	// Change the buttons background sprite
+	if (player.points >= this.upgradeType.upgrades[this.level - 1].price) {
+		this.setSource('Upgrades.btn1c');
+		this.parent.btnBuy.enable();
+	}
+	else {
+		this.setSource('Upgrades.btn2c');
+		this.parent.btnBuy.disable();
+	}
+	this.parent.btnBuy.animate({opacity: 1}, {dur: 500});
+
+	// Set upgrade menu info test
+	this.parent.infoCurrent = this.id;
+	this.parent.infoHeader.setString(this.name);
+	this.parent.infoText.setString(this.description);
+	this.parent.iconSelected = this;
+	this.selected = true;
+};
+
+UpgradeIcon.prototype.deselect = function () {
+	if (this.selected) {
+		if (player.points >= this.upgradeType.upgrades[this.level - 1].price) {
+			this.setSource('Upgrades.btn1b');
 		}
-		if (this.buttonType==2 && player.points>=this.upgradeType.upgrades[this.level-1].price) {
-			this.bm=loader.images[pImg+'Upgrades/btn2b.png'];
+		else {
+			this.setSource('Upgrades.btn2b');
 		}
 
-		// Change menu text
-		if (upgradeMenu.infoCurrent!=this.id) {
-			upgradeMenu.infoCurrent=this.id;
-			upgradeMenu.infoHeader.setString(this.name);
-			upgradeMenu.infoText.setString(this.description);
-		}
-	} else {
-		if (this.buttonType==2 && player.points>=this.upgradeType.upgrades[this.level-1].price) {
-			this.bm=loader.images[pImg+'Upgrades/btn2a.png'];
-		}
-		
-		// Set infotext to default
-		if (upgradeMenu.infoCurrent==this.id) {
-			upgradeMenu.resetInfo();
+		this.selected = false;
+	}
+};
+
+UpgradeIcon.prototype.update = function () {
+	if (this.buttonType === 2) {
+		if (mouse.squareIsPressed(this.x - 36, this.y - 36, 72, 72)) {
+			// Change menu text
+			this.select();
 		}
 	}
-}
+};

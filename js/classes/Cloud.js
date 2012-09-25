@@ -1,14 +1,17 @@
-function Cloud() {
-	//Extend GameObject
-	GameObject.call(this,pImg+'Cloud.png',2,Math.random()*arena.style.width.replace('px',''),50+Math.random()*100,0,{'dX':5+Math.random()*10,'dY':0});
-	updateObjects['onPaused'][this.id]=this;
+jseCreateClass('Cloud');
+jseExtend(Cloud, GameObject);
 
-	this.bmWidth*=.7+Math.random()*.3
-	this.bmHeight*=.7+Math.random()*.3
-	
-	this.step=function() {
-		if (this.x>canvasResX) {
-			this.x=0;
-		}
+Cloud.prototype.cloud = function () {
+	this.gameObject('Backgrounds.Cloud', Math.random() * engine.canvasResX, 50 + Math.random() * 100, 0, {'dX': 5 + Math.random() * 10, 'dY': 0});
+
+	engine.addActivityToLoop(this, this.checkOutside, 'eachFrame');
+
+	this.bmWidth *=  0.7 + Math.random() *  0.3;
+	this.bmHeight *=  0.7 + Math.random() *  0.3;
+};
+
+Cloud.prototype.checkOutside = function () {
+	if (this.x > engine.canvasResX + this.bmWidth / 2) {
+		this.x = 0;
 	}
-}
+};

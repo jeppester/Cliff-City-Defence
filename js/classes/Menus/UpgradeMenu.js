@@ -10,88 +10,100 @@ Requires:
 	Shop
 */
 
-function UpgradeMenu(onContinue) {
+jseCreateClass('UpgradeMenu');
+jseExtend(UpgradeMenu, ObjectContainer);
+
+UpgradeMenu.prototype.upgradeMenu = function (onContinue) {
 	// Make upgrade header
-	this.headerBox = new Sprite(pImg+'HeaderBox.png',9,300,55,0);
-	this.headerText = new TextBlock('UPGRADES AVAILABLE:',9,0,24,600,{'font':'normal 36px Verdana','align':'center'});
-	this.icons=[];
-	this.onContinue=onContinue?onContinue:function(){};
+	this.headerBox = new Sprite('Dialog.HeaderBox', 300, 55, 0);
+	this.headerText = new TextBlock('UPGRADES AVAILABLE: ', 0, 24, 600, {'font': 'normal 36px Verdana', 'align': 'center'});
+	this.icons = [];
+	this.onContinue = onContinue ? onContinue: function () {};
+	this.iconSelected = false;
 
-	// Always pause the game when showing the upgrade menu
-	pause=1;
-	
-	// Function for drawing upgrade "tree"
-	this.makeUpgradeTree=function (_animate) {
-		var animate=_animate?_animate:0;
+	// Make info text
+	this.infoBox = new Sprite('Dialog.TextBox', 300, 568, 0);
+	this.infoHeader = new TextBlock(' ', 80, 510, 400, {'font': 'bold 14px Verdana'});
+	this.infoText = new TextBlock(' ', 80, 540, 440);
+	this.infoCurrent = '';
 
-		while (this.icons.length>0) {
-			test=this.icons[0];
-			this.icons[0].remove();
-			this.icons.splice(0,1);
-		}
-		var c=0;
+	// Make buy button
+	this.btnBuy = new Button(300, 628, 0, 'BUY UPGRADE', function () {
+		var upgrade = this.parent.iconSelected;
+		player[upgrade.upgradeType.lockVar] ++;
+		player.addPoints(-upgrade.upgradeType.upgrades[upgrade.level - 1].price);
 
-		for (var i in game.upgradeTypes) {
-			c++;
-			var t=game.upgradeTypes[i];
+		this.parent.makeUpgradeTree();
+		this.parent.resetInfo();
+	}, {opacity: 0});
+
+	// Make next button
+	this.btnNext = new Button(300, 710, 0, 'CONTINUE', function () {
+		pause = 0;
+		this.parent.onContinue();
+		this.parent.remove();
+	});
+
+	this.addChildren(this.headerBox, this.headerText, this.infoBox, this.infoHeader, this.infoText, this.btnBuy, this.btnNext);
+
+	// Draw upgrade "tree"
+	this.makeUpgradeTree(1);
+	this.resetInfo();
+
+	engine.redrawStaticLayers();
+};
+
+// Function for drawing upgrade "tree"
+UpgradeMenu.prototype.makeUpgradeTree = function (_animate) {
+	var animate = _animate ? _animate: 0,
+		c,
+		t,
+		i,
+		ii,
+		lock;
+
+	while (this.icons.length > 0) {
+		this.icons[0].remove();
+		this.icons.splice(0, 1);
+	}
+	c = 0;
+
+	for (i in data.upgradeTypes) {
+		if (data.upgradeTypes.hasOwnProperty(i)) {
+			c ++;
+			t = data.upgradeTypes[i];
 
 			// Make category icon
-			this.icons.push(new UpgradeIcon(t,0,0,10,c*100,140,animate));
+			this.icons.push(new UpgradeIcon(t, 0, 0, c * 100, 140, animate));
 
-			for (var ii=1; ii<5; ii++) {
-				var lock=ii-player[t.lockVar]+1;
-				if (lock>3) {
-					break;
+			for (ii = 1; ii < 5; ii ++) {
+				if (t.lockVar) {
+					lock = ii - player[t.lockVar] + 1;
+					if (lock > 3) {
+						break;
+					}
+					lock = Math.max(lock, 1);
 				}
-				lock=Math.max(lock,1);
+				else {
+					lock = 2;
+				}
 
-				this.icons.push(new UpgradeIcon(t,lock,ii,10,c*100,220+(ii-1)*74,animate));
+				this.icons.push(new UpgradeIcon(t, lock, ii, c * 100, 220 + (ii - 1) * 74, animate));
 			}
 		}
 	}
 
-	this.resetInfo=function() {
-		if (this.infoCurrent=='default') {
-			return;
-		}
-		this.infoCurrent='default';
-		this.infoHeader.setString('UPGRADES');
-		this.infoText.setString('Buy different upgrades to enhance Cliff City\'s defence against the falling rocks.')
+	this.addChildren.apply(this, this.icons);
+};
+
+UpgradeMenu.prototype.resetInfo = function () {
+	if (this.infoCurrent === 'default') {
+		return;
 	}
-
-	// Make info text (638)
-	this.infoBox = new Sprite(pImg+'TextBox.png',9,300,568,0);
-	this.infoHeader = new TextBlock(' ',10,80,510,400,{'font':'bold 14px Verdana'});
-	this.infoText = new TextBlock(' ',10,80,540,440);
-	this.infoCurrent='';
-	this.resetInfo();
-	
-	// Make buttons	
-	this.btnNext = new Button(10,400,710,0,'CONTINUE',function() {
-		upgradeMenu.remove();
-		pause=0;
-		upgradeMenu.onContinue();
-	});
-
-	// Draw upgrade "tree"
-	this.makeUpgradeTree(1);
-
-	redrawStaticLayers();
-
-	this.remove=function() {
-		this.headerBox.remove();
-		this.headerText.remove();
-		this.infoBox.remove();
-		this.infoHeader.remove();
-		this.infoText.remove();
-		this.btnNext.remove();
-
-		while (this.icons.length>0) {
-			this.icons[this.icons.length-1].remove();
-			this.icons.splice(this.icons.length-1,1);
-		}
-
-		redrawStaticLayers();
-		purge(this);
-	}
-}
+	this.infoCurrent = 'default';
+	this.infoHeader.setString('UPGRADES');
+	this.infoText.setString('Click on an update see a description of it.\n\nTo purchase an upgrade, click the "BUY" - button below it\'s description. You can only purchase an upgrade if you have enough game points.');
+	this.iconSelected = false;
+	this.btnBuy.disable();
+	this.btnBuy.animate({opacity: 0}, {dur: 200});
+};

@@ -4,108 +4,122 @@ A controller responsible for doing level related things, spawning rocks for inst
 
 Requires:
 	Level vars to be set
-*/
+ */
 
-function StageController() {
-	this.id='StageController';
-	this.level=0;
-	this.curObj=0;
-	this.running=false;
-	this.playerLevelStartState=false;
-	this.onLevelSucceed=function(){};
-	this.onLevelFail=function(){};
-	this.scheduledTasks=[];
-	this.messages={};
-	this.stats={
-		rocks:[]
+jseCreateClass('StageController');
+
+StageController.prototype.stageController = function () {
+	this.id = 'StageController';
+	this.level = 0;
+	this.curObj = 0;
+	this.running = false;
+	this.playerLevelStartState = false;
+	this.onLevelSucceed = function () {};
+	this.onLevelFail = function () {};
+	this.scheduledTasks = [];
+	this.messages = {};
+	this.stats = {
+		rocks: []
 	};
-	updateObjects['onRunning'][this.id]=this;
-}
+	engine.addActivityToLoop(this, this.update, 'onRunning');
+};
 
-StageController.prototype.prepareBackgrounds=function() {
-	//Make cliff
-	if (typeof ground=="undefined") {
-		ground = new Sprite(pBg+'cliffCityGround.png',0,0,0,0,{'xOff':0,'yOff':0});
-		road = new Sprite(pBg+'cliffCityRoad.png',0,0,0,0,{'xOff':0,'yOff':0});
-		cliff = new Sprite(pBg+'cliffSide.png',8,0,0,0,{'xOff':0,'yOff':0});
-		redrawStaticLayers();
+StageController.prototype.prepareBackgrounds = function () {
+	// Make cliff
+	if (typeof this.ground === "undefined") {
+		this.ground = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityGround', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
+		this.road = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityRoad', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
+		this.cliff = engine.depth[6].addChild(new Sprite('Backgrounds.cliffSide', 0, 0, 0, {'xOff': 10, 'yOff': 0}));
+		this.nightOverlay = engine.depth[7].addChild(new Sprite('Effects.NightOverlay', 0, 0, 0, {'xOff': 0, 'yOff': 0, opacity: 0}));
+		engine.redrawStaticLayers();
 
-		//Make some clouds
-		for (var i=0;i<5;i++) {
-			new Cloud();
+		// Make some clouds
+		for (var i = 0;i < 5;i++) {
+			engine.depth[1].addChild(new Cloud());
 		}
 		console.log('Stage background created');
 	}
 	else {
 		console.log('Stage background already created');
 	}
-}
+};
 
-StageController.prototype.prepareGame=function() {
-	//Make score-object
-	player=new Player();
+StageController.prototype.prepareGame = function () {
+	// Make score - object
+	player = new Player();
 
-	//Make canon building
-	cannonBuilding=new CannonBuilding();
-	
-	//Make buildings and trees (the order is important for depth)
-	this.destroyables=[];
+	// Make cannon building
+	cannonBuilding = engine.depth[4].addChild(new CannonBuilding());
+
+	// Make buildings and trees (the order is important for depth)
+	this.destroyables = [];
+	this.buildings = [];
+
 	this.destroyables.push(
-		new Destroyable(pImg+'Tree.png',4,421,680),
-		new Destroyable(pImg+'AppleTree.png',4,520,673)
+		new Destroyable('Trees.Tree', 421, 680),
+		new Destroyable('Trees.AppleTree', 520, 673)
 	);
-	
-	b1=new Building(1,4,91,665);
-	b2=new Building(2,4,163,665);
-	
+
+	this.buildings.push(
+		new Building(1, 91, 665),
+		new Building(2, 163, 665)
+	);
+
 	this.destroyables.push(
-		new Destroyable(pImg+'Tree.png',4,200,690)
+		new Destroyable('Trees.Tree', 200, 690)
 	);
-	
-	b3=new Building(3,4,232,680);
-	b4=new Building(4,4,392,687);
-	b5=new Building(5,4,446,663);
-	b6=new Building(6,4,490,668);
-	
+
+	this.buildings.push(
+		new Building(3, 232, 680),
+		new Building(6, 490, 668),
+		new Building(5, 446, 663),
+		new Building(4, 392, 687)
+	);
+
 	this.destroyables.push(
-		new Destroyable(pImg+'Tree.png',4,98,700),
-		new Destroyable(pImg+'AppleTree.png',4,151,725),
-		new Destroyable(pImg+'Tree.png',4,225,718),
-		new Destroyable(pImg+'AppleTree.png',4,362,700),
-		new Destroyable(pImg+'AppleTree.png',4,436,718),
-		new Destroyable(pImg+'Tree.png',4,473,694)
+		new Destroyable('Trees.Tree', 98, 700),
+		new Destroyable('Trees.AppleTree', 151, 725),
+		new Destroyable('Trees.Tree', 225, 718),
+		new Destroyable('Trees.AppleTree', 362, 700),
+		new Destroyable('Trees.AppleTree', 436, 718),
+		new Destroyable('Trees.Tree', 473, 694)
 	);
-}
+
+	var d = this.destroyables,
+		b = this.buildings;
+
+	engine.depth[4].addChildren(d[0], d[1], b[0], b[1], d[2], b[2], b[3], b[4], b[5], d[3], d[4], d[5], d[6], d[7], d[8]);
+};
 
 // For ending all game related activities
-StageController.prototype.destroyGame=function() {
-	this.running=false;
+StageController.prototype.destroyGame = function () {
+	var i;
+	this.running = false;
 
 	// Remove buildings
 	cannonBuilding.remove();
-	b1.remove();
-	b2.remove();
-	b3.remove();
-	b4.remove();
-	b5.remove();
-	b6.remove();
+	i = this.buildings.length;
+	while (i--) {
+		this.buildings[i].remove();
+	}
 
 	// Remove trees
-	for (var i=0;i<this.destroyables.length;i++) {
-		purge(this.destroyables[i]);
-	}
-	if (typeof shopCircle!== "undefined") {
-		shopCircle.remove();
+	i = this.destroyables.length;
+	while (i--) {
+		this.destroyables[i].remove();
+		this.destroyables.splice(i, 1);
 	}
 
 	// Remove rocks and rockets
-	clearDepth(5);
-	clearDepth(3);
+	engine.depth[5].removeChildren();
+	engine.depth[3].removeChildren();
 
 	// Remove messages, if there are any
-	for (var i in this.messages) {
-		this.messages[i].remove();
-		delete this.messages[i];
+	for (i in this.messages) {
+		if (this.messages.hasOwnProperty(i)) {
+			this.messages[i].remove();
+			delete this.messages[i];
+		}
 	}
 
 	// Stop all scheduled tasks
@@ -113,60 +127,69 @@ StageController.prototype.destroyGame=function() {
 
 	// Remove player object
 	if (player) {
-		purge(player.inGameScore);
+		jsePurge(player.inGameScore);
 		delete player;
 	}
-}
+
+	delete this.controller;
+};
 
 // For removing game backgrounds
-StageController.prototype.destroyBackgrounds=function() {
-	if (typeof ground!="undefined") {
-		purge(ground);
-		purge(road);
-		purge(cliff);
+StageController.prototype.destroyBackgrounds = function () {
+	if (typeof ground !== "undefined") {
+		this.ground.remove();
+		this.road.remove();
+		this.cliff.remove();
 
-		delete ground;
-		delete road;
-		delete cliff;
+		delete this.ground;
+		delete this.road;
+		delete this.cliff;
 
-		//Remove clouds
-		clearDepth(2);
+		// Remove clouds
+		engine.depth[1].removeChildren();
 		console.log('Stage background removed');
-		redrawStaticLayers();
+		engine.redrawStaticLayers();
 	}
 	else {
 		console.log('Stage background not there');
 	}
-}
+};
 
 // For saving the game before each level, so a level can be played from the start
-StageController.prototype.getPlayerState=function() {
+StageController.prototype.getPlayerState = function () {
 	// Return the state of all the buildings
-	var states={};
-	for (var i=1;i<7;i++) {
-		var b=window['b'+i];
-		states['b'+i]={
-			life:b.life,
-			gunType:b.gunType,
-			shieldType:b.shield.type
-		}
+	var states = {},
+		len = this.buildings.length,
+		b;
+
+	states.buildings = [];
+	while (len--) {
+		b = this.buildings[len];
+		states.buildings[len] = {
+			life: b.life,
+			gunType: b.gunType,
+			shieldType: b.shield.type
+		};
 	}
 
-	states.cannonBuilding={cannon:{alive:cannonBuilding.cannon.alive}};
+	states.cannonBuilding = {cannon: {alive: cannonBuilding.cannon.alive}};
 
-	states.player= {
-		points:player.points,
-		pointsTotal:player.pointsTotal
-	}
+	states.player = {
+		points: player.points,
+		pointsTotal: player.pointsTotal
+	};
 
 	return states;
-}
+};
 
-StageController.prototype.loadPlayerState=function(playerState) {
-	for (var i=1;i<7;i++) {
-		bState=playerState['b'+i];
+StageController.prototype.loadPlayerState = function (playerState) {
+	var len = this.buildings.length,
+		bState,
+		b;
+	while (len--) {
+		bState = playerState.buildings[len];
 
-		b=window['b'+i];
+		b = this.buildings[len];
 		b.setGun(bState.gunType);
 		b.setShield(bState.shieldType);
 		b.setLife(bState.life);
@@ -177,61 +200,76 @@ StageController.prototype.loadPlayerState=function(playerState) {
 	}
 	cannonBuilding.setCannon(playerState.cannonBuilding.cannon.alive);
 
-	player.points=playerState.player.points;
-	player.pointsTotal=playerState.player.pointsTotal;
-	player.inGameScore.setString(player.points.toString()+"$");
-}
+	player.points = playerState.player.points;
+	player.pointsTotal = playerState.player.pointsTotal;
+	player.inGameScore.setString(player.points.toString() + "$");
+};
 
-StageController.prototype.update=function() {
+StageController.prototype.update = function () {
 	// If paused, return
-	if (pause) {return}
-	
-	for (var i=0; i<this.scheduledTasks.length; i++) {
-		var t=this.scheduledTasks[i];
-		if (gameTime>=t.fireTime) {
-			t.callback();
-			this.scheduledTasks.splice(i,1);
+	if (game.pause) {return; }
+
+	var i,
+		t,
+		r,
+		l;
+
+	for (i = 0; i < this.scheduledTasks.length; i ++) {
+		t = this.scheduledTasks[i];
+		if (engine.loops[t.loop].time >= t.fireTime) {
+			if (t.caller) {
+				t.callback.call(t.caller);
+			}
+			else {
+				t.callback();
+			}
+
+			this.scheduledTasks.splice(i, 1);
 			i--;
 		}
 	}
 
 	// If running, spawn rocks
-	if (!this.running) {return}
-	this.levelTime+=now-last
-	if (frames % 4===0) {
-		if (this.curObj==this.level.rocks.length && Object.keys(depth[5]).length===0) {
+	if (!this.running) {return; }
+
+	this.levelTime += engine.now - engine.last;
+
+	if (engine.frames % 4 === 0) {
+		if (this.curObj === this.level.rocks.length && engine.depth[5].children.length === 0) {
 			this.endLevel();
 		}
-		
-		for (var i=this.curObj;i<this.level.rocks.length;i++) {
-			var r=this.level.rocks[i];
-			r.level=r.level?r.level:1;
-			this.curObj=i;
-			
-			if (this.cumulatedTime+r.spawnDelay<=this.levelTime) {
-				this.cumulatedTime+=r.spawnDelay;
-				
+
+		for (i = this.curObj;i < this.level.rocks.length;i ++) {
+			r = this.level.rocks[i];
+			r.level = r.level ? r.level: 1;
+			this.curObj = i;
+
+			if (this.cumulatedTime + r.spawnDelay <= this.levelTime) {
+				this.cumulatedTime += r.spawnDelay;
+
 				// If direction and startposition is not set, randomize them
-				r.dir=r.dir?r.dir:Math.random()*Math.PI;
-				r.x=r.x?r.x:55+Math.random()*(arena.offsetWidth-110);
+				r.dir = r.dir ? r.dir: Math.random() * Math.PI;
+				r.x = r.x ? r.x: 55 + Math.random() * (arena.offsetWidth - 110);
 
 				// Get the rock's type
-				var t=rocks[r.type.toLowerCase()];
+				t = data.rocks[r.type.toLowerCase()];
 				// Get the rock's level's specifications
-				var l=t.levels[r.level-1];
+				l = t.levels[r.level - 1];
 
 				// Create a rock by putting together the gathered information
-				new Rock(
-					pImg+'Rocks/'+t.prefix+r.level+".png", //Sprite
-					pImg+'Rocks/'+t.prefix+r.level+"Cracks.png", //Damage sprite
-					r.x, // Start position
-					r.dir, // Start direction
-					l.gravity, // Gravity
-					l.life, // Life
-					l.value, // Value
-					l.maxSpeed, // Max speed
-					t.onStep, // Function to call on each step (for advanced customizing of the rocks behavior)
-					t.onDestroy // Function to call when destroyed (for doing explosions etc.)
+				engine.depth[5].addChild(
+					new Rock(
+						'Rocks.' + t.prefix + r.level, // Sprite
+						'Rocks.' + t.prefix + r.level + "Cracks", // Damage sprite
+						r.x, // Start position
+						r.dir, // Start direction
+						l.gravity, // Gravity
+						l.life, // Life
+						l.value, // Value
+						l.maxSpeed, // Max speed
+						t.onStep, // Function to call on each step (for advanced customizing of the rocks behavior)
+						t.onDestroy// Function to call when destroyed (for doing explosions etc.)
+					)
 				);
 				this.curObj++;
 			}
@@ -240,211 +278,200 @@ StageController.prototype.update=function() {
 			}
 		}
 	}
-}
+};
 
-StageController.prototype.startLevel=function(level,onLevelSucceed,onLevelFail) {
+StageController.prototype.startSession = function (controller) {
+	if (controller === undefined) {throw new Error('Missing argument: controller'); }
+	this.controller = controller;
+};
+
+StageController.prototype.startLevel = function (levelNumber) {
+	if (levelNumber === undefined) {throw new Error('Missing argument: levelNumber'); }
+
 	delete this.stats;
-	this.stats={
-		rocks:[]
+	this.stats = {
+		rocks: []
 	};
-	this.levelStartPlayerState=this.getPlayerState();
-	this.curObj=0;
-	this.level=level;
-	this.levelTime=-8000;
-	this.running=0;
-	this.cumulatedTime=0;
-	this.onLevelSucceed=onLevelSucceed?onLevelSucceed:this.onLevelSucceed;
-	this.onLevelFail=onLevelFail?onLevelFail:this.onLevelFail;
+	this.levelStartPlayerState = this.getPlayerState();
+	this.curObj = 0;
+	this.controller.currentLevel = levelNumber;
+	this.level = this.controller.getLevels()[this.controller.currentLevel];
+	this.levelTime = -8000;
+	this.running = 0;
+	this.cumulatedTime = 0;
+	this.controller.onLevelStart();
 
-	loadedAfter=0;
-
-	if (player.currentLevel !== undefined) {
-		new FadeMessage("Prepare for\nlevel "+(player.currentLevel+1)+"/"+game.levels.length,10,200,0,1500,{align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'});
-	}
-	else {
-		new FadeMessage("Prepare for\nlevel test",10,200,0,1500,{align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'});
+	// If night theme is enabled fade in night overlay
+	if (this.level.theme === "Night") {
+		this.nightOverlay.animate({opacity: 1}, {dur: 2000});
 	}
 
-	// Make countdowntimer for incoming rocks
-	var firstDelay=this.level.rocks[0].spawnDelay;
-	var addOpt={align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'};
+	this.running = true;
+};
 
-	new FadeMessage('5',10,260,3000+firstDelay,1000,addOpt);
-	new FadeMessage('4',10,260,4000+firstDelay,1000,addOpt);
-	new FadeMessage('3',10,260,5000+firstDelay,1000,addOpt);
-	new FadeMessage('2',10,260,6000+firstDelay,1000,addOpt);
-	new FadeMessage('1',10,260,7000+firstDelay,1000,addOpt);
-
-	this.running=true;
-}
-
-StageController.prototype.endLevel=function() {
-	if (typeof shopCircle!== "undefined") {
-		shopCircle.remove();
-	}
-
-	this.running=false;
-
-	// Run callbackfunctions depending on the outcome of the level
-	if (!this.checkPlayerAlive()) {
-		new FadeMessage("You\nfailed",10,200,0,1500,{align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'});
-		
-		this.scheduleTask(this.onLevelFail,2100,'levelFail');
-	} else {
-		// Update number of completed levels
-		game.store.levelsCompleted++;
-
-		if (player.currentLevel !== undefined) {
-			new FadeMessage("Level "+(player.currentLevel+1)+"/"+game.levels.length+"\ncompleted!",10,200,0,1500,{align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'});
+StageController.prototype.endLevel = function () {
+	var len = this.buildings.length,
+		b;
+	while (len--) {
+		b = this.buildings[len];
+		if (b.shop) {
+			b.shop.remove();
+			b.shop = false;
 		}
-		else {
-			new FadeMessage("Level test\ncomplete!",10,200,0,1500,{align:'center',font:'normal 58px Verdana',bmSize:3,opacity:0,xOff:300,yOff:60,fillStyle:'#000000'});
-		}
-
-		// Store number of damaged- and lost buildings for statistic use
-		this.levelStartPlayerState
-		for (var i=1;i<7;i++) {
-			var b=window['b'+i];
-			var bStart=this.levelStartPlayerState['b'+i];
-			
-			if (b.life==1 && bStart.life==2) {
-				player.buildingsDamaged++;
-			}
-
-			if (b.life==0) {
-				console.log('building destroyed!');
-				if (bStart.life==2) {
-					player.buildingsDamaged++;
-					player.buildingsLost++;
-				} else if (bStart.life==1) {
-					player.buildingsLost++;
-				}
-			}
-		}
-
-		// Do custom onLevelSucceed function
-		this.scheduleTask(this.onLevelSucceed,2100,'levelSucceed');
 	}
 
-	return true
-}
-
-StageController.prototype.calculateLevelStats=function() {
-	// Calculated level stats
-	var totalImpacts=0,
-		totalFallDistance=0,
-		stats={};
-	for (var i=0; i<this.stats.rocks.length; i++) {
-		var r=this.stats.rocks[i];
-
-		totalImpacts+=r.impacted?1:0;
-		totalFallDistance+=r.fallDistance;
+	// If night theme is enabled fade out night overlay
+	if (engine.theme === "Night") {
+		this.nightOverlay.animate({opacity: 0}, {dur: 2000});
 	}
 
-	stats.impactFactor=totalImpacts/this.stats.rocks.length;
-	stats.meanFallDistance=totalFallDistance/this.stats.rocks.length;
+	this.running = false;
+
+	this.controller.onLevelEnd();
+
+	return true;
+};
+
+// Function for calculating level stats
+StageController.prototype.calculateLevelStats = function () {
+	var totalImpacts, totalFallDistance, stats, i, r;
+
+	totalImpacts = 0,
+	totalFallDistance = 0,
+	stats = {};
+	
+	for (i = 0; i < this.stats.rocks.length; i ++) {
+		r = this.stats.rocks[i];
+
+		totalImpacts += r.impacted ? 1: 0;
+		totalFallDistance += r.fallDistance;
+	}
+
+	stats.impactFactor = totalImpacts / this.stats.rocks.length;
+	stats.meanFallDistance = totalFallDistance / this.stats.rocks.length;
 	return stats;
-}
+};
 
 // Function for restarting a level
-StageController.prototype.restartLevel=function() {
+StageController.prototype.restartLevel = function () {
 	if (!this.levelStartPlayerState) {
 		return false;
 	}
 	this.loadPlayerState(this.levelStartPlayerState);
-	this.startLevel(this.level);
-}
+	this.startLevel(this.controller.currentLevel);
+};
 
-StageController.prototype.checkPlayerAlive=function() {
+// Function for checking if the player is "alive"
+StageController.prototype.checkPlayerAlive = function () {
 	// Count how many buildings that are alive
-	var aliveCount=0;
-	for (var i=1;i<7;i++) {
-		if (window['b'+i].life>0) {
-			aliveCount++;
+	var aliveCount = 0,
+		len = this.buildings.length;
+	while (len --) {
+		if (this.buildings[len].life > 0) {
+			aliveCount ++;
 		}
 	}
 
 	// If no buildings are alive, return true
-	if (aliveCount==0) {
+	if (aliveCount === 0) {
 		return false;
 	}
 
 	// If the cannonbuilding is not alive, return true
 	return cannonBuilding.alive;
-}
+};
 
-// Function for scheduling tasks within the game (works like alarm() but integrates with the game)
-StageController.prototype.scheduleTask=function(callback,delayTime,id) {
-	if (callback===undefined) {
+// Function for scheduling tasks within the game (works like setTimeout() but integrates with the game)
+StageController.prototype.scheduleTask = function (callback, delayTime, loop, id, caller) {
+	if (callback === undefined) {
 		throw new Error('Missing argument: callback');
 	}
-	if (delayTime===undefined) {
+	if (delayTime === undefined) {
 		throw new Error('Missing argument: delayTime');
 	}
-	var id=id===undefined?false:id;
-
-	var task={
-		callback:callback,
-		fireTime:gameTime+delayTime,
-		id:id
+	if (loop === undefined) {
+		throw new Error('Missing argument: loop');
 	}
+	id = id === undefined ? false: id;
+
+	var task = {
+		callback: callback,
+		fireTime: engine.loops[loop].time + delayTime,
+		loop: loop,
+		id: id,
+		caller: caller,
+	};
 
 	this.scheduledTasks.push(task);
-}
+};
 
 // Function for stopping a single scheduled task (requires that the task has an id)
 // Calling this function with the taskId "false" will stop all tasks which has no id
-StageController.prototype.stopTask=function(taskId) {
-	for (var i=0; i<this.scheduledTasks.length; i++) {
-		if (this.scheduledTasks[i].id===taskId) {
-			this.scheduledTasks.splice(i,1);
+StageController.prototype.stopTask = function (taskId) {
+	for (var i = 0; i < this.scheduledTasks.length; i ++) {
+		if (this.scheduledTasks[i].id === taskId) {
+			this.scheduledTasks.splice(i, 1);
 			return true;
 		}
 	}
 
 	return false;
-}
+};
 
 // Function for stopping all tasks
-StageController.prototype.stopAllTasks=function() {
-	this.scheduledTasks=[];
-}
+StageController.prototype.stopAllTasks = function () {
+	this.scheduledTasks = [];
+};
 
-StageController.prototype.createDummies=function() {
-	if (typeof this.dummies!=="undefined") {return;}
+StageController.prototype.createDummies = function () {
+	if (typeof this.dummies !== "undefined") {console.log('Dummies already created'); return; }
 
-	this.dummies=[
-		//Make canon building
-		new Sprite(pImg+'RocketBuilding.png',4,315,660),
-		
-		//Make buildings and trees (the order is important for depth)
-		new Sprite(pImg+'Tree.png',4,421,680),
-		new Sprite(pImg+'AppleTree.png',4,520,673),
-		
-		new Sprite(pImg+'Building1.png',4,91,665),
-		new Sprite(pImg+'Building2.png',4,163,665),
-		
-		new Sprite(pImg+'Tree.png',4,200,690),
-		
-		new Sprite(pImg+'Building3.png',4,232,680),
-		new Sprite(pImg+'Building4.png',4,392,687),
-		new Sprite(pImg+'Building5.png',4,446,663),
-		new Sprite(pImg+'Building6.png',4,490,668),
-		
-		new Sprite(pImg+'Tree.png',4,98,700),
-		new Sprite(pImg+'AppleTree.png',4,151,725),
-		new Sprite(pImg+'Tree.png',4,225,718),
-		new Sprite(pImg+'AppleTree.png',4,362,700),
-		new Sprite(pImg+'AppleTree.png',4,436,718),
-		new Sprite(pImg+'Tree.png',4,473,694)
-	]
-}
+	this.dummies = engine.depth[4].addChildren(
+		// Make canon building
+		new Sprite('Buildings.RocketBuilding', 315, 660),
 
-StageController.prototype.removeDummies=function() {
-	if (typeof this.dummies=="undefined") {return;}
+		// Make buildings and trees (the order is important for depth)
+		new Sprite('Trees.Tree', 421, 680),
+		new Sprite('Trees.AppleTree', 520, 673),
 
-	for (var i=0;i<this.dummies.length;i++) {
-		purge(this.dummies[i]);
+		new Sprite('Buildings.Building1', 91, 665),
+		new Sprite('Buildings.Building2', 163, 665),
+
+		new Sprite('Trees.Tree', 200, 690),
+
+		new Sprite('Buildings.Building3', 232, 680),
+		new Sprite('Buildings.Building4', 392, 687),
+		new Sprite('Buildings.Building5', 446, 663),
+		new Sprite('Buildings.Building6', 490, 668),
+
+		new Sprite('Trees.Tree', 98, 700),
+		new Sprite('Trees.AppleTree', 151, 725),
+		new Sprite('Trees.Tree', 225, 718),
+		new Sprite('Trees.AppleTree', 362, 700),
+		new Sprite('Trees.AppleTree', 436, 718),
+		new Sprite('Trees.Tree', 473, 694)
+	);
+};
+
+StageController.prototype.removeDummies = function () {
+	if (typeof this.dummies === "undefined") {return; }
+
+	for (var i = 0;i < this.dummies.length;i++) {
+		jsePurge(this.dummies[i]);
 	}
 	delete this.dummies;
-}
+};
+
+StageController.prototype.shakeCliff = function () {
+	stageController.cliff.shakes = 0;
+
+	stageController.cliff.shake = function () {
+		if (this.shakes < 16) {
+			this.shakes++;
+			var nextX = this.shakes % 2 ? this.x + 5 : this.x - 5;
+			this.animate({x: nextX}, {dur: 130, callback: this.shake, loop: 'onRunning'});
+		}
+	};
+
+	stageController.cliff.shake();
+};

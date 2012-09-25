@@ -12,7 +12,7 @@ foreach ($files as $file) {
 }
 
 if (in_array("--nominify",$argv)) {
-	// do not minify, just concatenate all files
+	// do not minify, just append all files to each other
 	echo $filesContent;
 	exit;
 };

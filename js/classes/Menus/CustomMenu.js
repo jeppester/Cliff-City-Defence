@@ -6,76 +6,65 @@ Requires:
 	Button
 */
 
-function CustomMenu(_depth,_x,_y,_buttons) {
-	// Inherit animation
-	importClass(this,Animation);
+jseCreateClass('CustomMenu');
+jseExtend(CustomMenu, Animation);
+jseExtend(CustomMenu, ObjectContainer);
 
-	if (_depth===undefined) {
-		throw new Error('Missing argument: depth');
-	}
-	if (_x===undefined) {
+CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
+	if (_x === undefined) {
 		throw new Error('Missing argument: x');
 	}
-	if (_y===undefined) {
+	if (_y === undefined) {
 		throw new Error('Missing argument: y');
 	}
-
-	if (_buttons===undefined) {
+	if (_buttons === undefined) {
 		throw new Error('Missing argument: buttons');
 	}
-	/*if (typeof _buttons !== "Array") {
-		throw new Error('Argument buttons not array');
-	}*/
-	if (_buttons.length===0) {
+	if (_buttons.length === 0) {
 		throw new Error('Argument buttons is empty');
 	}
 
-	this.depth=_depth;
-	this.x=_x;
-	this.y=_y;
-	this.opacity=1;
-	this.buttons=[];
+	this.x = _x;
+	this.y = _y;
+	this.opacity = 1;
 
-	this.id = "obj" + curId;
-	curId++
-	updateObjects.onRunning[this.id]=this;
-	updateObjects.onPaused[this.id]=this;
+	// Load additional options
+	copyVars(_addOpt, this);
 
-	for (var i=0; i<_buttons.length; i++) {
-		var b=_buttons[i];
+	engine.registerObject(this);
+	engine.addActivityToLoop(this, this.update, 'onRunning');
+	engine.addActivityToLoop(this, this.update, 'onPaused');
 
-		this.buttons.push(
-			new Button(this.depth,this.x,this.y-62*(_buttons.length-1)/2+i*62,0,b.text,b.onClick)
+	var i,
+		b;
+	for (i = 0; i < _buttons.length; i ++) {
+		b = _buttons[i];
+
+		this.addChild(
+			new Button(this.x, this.y - 62 * (_buttons.length - 1) / 2 + i * 62, 0, b.text, b.onClick, {opacity: this.opacity})
 		);
-
-		this.buttons[i].parent=this;
 	}
-}
+};
 
-CustomMenu.prototype.enable = function() {
-	for (var i=0; i<this.buttons.length; i++) {
-		this.buttons[i].enable();
+CustomMenu.prototype.enable = function () {
+	for (var i = 0; i < this.children.length; i ++) {
+		this.children[i].enable();
 	}
-}
+};
 
-CustomMenu.prototype.disable = function() {
-	for (var i=0; i<this.buttons.length; i++) {
-		this.buttons[i].disable();
+CustomMenu.prototype.disable = function () {
+	for (var i = 0; i < this.children.length; i ++) {
+		this.children[i].disable();
 	}
-}
+};
 
-CustomMenu.prototype.update=function() {
-	for (var i=0; i<this.buttons.length; i++) {
-		var btn=this.buttons[i];
-		btn.x=this.x;
-		btn.y=this.y-62*(this.buttons.length-1)/2+i*62;
-		btn.opacity=this.opacity;
+CustomMenu.prototype.update = function () {
+	var i,
+		btn;
+	for (i = 0; i < this.children.length; i ++) {
+		btn = this.children[i];
+		btn.x = this.x;
+		btn.y = this.y - 62 * (this.children.length - 1) / 2 + i * 62;
+		btn.opacity = this.opacity;
 	}
-}
-
-CustomMenu.prototype.remove=function() {
-	for (var i=0; i<this.buttons.length; i++) {
-		this.buttons[i].remove();
-	}
-	redrawStaticLayers();
-}
+};

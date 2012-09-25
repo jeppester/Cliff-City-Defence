@@ -1,18 +1,18 @@
 function resizeCanvas() {
 	// Check if the window is wider og heigher than the game's canvas
 	windowWH=window.innerWidth/window.innerHeight;
-	gameWH=canvasResX/canvasResY;
+	gameWH=engine.canvasResX/engine.canvasResY;
 	
 	if (windowWH>gameWH) {
 		var h=window.innerHeight;
-		var w=canvasResX/canvasResY*h;
+		var w=engine.canvasResX/engine.canvasResY*h;
 	} else {
 		var w=window.innerWidth;
-		var h=canvasResY/canvasResX*w;
+		var h=engine.canvasResY/engine.canvasResX*w;
 	}
 
-	w=Math.min(w,canvasResX);
-	h=Math.min(h,canvasResY);
+	w=Math.min(w,engine.canvasResX);
+	h=Math.min(h,engine.canvasResY);
 	
 	arena.style.top="50%";
 	arena.style.left="50%";

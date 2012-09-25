@@ -1,21 +1,25 @@
-function Particle(_src,_depth,_x,_y,_dir,_lifetime,_addOpt) {
-	if (_lifetime===undefined) {
+jseCreateClass('Particle');
+jseExtend(Particle, GameObject);
+
+Particle.prototype.particle = function (_src, _x, _y, _dir, _lifetime, _addOpt) {
+	if (_lifetime === undefined) {
 		throw new Error('Missing argument "lifetime"');
 	}
-	GravityObject.call(this,_src, _depth, _x, _y, _dir, _addOpt);
+	this.gameObject(_src, _x, _y, _dir, _addOpt);
 
-	this.spawnTime=gameTime;
-	this.lifetime=_lifetime;
-	
-	this.step = function() {
-		this.doGrav();
-		this.updateLife();
-	}
-	this.updateLife=function() {
-		var left=1-(gameTime-this.spawnTime)/this.lifetime;
-		//this.opacity=left;
-		this.bmSize=left;
+	this.spawnTime = engine.gameTime;
+	this.lifetime = _lifetime;
 
-		if (left<0) {purge(this)}
+	engine.addActivityToLoop(this, this.updateLife, this.loop);
+};
+
+Particle.prototype.updateLife = function () {
+	var left = 1 - (engine.gameTime - this.spawnTime) / this.lifetime;
+
+	// this.opacity = left;
+	this.bmSize = left;
+
+	if (left < 0) {
+		jsePurge(this);
 	}
-}
+};

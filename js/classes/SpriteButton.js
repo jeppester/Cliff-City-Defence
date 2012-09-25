@@ -1,58 +1,54 @@
-function SpriteButton() {
-	// Import Sprite
-	importClass(this,Sprite);
+jseCreateClass('SpriteButton');
+jseExtend(SpriteButton, ObjectContainer);
+jseExtend(SpriteButton, Animation);
 
-	// Enable creation with "new [Class]"
-	constructIfNew(this,this.spriteButton,arguments);
-}
+SpriteButton.prototype.spriteButton = function (x, y, onClick, sprite1, sprite2) {
+	if (x === undefined) {throw new Error('Argument missing: x'); }
+	if (y === undefined) {throw new Error('Argument missing: y'); }
+	if (sprite1 === undefined) {throw new Error('Argument missing: sprite1'); }
+	if (onClick === undefined) {throw new Error('Argument missing: onClick'); }
 
-SpriteButton.prototype.spriteButton=function(x, y, depth, onClick, sprite1, sprite2) {
-	if (x===undefined) {throw new error('Argument missing: x')}
-	if (y===undefined) {throw new error('Argument missing: y')}
-	if (depth===undefined) {throw new error('Argument missing: depth')}
-	if (sprite1===undefined) {throw new error('Argument missing: sprite1')}
-	if (onClick===undefined) {throw new error('Argument missing: onClick')}
+	this.disabled = false;
 
-	this.sprite(sprite1,depth,x,y,0);
-	
-	this.disabled=false;
+	engine.addActivityToLoop(this, this.update, 'eachFrame');
 
-	updateObjects.onRunning[this.id]=this;
-	updateObjects.onPaused[this.id]=this;
+	this.x = x;
+	this.y = y;
+	this.opacity = 1;
 
-	this.onClick=onClick;	
-	this.fg = sprite2===undefined ? false : this.addChild(new Sprite(sprite2,depth,x,y,0));
-}
+	this.onClick = onClick;
+	this.bg = this.addChild(new Sprite(sprite1, x, y, 0));
+	this.fg = sprite2 === undefined  ?  false : this.addChild(new Sprite(sprite2, x, y, 0));
+};
 
-SpriteButton.prototype.enable = function() {
-	this.disabled=false;
-}
+SpriteButton.prototype.enable = function () {
+	this.disabled = false;
+};
 
-SpriteButton.prototype.disable = function() {
-	this.disabled=true;
-}
+SpriteButton.prototype.disable = function () {
+	this.disabled = true;
+};
 
-SpriteButton.prototype.update = function() {
+SpriteButton.prototype.update = function () {
+	this.bg.x = this.x;
+	this.bg.y = this.y;
+	this.bg.opacity = this.opacity;
+
 	if (this.fg) {
-		this.fg.x=this.x;
-		this.fg.y=this.y;
-		this.fg.opacity=this.opacity;
+		this.fg.x = this.x;
+		this.fg.y = this.y;
+		this.fg.opacity = this.opacity;
 	}
 
 	if (this.disabled) {
 		return;
 	}
 
-	//Check for hover and click
-	var sprX=this.x-this.xOff,
-		sprY=this.y-this.yOff;
+	// Check for hover and click
+	var sprX = this.bg.x - this.bg.xOff,
+		sprY = this.bg.y - this.bg.yOff;
 
-	if (mouse.x>sprX && mouse.x<sprX+this.bmWidth && mouse.y>sprY && mouse.y<sprY+this.bmHeight) {
-		if (mouse.isPressed(1)) {
-			this.onClick(1);
-		}
-		if (mouse.isPressed(3)) {
-			this.onClick(3);
-		}
+	if (mouse.squareIsPressed(sprX, sprY, this.bg.bmWidth, this.bg.bmHeight)) {
+		this.onClick(1);
 	}
-}
+};

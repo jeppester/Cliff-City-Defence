@@ -8,181 +8,201 @@ Requires:
 	Animator
 */
 
-function Building(type,_depth,_x,_y,_dir) {
-	// Import sprite
-	importClass(this,Sprite);
+jseCreateClass('Building');
+jseExtend(Building, ObjectContainer);
 
-	if (type==undefined) {
+Building.prototype.building = function (type, _x, _y, _dir) {
+	if (type === undefined) {
 		return false;
 	}
-	
-	this.type=type;
-	
+
+	this.type = type;
+	this.x = _x;
+	this.y = _y;
+	this.shop = false;
+
 	switch (type) {
 	case 1:
-		this.spritePos={
-			'gunStand':{'x':-13,'y':-28,'dir':0},
-			'gun':{'x':-13,'y':-40}
+		this.spritePos = {
+			'gunStand': {'x': - 13, 'y': - 28, 'dir': 0},
+			'gun': {'x': - 13, 'y': - 40}
 		};
-	break;
+		break;
 	case 2:
-		this.spritePos={
-			'gunStand':{'x':2,'y':-42,'dir':0},
-			'gun':{'x':2,'y':-54}
+		this.spritePos = {
+			'gunStand': {'x': 2, 'y': - 42, 'dir': 0},
+			'gun': {'x': 2, 'y': - 54}
 		};
-	break;
+		break;
 	case 3:
-		this.spritePos={
-			'gunStand':{'x':-4,'y':-36,'dir':0},
-			'gun':{'x':-4,'y':-47}
+		this.spritePos = {
+			'gunStand': {'x': - 4, 'y': - 36, 'dir': 0},
+			'gun': {'x': - 4, 'y': - 47}
 		};
-	break;
+		break;
 	case 4:
-		this.spritePos={
-			'gunStand':{'x':-4,'y':-32,'dir':0},
-			'gun':{'x':-4,'y':-43}
+		this.spritePos = {
+			'gunStand': {'x': - 4, 'y': - 32, 'dir': 0},
+			'gun': {'x': - 4, 'y': - 43}
 		};
-	break;
+		break;
 	case 5:
-		this.spritePos={
-			'gunStand':{'x':-20,'y':-30,'dir':-Math.PI/4},
-			'gun':{'x':-29,'y':-39}
+		this.spritePos = {
+			'gunStand': {'x': - 20, 'y': - 30, 'dir': - Math.PI / 4},
+			'gun': {'x': - 29, 'y': - 39}
 		};
-	break;
+		break;
 	case 6:
-		this.spritePos={
-			'gunStand':{'x':0,'y':-36,'dir':0},
-			'gun':{'x':0,'y':-48}
+		this.spritePos = {
+			'gunStand': {'x': 0, 'y': - 36, 'dir': 0},
+			'gun': {'x': 0, 'y': - 48}
 		};
-	break;
-	}
-	
-	//Prepare upgrade sprites
-	this.gunStand=new Sprite(pImg+'BuildingGunStand.png',_depth-1,_x+this.spritePos.gunStand.x,_y+this.spritePos.gunStand.y,this.spritePos.gunStand.dir,{opacity:0});
-	this.gun=false;
-
-	//Extend Sprite
-	Sprite.call(this,pImg+'Building'+this.type+'.png',_depth,_x,_y,_dir);
-	
-	this.shield=new Shield(this.type,this.x,this.y);
-	this.gunType=0;
-
-	//Add to updated objects
-	updateObjects.onRunning[this.id]=this;
-	
-	this.life=2;
-	this.die = function(time) {
-		if (this.life) {
-			this.life = 0;
-			time = time ? time : 200;
-			this.animate({"bmSize":1.5,"opacity":0},{'dur':time});
-			
-			//Remove upgrades
-			this.gunStand.animate({"bmSize":1.5,"opacity":0},{'dur':time});
-			this.gunType=0;
-			if (this.gun) {
-				this.gun.remove();
-				delete this.gun;
-			}
-			
-			return true;
-		}
-		return false;
+		break;
 	}
 
-	this.update=function() {
-		//Use update to check for mouse clicks
-		cDist=this.bmWidth/2;
-		if (mouse.isPressed(1) && this.life) {
-			if (Math.sqrt(Math.pow(mouse.x-this.x,2)+Math.pow(mouse.y-this.y,2))<cDist) {
-				if (typeof shopCircle!="undefined") {
-					if (shopCircle.building!=this) {
-						shopCircle.remove();
-						shopCircle=new ShopCircle(this);
-					}
-				} else {
-					shopCircle=new ShopCircle(this);
-				}
-			}
-		}
-	}
-	
-	this.remove=function() {
-		purge(this.shield);
-		purge(this.gunStand);
-		if (this.gun) {
-			purge(this.gun);
-		}
-		purge(this);
-	}
-	
-	this.cols=function() {
-		//Check for collisions with rocks
-		if (!this.life) {return;}
-		
-		for (var i in depth[5]) {
-			cObj=depth[5][i];
-			if (!cObj.alive) {continue;}
-			cDist=this.bmWidth/2+cObj.bmWidth/2;
-			if (Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist) {
-				if (this.shield.enabled) {
-					this.shield.life-=cObj.life;
-					if (this.shield.life<=0) {
-						this.shield.disable();
-					}
-				} else {
-					this.setLife(this.life-1);
-				}
-				cObj.impacted=true;
-				cObj.remove();
-			}
-		}
-	}
+	// Prepare upgrade sprites
+	this.gunStand = new Sprite('BuildingEnhancements.GunStand', this.x + this.spritePos.gunStand.x, this.y + this.spritePos.gunStand.y, this.spritePos.gunStand.dir, {opacity: 0});
+	this.addChild(this.gunStand);
+	this.gun = false;
 
-	this.setLife=function(life) {
-		if (this.life===0) {
-			this.bmSize=0;
-			this.opacity=1;
-		}
+	// Extend Sprite
+	this.sprite = new Sprite('Buildings.Building' + this.type, this.x, this.y, _dir);
+	this.addChild(this.sprite);
 
-		switch (life) {
-			case 0:
-				this.die();
-				return;
-			break;
-			case 1:
-				this.bm=loader.images[pImg+'Building'+this.type+'Damaged.png'];
-			break;
-			case 2:
-				this.bm=loader.images[pImg+'Building'+this.type+'.png'];
-			break;
-		}
+	// Prepare shield
+	this.shield = new Shield(this.type, this.x, this.y);
+	this.addChild(this.shield);
+	this.gunType = 0;
 
-		this.animate({"bmSize":1},{'dur':200});
-		this.life=life;
-	}
-	
-	//Upgrade functions
-	this.setShield=function(type) {
-		this.shield.set(type);
-	}
-	
-	this.setGun=function(type) {
-		this.gunType=type
+	// Add to updated objects
+	engine.addActivityToLoop(this, this.update, 'onRunning');
+	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+
+	this.life = 2;
+};
+
+Building.prototype.die = function (time) {
+	if (this.life) {
+		this.life = 0;
+		time = time  ?  time : 200;
+		this.sprite.animate({"bmSize": 1.5, "opacity": 0}, {'dur': time});
+
+		// Remove upgrades
+		this.gunStand.animate({"bmSize": 1.5, "opacity": 0}, {'dur': time});
+		this.gunType = 0;
 		if (this.gun) {
 			this.gun.remove();
+			delete this.gun;
 		}
 
-		if (this.gunType==0) {
-			this.gunStand.animate({'opacity':0},{'dur':200});
-			if (this.gun) {
-				delete this.gun;
-			}
-			return
-		}
-
-		this.gun=new AiGun(type,this.x+this.spritePos.gun.x,this.y+this.spritePos.gun.y,this);
-		this.gunStand.bmSize=1;
-		this.gunStand.animate({'opacity':1},{'dur':200});
+		return true;
 	}
-}
+	return false;
+};
+
+Building.prototype.setLife = function (life) {
+	if (this.life === life) {
+		return;
+	}
+
+	if (this.life === 0) {
+		this.sprite.bmSize = 0;
+		this.sprite.opacity = 1;
+	}
+
+	switch (life) {
+	case 0:
+		this.die();
+		return;
+	case 1:
+		this.sprite.setSource('Buildings.Building' + this.type + 'Damaged');
+		break;
+	case 2:
+		this.sprite.setSource('Buildings.Building' + this.type);
+		break;
+	}
+
+	this.sprite.animate({"bmSize": 1}, {'dur': 200});
+	this.life = life;
+};
+
+// Upgrade functions
+Building.prototype.setShield = function (type) {
+	this.shield.set(type);
+};
+
+Building.prototype.setGun = function (type) {
+	// If there is already a gun on the building, remove it
+	if (this.gun) {
+		this.gun.remove();
+	}
+
+	// Set the new gun type
+	this.gunType = type;
+
+	if (this.gunType === 0) {
+		this.gunStand.animate({'opacity': 0}, {'dur': 200});
+		if (this.gun) {
+			delete this.gun;
+		}
+		return;
+	}
+
+	this.gun = new AiGun(type, this.x + this.spritePos.gun.x, this.y + this.spritePos.gun.y, this);
+	this.addChild(this.gun);
+	this.gunStand.bmSize = 1;
+	this.gunStand.animate({'opacity': 1}, {'dur': 200});
+};
+
+Building.prototype.update = function () {
+	// Use update to check for mouse clicks
+	var cDist = this.sprite.bmWidth / 2,
+		len,
+		b;
+
+	if (mouse.circleIsPressed(this.x, this.y, cDist) && this.life) {
+		if (!this.shop) {
+			len = stageController.buildings.length;
+
+			while (len --) {
+				b = stageController.buildings[len];
+				if (b.shop) {
+					b.shop.remove();
+					b.shop = false;
+				}
+			}
+
+			this.shop = new ShopCircle(this);
+			engine.depth[8].addChild(this.shop);
+		}
+	}
+};
+
+Building.prototype.cols = function () {
+	// Check for collisions with rocks
+	if (!this.life) {return; }
+
+	var rocks = engine.depth[5].getChildren(),
+		i,
+		cObj,
+		cDist;
+	for (i = 0; i < rocks.length; i ++) {
+		cObj = rocks[i];
+
+		if (!cObj.alive) {continue; }
+
+		cDist = this.sprite.bmWidth / 2 + cObj.bmWidth / 2;
+		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
+			if (this.shield.enabled) {
+				this.shield.life -= cObj.life;
+				if (this.shield.life <= 0) {
+					this.shield.disable();
+				}
+			} else {
+				this.setLife(this.life - 1);
+			}
+			cObj.impacted = true;
+			cObj.remove();
+		}
+	}
+};

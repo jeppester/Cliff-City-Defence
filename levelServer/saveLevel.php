@@ -13,9 +13,10 @@ if (count($level->rocks)<10) {
 // Escape level data
 $name=$db->esc($level->name);
 $preparetime=$db->esc($level->prepareTime);
+$theme=$db->esc($level->theme);
 
 // Insert level into database
-$q="insert into level (name,createtime) values ('$name',NOW())";
+$q="insert into level (name,createtime,theme) values ('$name',NOW(),'$theme')";
 $levelId=$db->ins($q);
 
 // Insert each rock into the database

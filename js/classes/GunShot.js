@@ -1,116 +1,103 @@
-function GunShot(_type,_dir,_x,_y,_target) {
-	this.type=_type ? _type : 1;
-	this.target=_target!==undefined?_target:false;
-	var _acc=0;
-	switch (this.type) {
-	case 1:
-		this.damage=50;
-		this.blastRange=0;
-		_acc=800;
-	break;
-	case 2:
-		this.damage=20;
-		this.blastRange=0;
-		_acc=600;
-	break;
-	case 3:
-		this.damage=200;
-		this.blastRange=75;
-		_acc=400;
-	break;
-	}
+jseCreateClass('GunShot');
+jseExtend(GunShot, GameObject);
 
-	//Extend gameObject
-	var _x=_x?_x:0;
-	var _y=_y?_y:0;
-	var _dX=Math.cos(_dir)*_acc;
-	var _dY=Math.sin(_dir)*_acc;
-	
-	GameObject.call(this, pImg+'GunShot'+this.type+'.png', 2, _x, _y, _dir, {'dX':_dX,'dY':_dY,'update':'onRunning','xOff':17,'yOff':1});
-	
-	this.step=function() {
-	}
-	
-	this.cols=function() {
-		// If not alive, do nothing
-		if (!this.alive) {return;}
+GunShot.prototype.gunShot = function (_x, _y, _dir, _speed, _damage, _blastRange, _bmSource, _target, _gun) {
+	this.target = _target !== undefined ? _target: false;
 
-		//Destroy the bullet if it's outside the level
-		this.doBorders();
+	this.speed = _speed;
+	this.dmg = _damage;
+	this.blastRange = _blastRange;
+	this.gun = _gun;
 
-		if (this.type==3) {
-			if (this.y<this.target.y) {
-				this.remove();
-				this.explode();
-				return;
-			}
-		}
-	
-		//Check for collisions with rocks
-		for (var i in depth[5]) {
-			var cObj=depth[5][i];
-			if (!cObj.alive) {continue;}
-			
-			var cDist=10+cObj.bmWidth/2;
-			
-			if (Math.sqrt(Math.pow(cObj.x-this.x,2)+Math.pow(cObj.y-this.y,2))<cDist) {
-				this.remove();
+	// Extend gameObject
+	_x = _x ? _x: 0;
+	_y = _y ? _y: 0;
 
-				// If there is no blastrange do regular damage
-				if (!this.blastRange) {
-					cObj.damage(this.damage);
-				} else {
-					// Do blastrange damage
-					// Make explosion
-					this.explode();
-				}
-			}
-		}
-	}
-	
-	this.doBorders = function() {
-		if (this.x < 40 || this.x > arena.offsetWidth - 40) {
+	var _dX = Math.cos(_dir) * this.speed,
+		_dY = Math.sin(_dir) * this.speed;
+
+	this.gameObject(_bmSource, _x, _y, _dir, {'dX': _dX, 'dY': _dY, 'loop': 'onRunning', 'xOff': 17, 'yOff': 1});
+	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+};
+
+GunShot.prototype.cols = function () {
+	var rocks, i, cObj, cDist;
+
+	// If not alive, do nothing
+	if (!this.alive) {return; }
+
+	// Destroy the bullet if it's outside the level
+	this.doBorders();
+
+	// If this is an exploding bullet, do explosion when the height is above the targets height
+	if (this.blastRange) {
+		if (this.y < this.target.y) {
 			this.remove();
-		}
-
-		if (this.y > arena.offsetHeight - 200 && this.dY > 0) {
-			this.remove();
-		}
-		if (this.y < -17) {
-			this.remove();
+			this.explode();
+			return;
 		}
 	}
-}
 
-GunShot.prototype.explode=function() {
-	new Explosion(this.x,this.y,this.blastRange+this.bmWidth,400);
+	// Check for collisions with rocks
+	var rocks = engine.depth[5].getChildren();
+	for (i = 0; i < rocks.length; i ++) {
+		cObj = rocks[i];
+		if (!cObj.alive) {continue; }
 
-	for (var i in depth[5]) {
-		var bObj=depth[5][i];
-		if (!bObj.alive) {continue;}
-		
-		// Calculate the collision distance
-		var cDist2=this.bmWidth/2+cObj.bmWidth/2;
+		cDist = cObj.bmWidth / 2;
+
+		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
+			this.remove();
+			this.explode();
+			break;
+		}
+	}
+};
+
+GunShot.prototype.doBorders = function () {
+	if (this.x < 40 || this.x > engine.arena.offsetWidth - 40) {
+		this.remove();
+	}
+
+	if (this.y > engine.arena.offsetHeight - 200 && this.dY > 0) {
+		this.remove();
+	}
+	if (this.y < - 17) {
+		this.remove();
+	}
+};
+
+GunShot.prototype.explode = function () {
+	var rocks, i, bObj, bDist, objDist, blastDist, dmg;
+
+	engine.depth[7].addChild(
+		new Explosion('Effects.BlastWave', this.x, this.y, this.blastRange * 2 + this.bmWidth, 400)
+	);
+
+	rocks = engine.depth[5].getChildren();
+	for (i = 0; i < rocks.length; i ++) {
+		bObj = rocks[i];
+		if (!bObj.alive) {continue; }
 
 		// Calculate the distance between the objects
-		var objDist=Math.sqrt(Math.pow(bObj.x-this.x,2)+Math.pow(bObj.y-this.y,2));
+		objDist = Math.sqrt(Math.pow(bObj.x - this.x, 2) + Math.pow(bObj.y - this.y, 2));
+		blastDist = objDist - bObj.bmWidth / 2;
 
-		// Check that the rock is within blast range
-		if (objDist<cDist2) {
-			bObj.damage(this.damage);
-		} else {
-			if (objDist<this.bmWidth+this.blastRange) {
-				var blastDist=objDist-this.bmWidth;
+		if (blastDist <= 0) {
+			dmg = this.dmg;
+		}
+		else if (blastDist < this.blastRange) {
+			dmg = this.dmg - Math.min(blastDist / this.blastRange, 1) * this.dmg;
+		}
+		else {
+			continue;
+		}
 
-				if (blastDist<0) {
-					var dmg=this.damage;
-				} else {
-					var dmg=this.damage-blastDist/this.blastRange*this.damage;
-				}
-
-				// Damage the rock according to the distance
-				bObj.damage(dmg);
-			}
+		// Damage the rock according to the distance
+		//console.log('Range: ' + blastDist + ' / ' + this.blastRange + ', Damage: ' + dmg + ' / ' + this.dmg);
+		bObj.damage(dmg, this.gun);
+		if (!bObj.alive && this.gun) {
+			this.gun.addKill();
 		}
 	}
-}
+};

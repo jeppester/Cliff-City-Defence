@@ -7,90 +7,86 @@ Requires:
 	Mouse
 */
 
-function ShopIcon() {
-	// Import sprite
-	importClass(this,Sprite);
+jseCreateClass('ShopIcon');
+jseExtend(ShopIcon, ObjectContainer);
+jseExtend(ShopIcon, Animation);
 
-	constructIfNew(this,this.shopIcon,arguments);
-}
+ShopIcon.prototype.shopIcon = function (_type, _level, _x, _y, _toX, _toY) {
+	if (_type === undefined || _level === undefined) {return; }
+	this.type = _type;
+	this.level = _level;
+	this.alive = true;
 
-ShopIcon.prototype.shopIcon=function(_type,_level,_x,_y,_toX,_toY) {
-	// Extend Sprite
-	this.sprite(pImg+'Upgrades/btn11c.png', 10, _x, _y, 0);
+	this.x = _x;
+	this.y = _y;
+	this.bmSize = 0;
+	this.opacity = 1;
 
-	if (_type==undefined || _level==undefined) {return;}
-	this.type=_type;
-	this.level=_level;
-	this.alive=true;
+	this.bg = new Sprite('Upgrades.btn1', _x, _y, 0, {bmSize: this.bmSize, opacity: this.opacity});
+	this.icon = new Sprite('Upgrades.' + this.type.folder + '.l' + this.level + '1', _x, _y, 0, {bmSize: this.bmSize, opacity: this.opacity});
 
-	this.icon=new Sprite(pImg+'Upgrades/'+this.type.folder+'/'+this.level+'1.png', 10, _x, _y, 0);
-	
-	updateObjects.onRunning[this.id]=this;
-	updateObjects.onPaused[this.id]=this;
+	this.addChildren(this.bg, this.icon);
 
-	this.bmSize=0;
-	this.icon.opacity=0;
+	engine.addActivityToLoop(this, this.update, 'eachFrame');
 
-	this.animate({bmSize:0.4},{dur:150,callback:function() {
-		this.animate({x:_toX,y:_toY},{dur:200});
+	this.animate({bmSize: 0.4}, {dur: 150, callback: function () {
+		this.animate({x: _toX, y: _toY}, {dur: 200});
 	}});
-}
+};
 
-ShopIcon.prototype.remove = function() {
-	this.alive=false;
-	this.icon.animate({bmSize:0.0},{dur:150,callback:function() {
-		purge(this);
-	}});
-	this.animate({bmSize:0.0},{dur:150,callback:function() {
-		purge(this);
-	}});
-}
+ShopIcon.prototype.update = function () {
+	if (!this.alive) {return; }
 
-ShopIcon.prototype.update = function() {
-	if (!this.alive){return;}
+	this.bg.x = this.x;
+	this.bg.y = this.y;
+	this.bg.opacity = this.opacity;
+	this.bg.bmSize = this.bmSize;
+	this.icon.x = this.x;
+	this.icon.y = this.y;
+	this.icon.opacity = this.opacity;
+	this.icon.bmSize = this.bmSize;
 
-	this.icon.x=this.x;
-	this.icon.y=this.y;
-	this.icon.opacity=this.opacity;
-	this.icon.bmSize=this.bmSize;
-	if (this.level!=0) {
-		if (this.type.upgrades[this.level-1].shopPrice>player.points) {return;}
+	if (this.level !== 0) {
+		if (this.type.upgrades[this.level - 1].shopPrice * player.buildingEnhancementPriceFactor > player.points) {
+			this.bg.setSource('Upgrades.btn0');
+			return;
+		}
+		this.bg.setSource('Upgrades.btn1');
 
 		switch (this.type.lockVar) {
 		case 'weaponsAvailable':
-			if (shopCircle.building.gun) {
-				if (shopCircle.building.gun.type==this.level) {
+			if (this.parent.building.gun) {
+				if (this.parent.building.gun.type === this.level) {
 					return;
 				}
 			}
-		break;
+			break;
 		case 'shieldsAvailable':
-			if (shopCircle.building.shield.type==this.level && shopCircle.building.shield.enabled) {
+			if (this.parent.building.shield.type === this.level && this.parent.building.shield.enabled) {
 				return;
 			}
-		break;
+			break;
 		}
 	}
 
-	//Check for hover and click
-	if (Math.abs(mouse.x-this.x)<15 && Math.abs(mouse.y-this.y)<15) {
-		if (mouse.isPressed(1)) {
-			if (this.level==0) {
-				shopCircle.circleMenu(this.type);
+	// Check for click
+	if (mouse.squareIsPressed(this.x - 15, this.y - 15, 30, 30)) {
+		if (this.level === 0) {
+			this.parent.circleMenu(this.type);
+		} else {
+			if (this.type.folder === "Weapons") {
+				player.weaponsBought ++;
 			} else {
-				if (this.type.folder=="Weapons") {
-					player.weaponsBought++;
-				} else {
-					player.shieldsBought++;
-				}
-
-				this.type.upgrades[this.level-1].onBought();
-				player.addPoints(-this.type.upgrades[this.level-1].shopPrice);
-				shopCircle.remove();
+				player.shieldsBought ++;
 			}
+
+			this.type.upgrades[this.level - 1].onBought.call(this.parent.building);
+			player.addPoints(-this.type.upgrades[this.level - 1].shopPrice * player.buildingEnhancementPriceFactor);
+
+			mouse.unPress(1);
+
+			this.parent.building.shop = false;
+			this.parent.remove();
 		}
-		this.bm=loader.images[pImg+'Upgrades/btn11b.png'];
-	} else {
-		this.bm=loader.images[pImg+'Upgrades/btn11.png'];
 	}
-}
+};

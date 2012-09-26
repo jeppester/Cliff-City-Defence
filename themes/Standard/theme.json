@@ -1,9 +1,7 @@
 {
 	"name":"Standard",
 	"inherit":"",
-	"music":{
-		"SpaceMusic":"",
-	},
+	"music":{},
 	"sfx":{
 		"Explosions":{
 			"Long1":"",

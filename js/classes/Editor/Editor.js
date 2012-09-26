@@ -64,7 +64,7 @@ Editor.prototype.editor = function () {
 	}
 
 	// Create selectorbox
-	this.selector = new Sprite("Editor.RockSelectorBox", - 10, 27, 0, {xOff: 0});
+	this.selector = new Sprite("Editor.RockSelectorBox", -10, 27, 0, {xOff: 0});
 
 	// Theme change button
 	this.btnChangeTheme = new SpriteButton(25, 558, function () {
@@ -116,10 +116,7 @@ Editor.prototype.remove = function () {
 	this.btnChangeTheme.remove();
 	stageController.removeDummies();
 
-	var i,
-		markers,
-		ii,
-		markerRemoveAnimCallback;
+	var i, markers, ii, markerRemoveAnimCallback;
 
 	for (i = 0; i < this.rockButtons.length; i ++) {
 		this.rockButtons[i].remove();
@@ -164,9 +161,7 @@ Editor.prototype.startTestMode = function () {
 	this.btnMainMenu.animate({x: - 30}, {dur: 200});
 	this.btnChangeTheme.animate({x: - 30}, {dur: 200});
 
-	var i,
-		rock,
-		ii;
+	var i, rock, ii;
 	for (i = 0; i < this.rocks.length; i ++) {
 		rock = this.rocks[i];
 
@@ -186,9 +181,7 @@ Editor.prototype.startTestMode = function () {
 };
 
 Editor.prototype.testBeforeSave = function () {
-	var i,
-		rock,
-		ii;
+	var i, rock, ii;
 
 	// If the level does not contain enough rocks, do nothing
 	if (this.rocks.length < 10) {
@@ -214,9 +207,7 @@ Editor.prototype.testBeforeSave = function () {
 		game.showDialog(
 			new Sprite('Dialog.EditorNotEnoughRocks', 320, 345, 0, {opacity: 0}),
 			new Button(320, 421, 0, 'Back to editor', function () {
-				var i,
-					rock,
-					ii;
+				var i, rock, ii;
 
 				game.clearDialog();
 

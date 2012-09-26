@@ -17,7 +17,12 @@ GunShot.prototype.gunShot = function (_x, _y, _dir, _speed, _damage, _blastRange
 		_dY = Math.sin(_dir) * this.speed;
 
 	this.gameObject(_bmSource, _x, _y, _dir, {'dX': _dX, 'dY': _dY, 'loop': 'onRunning', 'xOff': 17, 'yOff': 1});
-	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+	if (this.gun.type==1) {
+		engine.addActivityToLoop(this, this.cols, 'eachFrame');
+	}
+	else {
+		engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+	}
 };
 
 GunShot.prototype.cols = function () {

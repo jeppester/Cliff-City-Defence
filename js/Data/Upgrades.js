@@ -46,7 +46,7 @@ data.upgradeTypes = [
 			},
 		]
 	},
-
+	
 	// Shield upgrades
 	{
 		name: 'Building shielding',
@@ -166,14 +166,14 @@ data.upgradeTypes = [
 				description: 'Makes AI guns return to an optimal idle position when there are no targets.',
 			},
 			{
-				name: 'Use the best target',
+				name: 'Intelligent aim',
 				price: '7000',
-				description: 'Lets AI guns choose a better target, if the current target is moving away from the cannon.',
+				description: 'Makes AI guns aware of the targetted rocks\' movement when aiming',
 			},
 			{
-				name: 'Intelligent aim',
+				name: 'Use the best target',
 				price: '20000',
-				description: 'Makes AI guns aware of the targetted rocks\' movement when aiming',
+				description: 'Lets AI guns choose a better target, if the current target is moving away from the cannon.',
 			},
 			{
 				name: 'AI gun collaboration',
@@ -254,7 +254,7 @@ data.specialUpgrades = [
 			"desc": "",
 			"onBought": function () {
 				// TODO!
-				player.aiGunAimLevel = 1;
+				//player.aiGunAimLevel = 1;
 			},
 		},
 		{

@@ -26,7 +26,6 @@ TestModeController.prototype.onLevelStart = function () {
 	// Set day -/ night mode
 	var messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000",
 		textOpt = {align: 'center', font: 'normal 58px Verdana', bmSize: 3, opacity: 0, xOff: 300, yOff: 60, fillStyle: messageColor},
-
 		text,
 		firstDelay;
 

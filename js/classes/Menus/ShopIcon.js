@@ -47,18 +47,16 @@ ShopIcon.prototype.update = function () {
 	this.icon.bmSize = this.bmSize;
 
 	if (this.level !== 0) {
+		this.bg.setSource('Upgrades.btn0');
+		
 		if (this.type.upgrades[this.level - 1].shopPrice * player.buildingEnhancementPriceFactor > player.points) {
-			this.bg.setSource('Upgrades.btn0');
 			return;
 		}
-		this.bg.setSource('Upgrades.btn1');
 
 		switch (this.type.lockVar) {
 		case 'weaponsAvailable':
-			if (this.parent.building.gun) {
-				if (this.parent.building.gun.type === this.level) {
-					return;
-				}
+			if (this.parent.building.gun && this.parent.building.gun.type === this.level) {
+				return;
 			}
 			break;
 		case 'shieldsAvailable':
@@ -67,6 +65,7 @@ ShopIcon.prototype.update = function () {
 			}
 			break;
 		}
+		this.bg.setSource('Upgrades.btn1');
 	}
 
 	// Check for click

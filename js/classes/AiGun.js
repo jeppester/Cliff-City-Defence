@@ -132,16 +132,11 @@ AiGun.prototype.findTarget = function (compareBy, ignoreList) {
 		This is for forcing the aigun to select another rock that the already selected
 	*/
 
-	var bestVal = false,
-		best = false,
-		rocks = engine.depth[5].getChildren(),
-		i,
-		rock,
-		rockDist,
-		rockDir,
-		relDir,
-		dirDist;
+	var bestVal, best, rocks, i, ii, building, rock, rockDist, rockDir, relDir, dirDist;
 
+	rocks = engine.depth[5].getChildren();
+	bestVal = false;
+	best = false;
 	for (i = 0; i < rocks.length; i ++) {
 		rock = rocks[i];
 		if (ignoreList !== undefined && ignoreList.indexOf(rock.id) !== -1) {
@@ -202,30 +197,48 @@ AiGun.prototype.findShootDirection = function (target, dT) {
 	}
 };
 
+AiGun.prototype.getOccupiedTargets = function () {
+	var i, target, dist1, dist2;
+
+	// Check that no other building is aiming for the same target
+	var targets = [];
+	for (i = 0; i < stageController.buildings.length; i++) {
+		building = stageController.buildings[i];
+		if (building !== this.parent && building.gun && building.gun.targetId) {
+			// if the target is closer to this gun, don't put it on the list
+
+			target = engine.objectIndex[building.gun.targetId];
+			if (target === undefined) {
+				continue;
+			}
+
+			dist1 = Math.sqrt(Math.pow(building.gun.x - target.x, 2) + Math.pow(building.gun.y - target.y, 2));
+			dist2 = Math.sqrt(Math.pow(this.x - target.x, 2) + Math.pow(this.y - target.y, 2));
+
+			if (dist1 < dist2) {
+				targets.push(building.gun.targetId);
+			}
+		}
+	}
+	return targets;
+};
+
 AiGun.prototype.update = function () {
 	if (!this.alive) {return; }
+	var t, relDir, tDir, findDirRes, dDist, otherGunTargets, ignoreList, newTarget, id, lx, ly, beam, i;
 
-	var t,
-		relDir,
-		tDir,
-		findDirRes,
-
-		// When finding new target
-		dDist,
-		ignoreList,
-		newTarget,
-		id,
-
-		// Laser beam
-		lx,
-		ly,
-		beam;
-
-	// If the gun does not have a target, find the closest target
-	// (Another way to find a target could be finding the target that requires less gunrotation)
+	// If the gun does not have a target, find a target
 	t = engine.objectIndex[this.targetId];
 	if (!t || t.y > this.y) {
-		this.targetId = this.findTarget(0);
+		if (player.weaponIntelligence > 3) {
+			this.targetId = this.findTarget(0, this.getOccupiedTargets());
+			if (this.targetId === false) {	
+				this.targetId = this.findTarget(0);
+			}
+		}
+		else {
+			this.targetId = this.findTarget(0);
+		}
 	}
 
 	t = engine.objectIndex[this.targetId];
@@ -247,7 +260,7 @@ AiGun.prototype.update = function () {
 	}
 	else {
 		// Rotate towards the target
-		// Find the direction to target relative to the guns rotation
+		// Find the direction to the target relative to the guns rotation
 		if (player.weaponIntelligence < 2 || this.type === 4) {
 			tDir = Math.atan2(t.y - this.y, t.x - this.x);
 		}
@@ -257,11 +270,27 @@ AiGun.prototype.update = function () {
 
 			if (player.weaponIntelligence > 2) {
 				// Check that the distance to the target is not increasing
-				dDist = findDirRes.dist - findDirRes.lastDist;
-				if (dDist > 0) {
+				ignoreList = [];
 
-					// If the distance to current target is increasing, check if there are better targets
-					ignoreList = [this.targetId];
+				if (player.weaponIntelligence > 3) {
+					Array.prototype.push.apply(ignoreList, this.getOccupiedTargets());
+
+					if (ignoreList.indexOf(this.targetId) !== -1) {
+						console.log('Aiming a same target as other gun');
+						newTarget = this.findTarget(0, ignoreList);
+						if (newTarget) {
+							console.log('New target found');
+							this.targetId = newTarget;
+						}
+					}
+				}
+
+				dDist = findDirRes.dist - findDirRes.lastDist;
+
+				if (dDist > 0) {
+					// If the distance to current target is increasing, check if there is a better target
+					ignoreList.push(this.targetId);
+
 					newTarget = false;
 					
 					while (id = this.findTarget(0, ignoreList)) {
@@ -374,8 +403,8 @@ AiGun.prototype.cols = function () {
 		if (!cObj.alive) {continue; }
 		cDist = this.bmWidth / 2 + cObj.bmWidth / 2;
 		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
-			this.remove();
 			cObj.remove();
+			this.parent.setGun(0);
 			break;
 		}
 	}

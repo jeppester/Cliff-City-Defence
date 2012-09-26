@@ -6,7 +6,7 @@ ShopCircle.prototype.shopCircle = function (building) {
 	this.x = building.x;
 	this.y = building.y;
 
-	// Add object in update array (for checking if the cursor is too far away from the menu)
+	// Add object in update array
 	engine.registerObject(this);
 	engine.addActivityToLoop(this, this.update, 'onRunning');
 

@@ -136,7 +136,7 @@ StoryModeController.prototype.onLevelSucceed = function () {
 			game.setNightMode((stageController.controller.currentLevel + 1) % 2);
 
 			// show upgrade menu every second level, and special upgrade menu every 6th level
-			if ((stageController.controller.currentLevel + 1) % 2 === 1) {
+			if ((stageController.controller.currentLevel + 1) % 6 === 0) {
 				game.showSpecialUpgradesMenu();
 			}
 			else if ((stageController.controller.currentLevel + 1) % 2 === 0) {

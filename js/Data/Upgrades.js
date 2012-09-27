@@ -19,7 +19,7 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Minigun',
-				price: '7000',
+				price: '8000',
 				shopPrice: '2000',
 				description: 'A fully automatic machine gun capable of shooting barrages of light ammunition.',
 				onBought: function () {
@@ -28,7 +28,7 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Rocket launcher',
-				price: '20000',
+				price: '14000',
 				shopPrice: '4000',
 				description: 'Fires highly explosive shells with a blast range.',
 				onBought: function () {
@@ -37,7 +37,7 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Laser beamer',
-				price: '40000',
+				price: '20000',
 				shopPrice: '8000',
 				description: 'High powered laser beamer. Hits instantly with a very powerfull laser beam, that will wipe out most rocks..',
 				onBought: function () {
@@ -56,7 +56,7 @@ data.upgradeTypes = [
 		upgrades: [
 			{
 				name: 'Tree shielding',
-				price: '3000',
+				price: '2000',
 				shopPrice: '1000',
 				description: 'Very weak but yet useable shielding.',
 				onBought: function () {
@@ -65,8 +65,8 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Rock shielding',
-				price: '7000',
-				shopPrice: '2000',
+				price: '4000',
+				shopPrice: '1500',
 				description: 'Slighty stronger than tree shielding.',
 				onBought: function () {
 					this.setShield(2);
@@ -74,8 +74,8 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Metal shielding',
-				price: '20000',
-				shopPrice: '4000',
+				price: '12000',
+				shopPrice: '2500',
 				description: 'Strong shielding. Can take much damage.',
 				onBought: function () {
 					this.setShield(3);
@@ -83,8 +83,8 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Kryptonite shielding',
-				price: '40000',
-				shopPrice: '8000',
+				price: '20000',
+				shopPrice: '5000',
 				description: 'Very strong shielding. Capable of resisting even the toughest rocks.',
 				onBought: function () {
 					this.setShield(4);
@@ -107,17 +107,17 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Medium blast range',
-				price: '7000',
+				price: '6000',
 				description: 'Improve the rockets\' blast range to a useable level.',
 			},
 			{
 				name: 'Large blast range',
-				price: '20000',
+				price: '15000',
 				description: 'Improve the rockets\' blast range to make them very effective against groups of rocks.',
 			},
 			{
 				name: 'Enormeous blast range',
-				price: '40000',
+				price: '30000',
 				description: 'Improve the rockets\' blast range to the max!',
 			},
 		]
@@ -132,7 +132,7 @@ data.upgradeTypes = [
 		upgrades: [
 			{
 				name: 'Drill rockets.',
-				price: '3000',
+				price: '4000',
 				description: 'Upgrade to drill rockets. Increases rockets\' damage to rocks.',
 			},
 			{
@@ -142,12 +142,12 @@ data.upgradeTypes = [
 			},
 			{
 				name: 'Electrical rockets',
-				price: '20000',
+				price: '15000',
 				description: 'Upgrade to electrical rockets. Increases rocket\'s damage to rocks.',
 			},
 			{
 				name: 'Nuclear rockets',
-				price: '40000',
+				price: '30000',
 				description: 'Upgrade to nuclear rockets. Increases rocket\'s damage to rocks.',
 			},
 		]
@@ -162,22 +162,22 @@ data.upgradeTypes = [
 		upgrades: [
 			{
 				name: 'Better idle position',
-				price: '3000',
+				price: '5000',
 				description: 'Makes AI guns return to an optimal idle position when there are no targets.',
 			},
 			{
 				name: 'Intelligent aim',
-				price: '7000',
+				price: '12000',
 				description: 'Makes AI guns aware of the targetted rocks\' movement when aiming',
 			},
 			{
 				name: 'Use the best target',
-				price: '20000',
+				price: '6000',
 				description: 'Lets AI guns choose a better target, if the current target is moving away from the cannon.',
 			},
 			{
 				name: 'AI gun collaboration',
-				price: '40000',
+				price: '6000',
 				description: 'Lets AI guns collaborate better when choosing targets.',
 			},
 		]
@@ -207,7 +207,7 @@ data.specialUpgrades = [
 		{
 			"name": "Efficient guns",
 			"info": "25% extra money from rocks shot by ai guns",
-			"desc": "Hello Mayor!\n\nIf you can ensure me, that we are going to use excessive amounts of ammunition, I can make a deal with \"Gun's & Fun\" that will make ammunition cheaper.",
+			"desc": "Hello Mayor!\n\nIf you can ensure me, that we are going to use excessive amounts of ammunition, I can make a deal with Guns'&'Fun that will make ammunition cheaper.",
 			"onBought": function () {
 				player.rockValueFactorAiGun *= 1.25;
 			},

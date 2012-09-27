@@ -15,6 +15,7 @@ SpriteButton.prototype.spriteButton = function (x, y, onClick, sprite1, sprite2)
 	this.x = x;
 	this.y = y;
 	this.opacity = 1;
+	this.dir = 0;
 
 	this.onClick = onClick;
 	this.bg = this.addChild(new Sprite(sprite1, x, y, 0));
@@ -33,11 +34,13 @@ SpriteButton.prototype.update = function () {
 	this.bg.x = this.x;
 	this.bg.y = this.y;
 	this.bg.opacity = this.opacity;
+	this.bg.dir = this.dir;
 
 	if (this.fg) {
 		this.fg.x = this.x;
 		this.fg.y = this.y;
 		this.fg.opacity = this.opacity;
+		this.fg.dir = this.dir;
 	}
 
 	if (this.disabled) {

@@ -183,7 +183,7 @@ Rocket.prototype.explode = function () {
 
 	// Make light beam on composited night light layer
 	if (engine.theme === "Night") {
-		beam = new Explosion('Effects.LightBeam', this.x, this.y, this.blastRange * 4 + this.bmWidth, 600);
+		beam = new Explosion('Effects.LightBeam', this.x, this.y, 40 + this.blastRange * 4 + this.bmWidth, 600);
 		beam.composite = 'destination-out';
 		engine.depth[7].addChild(beam);
 	}

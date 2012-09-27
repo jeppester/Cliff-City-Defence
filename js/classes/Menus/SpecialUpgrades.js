@@ -52,8 +52,19 @@ SpecialUpgrades.prototype.specialUpgrades = function (upgrades, callback) {
 				this.remove();
 			}).call(stageController.specialUpgrades);
 			delete stageController.specialUpgrades;
-		})
+		}),
+
+		// Offer choose arrows
+		this.nextArrow = new SpriteButton(570, 355, function () {
+			this.parent.selectUpgrade(this.parent.currentIndex + 2);
+		}, 'Dialog.NextOfferArrow'),
+		this.prevArrow = new SpriteButton(30, 355, function () {
+			this.parent.selectUpgrade(this.parent.currentIndex);
+		}, 'Dialog.NextOfferArrow')
 	);
+
+	this.prevArrow.dir = Math.PI;
+	this.prevArrow.opacity = 0.4;
 
 	this.currentIndex = -1;
 	this.selectUpgrade(1);
@@ -61,6 +72,9 @@ SpecialUpgrades.prototype.specialUpgrades = function (upgrades, callback) {
 
 SpecialUpgrades.prototype.selectUpgrade = function (upgradeNumber) {
 	var nextIndex = upgradeNumber - 1;
+
+	// If the upgrade number is invalid, do nothing
+	if (nextIndex > 2 || nextIndex < 0) {return; }
 
 	// If the upgrade is already selected, do nothing
 	if (nextIndex === this.currentIndex) {return; }
@@ -78,6 +92,9 @@ SpecialUpgrades.prototype.selectUpgrade = function (upgradeNumber) {
 		this.character3.animate({x: 1355}, {dur: this.animTime});
 		this.head2.animate({opacity: 1}, {dur: this.animTime});
 		this.head3.animate({opacity: 1}, {dur: this.animTime});
+
+		this.nextArrow.animate({opacity: 1}, {dur: this.animTime});
+		this.prevArrow.animate({opacity: 0.3}, {dur: this.animTime});
 		break;
 	case 1:
 		this.character2.animate({x: 155}, {dur: this.animTime});
@@ -87,6 +104,9 @@ SpecialUpgrades.prototype.selectUpgrade = function (upgradeNumber) {
 		this.character3.animate({x: 755}, {dur: this.animTime});
 		this.head1.animate({opacity: 1}, {dur: this.animTime});
 		this.head3.animate({opacity: 1}, {dur: this.animTime});
+
+		this.nextArrow.animate({opacity: 1}, {dur: this.animTime});
+		this.prevArrow.animate({opacity: 1}, {dur: this.animTime});
 		break;
 	case 2:
 		this.character3.animate({x: 155}, {dur: this.animTime});
@@ -96,6 +116,9 @@ SpecialUpgrades.prototype.selectUpgrade = function (upgradeNumber) {
 		this.character2.animate({x: - 445}, {dur: this.animTime});
 		this.head1.animate({opacity: 1}, {dur: this.animTime});
 		this.head2.animate({opacity: 1}, {dur: this.animTime});
+
+		this.nextArrow.animate({opacity: 0.3}, {dur: this.animTime});
+		this.prevArrow.animate({opacity: 1}, {dur: this.animTime});
 		break;
 	}
 

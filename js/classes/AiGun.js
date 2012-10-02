@@ -189,7 +189,7 @@ AiGun.prototype.findShootDirection = function (target, dT) {
 			dir: Math.atan2(nextY - this.y, nextX - this.x),
 			dist: dist,
 			lastDist: Math.sqrt(Math.pow(target.x - this.x, 2) + Math.pow(target.y - this.y, 2)),
-			steps: dT,
+			steps: dT
 		};
 	}
 	else {
@@ -276,10 +276,10 @@ AiGun.prototype.update = function () {
 					Array.prototype.push.apply(ignoreList, this.getOccupiedTargets());
 
 					if (ignoreList.indexOf(this.targetId) !== -1) {
-						console.log('Aiming a same target as other gun');
+						// console.log('Aiming a same target as other gun');
 						newTarget = this.findTarget(0, ignoreList);
 						if (newTarget) {
-							console.log('New target found');
+							// console.log('New target found');
 							this.targetId = newTarget;
 						}
 					}

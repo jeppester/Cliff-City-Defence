@@ -30,6 +30,7 @@ MouseIndex.prototype.mouseIndex = function () {
 			mouse.onMouseUp.call(mouse, event);
 		}, false);
 		document.addEventListener('mousemove', function (event) {
+			engine.host.hasMouse = true;
 			mouse.onMouseMove.call(mouse, event);
 		}, false);
 
@@ -192,7 +193,17 @@ MouseIndex.prototype.isPressed = function (button) {
 };
 
 MouseIndex.prototype.squareIsPressed = function (x, y, w, h) {
-	return this.isPressed(1) && this.x > x && this.x < x + w && this.y > y && this.y < y + h;
+	var btn = false, i;
+	for (i = 1; i < 4; i ++) {
+		if (this.isPressed(i)) {
+			btn = i;
+			break;
+		}
+	}
+	if (btn && this.x > x && this.x < x + w && this.y > y && this.y < y + h) {
+		return btn;
+	}
+	return 
 };
 
 MouseIndex.prototype.squareOutsideIsPressed = function (x, y, w, h) {

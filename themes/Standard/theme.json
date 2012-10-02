@@ -5,22 +5,22 @@
 	"sfx":{
 		"Explosions":{
 			"Long1":"",
-			"Long2":"",
-		},
+			"Long2":""
+        },
 		"Projectiles":{
 			"Laser1":"",
 			"Laser2":"",
 			"Laser3":"",
-			"Laser4":"",
-		},
+			"Laser4":""
+        },
 		"Rocks":{
-			"Boulder":"",
-		},
+			"Boulder":""
+        },
 		"Other":{
 			"Powerup":"",
-			"Shield":"",
-		},
-	},
+			"Shield":""
+        }
+    },
 	"images":{
 		// Projectiles
 		"Projectiles":{
@@ -36,8 +36,8 @@
 			"BlastRangeIndicator1":"",
 			"BlastRangeIndicator2":"",
 			"BlastRangeIndicator3":"",
-			"BlastRangeIndicator4":"",
-		},
+			"BlastRangeIndicator4":""
+        },
 
 		// Effects
 		"Effects":{
@@ -54,8 +54,8 @@
 			"NightOverlay":"",
 			"NightLight":"",
 			"LightBeam":"",
-			"FadeOut":"",
-		},
+			"FadeOut":""
+        },
 
 		// Characters
 		"Characters":{
@@ -68,8 +68,8 @@
 			"FarmerHeadSelected":"",
 			"Woman":"",
 			"WomanHead":"",
-			"WomanHeadSelected":"",
-		},
+			"WomanHeadSelected":""
+        },
 
 		// Menu and dialog stuff
 		"Dialog":{
@@ -90,8 +90,8 @@
 			"EditorHelp":"",
 			"EditorSaved":"",
 			"EditorNotEnoughRocks":"",
-			"NextOfferArrow":"",
-		},
+			"NextOfferArrow":""
+        },
 
 		// Upgrades
 		"Upgrades":{
@@ -117,8 +117,8 @@
 				"l31":"",
 				"l32":"",
 				"l41":"",
-				"l42":"",
-			},
+				"l42":""
+            },
 
 			"Weapons":{
 				"l01":"",
@@ -128,8 +128,8 @@
 				"l31":"",
 				"l32":"",
 				"l41":"",
-				"l42":"",
-			},
+				"l42":""
+            },
 
 			"Shields":{
 				"l01":"",
@@ -139,8 +139,8 @@
 				"l31":"",
 				"l32":"",
 				"l41":"",
-				"l42":"",
-			},
+				"l42":""
+            },
 
 			"FirePower":{
 				"l01":"",
@@ -150,8 +150,8 @@
 				"l31":"",
 				"l32":"",
 				"l41":"",
-				"l42":"",
-			},
+				"l42":""
+            },
 
 			"AiGunAim":{
 				"l01":"",
@@ -161,9 +161,9 @@
 				"l31":"",
 				"l32":"",
 				"l41":"",
-				"l42":"",
-			},
-		},
+				"l42":""
+            }
+        },
 
 		// Building enhancements
 		"BuildingEnhancements":{
@@ -199,8 +199,8 @@
 			"Gun1":"",
 			"Gun2":"",
 			"Gun3":"",
-			"Gun4":"",
-		},
+			"Gun4":""
+        },
 
 		// Rocks
 		"Rocks":{
@@ -221,14 +221,14 @@
 			"Fast2":"",
 			"Fast2Cracks":"",
 			"Fast3":"",
-			"Fast3Cracks":"",
-		},
+			"Fast3Cracks":""
+        },
 
 		// Particles
 		"Particles":{
 			"MagneticFracture":"",
-			"OrangeFracture":"",
-		},
+			"OrangeFracture":""
+        },
 
 		// Editor
 		"Editor":{
@@ -245,7 +245,7 @@
 			"Stop":"",
 			"Quit":"",
 			"Pause":"",
-			"NightDay":"",
-		}
+			"NightDay":""
+        }
 	}
 }

@@ -16,7 +16,7 @@ Editor.prototype.editor = function () {
 	stageController.prepareBackgrounds();
 
 	this.newSpawnArrow();
-	this.rockType = "Orange";
+	this.rockType = "orange";
 	this.rockLevel = 1;
 	this.rocks = [];
 	this.testModeStarted = false;
@@ -39,10 +39,10 @@ Editor.prototype.editor = function () {
 	};
 
 	for (i in data.rocks) {
-		if (data.rocks.hasOwnProperty(i) && data.rocks[i].prefix) {
+		if (data.rocks.hasOwnProperty(i)) {
 			for (ii = 0; ii < data.rocks[i].levels.length; ii ++) {
-				btn = new SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", "Rocks." + data.rocks[i].prefix + (ii + 1));
-				btn.rockType = data.rocks[i].prefix;
+				btn = new SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", data.rocks[i].levels[ii].sprite);
+				btn.rockType = i;
 
 				// If the rocks bmSize to fit the button
 				switch (ii) {
@@ -348,7 +348,7 @@ Editor.prototype.showTooltips = function () {
 };
 
 Editor.prototype.addRock = function (position, dir, type, level) {
-	var rock = new SpriteButton(545, 230, function () {}, 'Rocks.' + type + level),
+	var rock = new Sprite(data.rocks[type].levels[level - 1].sprite, 545, 230),
 		up,
 		down,
 		cross,
@@ -358,10 +358,10 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 	// Scale the rocks bmSize to fit the button
 	switch (level) {
 	case 2:
-		rock.bg.bmSize =  0.85;
+		rock.bmSize =  0.85;
 		break;
 	case 3:
-		rock.bg.bmSize =  0.7;
+		rock.bmSize =  0.7;
 		break;
 	}
 
@@ -412,7 +412,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 
 		if (btn === 1) {
 			t +=  0.5;
-		} else {
+		} else if (btn === 3) {
 			t -=  0.5;
 		}
 
@@ -427,7 +427,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 
 		t = t.toString();
 		if (t.length === 1) {
-			t += ' 0.0';
+			t += '.0';
 		}
 
 		this.text.setString(t.toString());
@@ -440,7 +440,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 	line = new Sprite('Editor.EditorLine', 300, 230, 0, {'opacity': 0});
 
 	// Set all buttons opacity to 0 (THIS WILL BE DONE WITH ADDOPT ARGUMENT IN THE FUTURE)
-	rock.bg.opacity = up.bg.opacity = down.bg.opacity = cross.bg.opacity = timer.bg.opacity = 0;
+	up.bg.opacity = down.bg.opacity = cross.bg.opacity = timer.bg.opacity = 0;
 	rock.opacity = up.opacity = down.opacity = cross.opacity = timer.opacity = 0;
 
 	timer.text = timer.addChild(new TextBlock(editor.rocks.length === 0 ? '0.0': '1.0', 570, 230, 18, {opacity: 0, font: 'normal 9px Verdana', align: 'right', fillStyle: '#fff', yOff: - 1}));

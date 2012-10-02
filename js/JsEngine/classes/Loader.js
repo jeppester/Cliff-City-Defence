@@ -12,7 +12,7 @@ Loader.prototype.loader = function () {
 	this.images = {};
 	this.scripts = {};
 	this.loaded = {
-		classes: [],
+		classes: []
 	};
 	this.themes = {};
 	this.callback = false;

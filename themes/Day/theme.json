@@ -20,21 +20,21 @@
 			"Building5Damaged":"",
 			"Building6Damaged":"",
 			"Cannon":"",
-			"RocketBuilding":"",
-		},
+			"RocketBuilding":""
+        },
 
 		// Trees
 		"Trees":{
 			"Tree":"",
-			"AppleTree":"",
-		},
+			"AppleTree":""
+        },
 
 		// Backgrounds
 		"Backgrounds":{
 			"Cloud":"",
 			"cliffCityGround":"",
 			"cliffCityRoad":"",
-			"cliffSide":"",
-		},
-	}
+			"cliffSide":""
+        }
+    }
 }

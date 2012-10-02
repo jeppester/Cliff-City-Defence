@@ -31,7 +31,7 @@ StageController.prototype.prepareBackgrounds = function () {
 		this.road = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityRoad', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
 		this.cliff = engine.depth[6].addChild(new Sprite('Backgrounds.cliffSide', 0, 0, 0, {'xOff': 10, 'yOff': 0}));
 		this.nightOverlay = engine.depth[7].addChild(new Sprite('Effects.NightOverlay', 0, 0, 0, {'xOff': 0, 'yOff': 0, opacity: 0}));
-		engine.redrawStaticLayers();
+		engine.redraw(1);
 
 		// Make some clouds
 		for (var i = 0;i < 5;i++) {
@@ -148,7 +148,7 @@ StageController.prototype.destroyBackgrounds = function () {
 		// Remove clouds
 		engine.depth[1].removeChildren();
 		console.log('Stage background removed');
-		engine.redrawStaticLayers();
+		engine.redraw(1);
 	}
 	else {
 		console.log('Stage background not there');
@@ -208,11 +208,7 @@ StageController.prototype.loadPlayerState = function (playerState) {
 StageController.prototype.update = function () {
 	// If paused, return
 	if (game.pause) {return; }
-
-	var i,
-		t,
-		r,
-		l;
+	var i, t, r, l, rock;
 
 	for (i = 0; i < this.scheduledTasks.length; i ++) {
 		t = this.scheduledTasks[i];
@@ -251,24 +247,14 @@ StageController.prototype.update = function () {
 				r.dir = r.dir ? r.dir: Math.random() * Math.PI;
 				r.x = r.x ? r.x: 55 + Math.random() * (arena.offsetWidth - 110);
 
-				// Get the rock's type
-				t = data.rocks[r.type.toLowerCase()];
-				// Get the rock's level's specifications
-				l = t.levels[r.level - 1];
-
 				// Create a rock by putting together the gathered information
 				engine.depth[5].addChild(
-					new Rock(
-						'Rocks.' + t.prefix + r.level, // Sprite
-						'Rocks.' + t.prefix + r.level + "Cracks", // Damage sprite
+					rock = new Rock(
 						r.x, // Start position
-						r.dir, // Start direction
-						l.gravity, // Gravity
-						l.life, // Life
-						l.value, // Value
-						l.maxSpeed, // Max speed
-						t.onStep, // Function to call on each step (for advanced customizing of the rocks behavior)
-						t.onDestroy// Function to call when destroyed (for doing explosions etc.)
+						- 50, // Start direction
+						r.type.toLowerCase(), // Type
+						r.level - 1,
+						r.dir
 					)
 				);
 				this.curObj++;
@@ -399,7 +385,7 @@ StageController.prototype.scheduleTask = function (callback, delayTime, loop, id
 		fireTime: engine.loops[loop].time + delayTime,
 		loop: loop,
 		id: id,
-		caller: caller,
+		caller: caller
 	};
 
 	this.scheduledTasks.push(task);

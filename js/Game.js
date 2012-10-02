@@ -60,13 +60,13 @@ Game.prototype.game = function () {
 Game.prototype.onLoaded = function () {
 	this.pause = 0;
 	engine.newLoop('onRunning', 1, function () {
-		return ! game.pause;
+		return !game.pause;
 	});
 	engine.newLoop('onPaused', 1, function () {
 		return game.pause;
 	});
 	engine.newLoop('collisionChecking', 2, function () {
-		return ! game.pause;
+		return !game.pause;
 	});
 
 	// engine.newLoop('animations', 2);
@@ -162,45 +162,48 @@ Game.prototype.clearDialog = function () {
 };
 
 Game.prototype.spawnMainMenu = function () {
+	var buttons;
+
 	this.setNightMode(0);
 	stageController.prepareBackgrounds();
 	stageController.createDummies();
 
-	game.showDialog(
-		new Sprite('Dialog.GameLogoPipes', 320, 340, 0, {opacity: 0}),
-		new Sprite('Dialog.GameLogoPipes', 320, 490, 0, {opacity: 0}),
-		new Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
-		new CustomMenu(320, 476, [
-			{text: 'STORY MODE', onClick: function () {
-				stageController.prepareBackgrounds();
-				stageController.prepareGame();
-				stageController.removeDummies();
+	buttons = [
+		{text: 'STORY MODE', onClick: function () {
+			stageController.prepareBackgrounds();
+			stageController.prepareGame();
+			stageController.removeDummies();
 
-				// Remove main menu
-				game.clearDialog();
+			// Remove main menu
+			game.clearDialog();
 
-				// Make dialog
-				game.pause = 0;
-				player.currentLevel = 0;
+			// Make dialog
+			game.pause = 0;
+			player.currentLevel = 0;
 
-				// Fetch levels from database
-				stageController.startSession(new StoryModeController());
-			}},
-			{text: 'PLAYER LEVELS', onClick: function () {
-				stageController.prepareBackgrounds();
-				stageController.prepareGame();
-				stageController.removeDummies();
+			// Fetch levels from database
+			stageController.startSession(new StoryModeController());
+		}},
+		{text: 'PLAYER LEVELS', onClick: function () {
+			stageController.prepareBackgrounds();
+			stageController.prepareGame();
+			stageController.removeDummies();
 
-				// Remove main menu
-				game.clearDialog();
+			// Remove main menu
+			game.clearDialog();
 
-				// Make dialog
-				game.pause = 0;
-				player.currentLevel = 0;
+			// Make dialog
+			game.pause = 0;
+			player.currentLevel = 0;
 
-				// Fetch levels from database
-				stageController.startSession(new CustomLevelModeController());
-			}},
+			// Fetch levels from database
+			stageController.startSession(new CustomLevelModeController());
+		}},
+	];
+
+	// TODO!
+	if (1 === 1/*engine.host.hasMouse*/) {
+		buttons.push(
 			{text: "CREATE LEVELS", onClick: function () {
 				// Remove main menu
 				game.clearDialog();
@@ -222,7 +225,14 @@ Game.prototype.spawnMainMenu = function () {
 					);
 				}
 			}}
-		], {opacity: 0})
+		);
+	}
+
+	game.showDialog(
+		new Sprite('Dialog.GameLogoPipes', 320, 340, 0, {opacity: 0}),
+		new Sprite('Dialog.GameLogoPipes', 320, 490, 0, {opacity: 0}),
+		new Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
+		new CustomMenu(320, 476, buttons, {opacity: 0})
 	);
 
 	this.pause = 0;

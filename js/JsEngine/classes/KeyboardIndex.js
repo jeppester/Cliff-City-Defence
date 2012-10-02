@@ -31,7 +31,6 @@ KeyboardIndex.prototype.onKeyDown = function (event) {
 	}
 
 	this.cleanUp(event.keyCode);
-
 	this.events.push({'key': event.keyCode, 'frame': frame, 'type': 'pressed'});
 };
 

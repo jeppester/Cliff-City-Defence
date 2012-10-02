@@ -1,51 +1,66 @@
 jseCreateClass('Rock');
 jseExtend(Rock, GravityObject);
 
-Rock.prototype.rock = function (_spr, _dmgSpr, _x, _dir, _grav, _life, _value, _maxSpeed, _onStep, _onDestroy) {
-	if (_dmgSpr === undefined) {
-		throw new Error('Missing argument "dmgSpr"');
+Rock.prototype.rock = function (x, y, type, level, dir, speed) {
+	if (x === undefined) {
+		throw new Error('Missing argument: x');
 	}
-	if (_life === undefined) {
-		throw new Error('Missing argument "life"');
+	if (y === undefined) {
+		throw new Error('Missing argument: y');
 	}
-	if (_value === undefined) {
-		throw new Error('Missing argument "value"');
+	if (type === undefined) {
+		throw new Error('Missing argument: type');
 	}
-	if (_grav === undefined) {
-		throw new Error('Missing argument "grav"');
-	}
-	if (_maxSpeed === undefined) {
-		throw new Error('Missing argument "maxSpeed"');
+	if (level === undefined) {
+		throw new Error('Missing argument: level');
 	}
 
-	// Set onStep and onDestroy functions
-	this.onStep = _onStep === undefined  ?  function () {} : _onStep;
-	this.onDestroy = _onDestroy === undefined  ?  function () {} : _onDestroy;
+	dir = dir !== undefined ? dir : Math.PI / 2;
+	acc = 5000;
+	speed = speed !== undefined ? speed : acc * engine.loopSpeed / 1000;
+
+	var sprite, dmgSprite, acc, grav, dX, dY;
+
+	// Fetch rock details based on type and level
+	this.type = type;
+	this.level = level;
+	level = data.rocks[this.type].levels[this.level];
+	this.maxLife = level.life;
+	this.life = level.life;
+	this.value = level.value;
+	this.maxSpeed = level.maxSpeed;
+	sprite = level.sprite !== undefined ? level.sprite : data.rocks[type].sprite;
+	dmgSprite = level.damageSprite !== undefined ? level.damageSprite : data.rocks[type].dmgSprite;
+	grav = level.gravity;
+	dX = Math.cos(dir) * speed;
+	dY = Math.sin(dir) * speed;
 
 	// Extend GravityObject
-	var acc = 5000,
-		x = _x,
-		y = -25,
-		dX = Math.cos(_dir) * acc * engine.loopSpeed / 1000,
-		dY = Math.sin(_dir) * acc * engine.loopSpeed / 1000;
+	this.gravityObject(sprite, x, y, dir, {'dX': dX, 'dY': dY, 'gravity': grav, loop: "onRunning"});
+	this.dmgSprite = this.addChild(new Sprite(dmgSprite, x, y, dir));
+	this.dmgSprite.opacity = 0;
 
-	this.gravityObject(_spr, x, y, _dir, {'dX': dX, 'dY': dY, 'gravity': _grav, loop: "onRunning"});
+	if (level.onStep) {
+		engine.addActivityToLoop(this, level.onStep, 'onRunning');
+	} else if (data.rocks[type].onStep) {
+		engine.addActivityToLoop(this, data.rocks[type].onStep, 'onRunning');
+	}
 
 	engine.addActivityToLoop(this, this.step, 'onRunning');
 
-	this.dmgSprite = this.addChild(new Sprite(_dmgSpr, x, y, _dir));
-	this.dmgSprite.opacity = 0;
-
-	this.maxLife = _life;
-	this.life = _life;
-	this.value = _value;
-	this.maxSpeed = _maxSpeed;
 	this.impacted = false;
 };
 
 Rock.prototype.damage = function (dhp, damagedBy) {
 	this.life = Math.max(0, this.life - dhp);
+
 	this.dmgSprite.opacity = (this.maxLife - this.life) / this.maxLife;
+
+	if (data.rocks[this.type].levels[this.level].onDamaged) {
+		data.rocks[this.type].levels[this.level].onDamaged.call(this, damagedBy, dhp);
+	} else if (data.rocks[this.type].onDamaged) {
+		data.rocks[this.type].onDamaged.call(this, damagedBy, dhp);
+	}
 
 	if (this.life === 0) {
 		this.remove();
@@ -72,9 +87,6 @@ Rock.prototype.step = function () {
 	this.dmgSprite.x = this.x;
 	this.dmgSprite.y = this.y;
 	this.dmgSprite.dir = this.dir;
-	this.doGrav();
-	this.doBorders();
-	this.onStep();
 };
 
 Rock.prototype.remove = function (time) {
@@ -90,11 +102,15 @@ Rock.prototype.remove = function (time) {
 		// Save rock stats for level stat calculation
 		stageController.stats.rocks.push({
 			fallDistance: this.y,
-			impacted: this.impacted,
+			impacted: this.impacted
 		});
 
 		// Run custom onDestroy function (for rocks with special behaevior when destroyed)
-		this.onDestroy();
+		if (data.rocks[this.type].levels[this.level].onDestroy) {
+			data.rocks[this.type].levels[this.level].onDestroy.call(this);
+		} else if (data.rocks[this.type].onDestroy) {
+			data.rocks[this.type].onDestroy.call(this);
+		}
 
 		// Play rock die sound
 		// loader.getSound('Rocks.Boulder').play();

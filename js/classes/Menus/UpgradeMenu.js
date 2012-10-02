@@ -50,7 +50,7 @@ UpgradeMenu.prototype.upgradeMenu = function (onContinue) {
 	this.makeUpgradeTree(1);
 	this.resetInfo();
 
-	engine.redrawStaticLayers();
+	engine.redraw(1);
 };
 
 // Function for drawing upgrade "tree"
@@ -102,7 +102,7 @@ UpgradeMenu.prototype.resetInfo = function () {
 	}
 	this.infoCurrent = 'default';
 	this.infoHeader.setString('UPGRADES');
-	this.infoText.setString('Click on an update see a description of it.\n\nTo purchase an upgrade, click the "BUY" - button below it\'s description. You can only purchase an upgrade if you have enough game points.');
+	this.infoText.setString('Click on an update see a description of it.\nTo purchase an upgrade, click the "BUY" - button below it\'s description. You can only purchase an upgrade if you have enough game points.');
 	this.iconSelected = false;
 	this.btnBuy.disable();
 	this.btnBuy.animate({opacity: 0}, {dur: 200});

@@ -51,7 +51,8 @@ SpriteButton.prototype.update = function () {
 	var sprX = this.bg.x - this.bg.xOff,
 		sprY = this.bg.y - this.bg.yOff;
 
-	if (mouse.squareIsPressed(sprX, sprY, this.bg.bmWidth, this.bg.bmHeight)) {
-		this.onClick(1);
+	button = mouse.squareIsPressed(sprX, sprY, this.bg.bmWidth, this.bg.bmHeight);
+	if (button) {
+		this.onClick(button);
 	}
 };

@@ -18,23 +18,19 @@ JsEngine = function (_opt) {
 	// Load default options
 	this.loopSpeed = 30;
 	this.loopsPerColCheck = 2;
-	this.staticDepths = [];
+	this.manualRedrawDepths = [];
 	this.canvasResX = 800;
 	this.canvasResY = 600;
-	this.engineDir = 'JsEngine';
+	this.enginePath = 'JsEngine';
 	this.arena = document.getElementById('arena');
 	this.compositedDepths = [];
 
 	// Define all used vars
-	var copyOpt,
-		i,
-		opt,
-		req,
-		gc;
+	var copyOpt, i, opt, req, gc;
 
 	// Copy options to engine (except those which are only used for engine initialization)
 	this.options = _opt ? _opt: {};
-	copyOpt = ['arena', 'loopSpeed', 'loopsPerColCheck', 'staticDepths', 'compositedDepths', 'canvasResX', 'canvasResY', 'enginePath', 'themesPath'];
+	copyOpt = ['arena', 'loopSpeed', 'loopsPerColCheck', 'manualRedrawDepths', 'compositedDepths', 'canvasResX', 'canvasResY', 'enginePath', 'themesPath'];
 	for (i = 0; i < copyOpt.length; i ++) {
 		opt = copyOpt[i];
 		if (this.options[opt] !== undefined) {
@@ -113,7 +109,7 @@ JsEngine.prototype.initialize = function () {
 
 	// Create the depths
 	this.depthMap = [];
-	var lastIsStatic = -1,
+	var lastIsManualRedrawed = -1,
 		lastIsComposited = false,
 		i,
 		d,
@@ -121,10 +117,10 @@ JsEngine.prototype.initialize = function () {
 
 	for (i = 0; i < this.options.depths; i ++) {
 		d = new ObjectContainer(i);
-		d.static = this.staticDepths.indexOf(i) !== -1;
+		d.manualRedraw = this.manualRedrawDepths.indexOf(i) !== -1;
 		d.composited = this.compositedDepths.indexOf(i) !== -1;
 
-		if (lastIsStatic === d.static && d.composited === false && lastIsComposited !== true) {
+		if (lastIsManualRedrawed === d.manualRedraw && d.composited === false && lastIsComposited !== true) {
 			d.first = false;
 			d.ctx = this.depth[i - 1].ctx;
 		}
@@ -136,7 +132,7 @@ JsEngine.prototype.initialize = function () {
 		this.depthMap[i] = d.ctx;
 		this.depth.push(d);
 
-		lastIsStatic = d.static;
+		lastIsManualRedrawed = d.manualRedraw;
 	}
 
 	// Disable right click inside arena
@@ -147,6 +143,7 @@ JsEngine.prototype.initialize = function () {
 	// Detect host information
 	this.host = {
 		hasTouch: 'ontouchstart' in document,
+		hasMouse: false
 	};
 
 	// Create objects required by the engine
@@ -197,20 +194,22 @@ JsEngine.prototype.clearStage = function () {
 };
 
 JsEngine.prototype.setTheme = function (themeName) {
+	var i, applyTheme;
+
 	this.theme = themeName;
 
-	var i = this.depth.length,
-		applyTheme = function () {
-			if (this.refreshSource) {
-				this.refreshSource();
-			}
-		};
+	i = this.depth.length,
+	applyTheme = function () {
+		if (this.refreshSource) {
+			this.refreshSource();
+		}
+	};
 
 	while (i --) {
 		this.depth[i].applyToThisAndChildren(applyTheme);
 	}
 
-	this.redrawStaticLayers();
+	this.redraw(1);
 };
 
 JsEngine.prototype.newLoop = function (name, framesPerLoop, mask) {
@@ -226,7 +225,7 @@ JsEngine.prototype.newLoop = function (name, framesPerLoop, mask) {
 		lastFrame: this.frames,
 		last: this.now  ?  this.now : new Date().getTime(),
 		time: 0,
-		execTime: 0,
+		execTime: 0
 	};
 };
 
@@ -333,7 +332,7 @@ JsEngine.prototype.mainLoop = function () {
 	this.updatesPerformed = true;
 
 	// Draw game objects
-	this.redrawNonStaticLayers();
+	this.redraw(0);
 
 	// Set last loop time, for next loop
 	this.last = this.now;
@@ -349,83 +348,15 @@ JsEngine.prototype.registerObject = function (obj, id) {
 	return id;
 };
 
-JsEngine.prototype.changeDepthStatic = function (index, static) {
-	static = static === undefined  ?  false : static;
-
-	var depth = this.depth[index];
-
-	if (depth.static === static) {return true; }
-
-	var oldCtx = depth.ctx;
-
-	// Find out if a nearby depth is static
-	if (index > 0 && this.depth[index - 1].static === static) {
-		// Make the depths use the same canvas
-		depth.ctx = this.depth[index - 1].ctx;
-		depth.static = static;
-		if (depth.first) {
-			this.depth[index + 1].first = true;
-			depth.first = false;
-		}
-	}
-	else if (index < this.depth.length - 1 && this.depth[index + 1].static === static) {
-		// Make the depths use the same canvas
-		depth.ctx = this.depth[index + 1].ctx;
-		depth.static = static;
-		depth.first = true;
-		this.depth[index + 1].first = false;
-	}
-	// If none of the nearby depths are static, create a new canvas for the static layer
-	else {
-		// Find out where to put the new canvas
-		console.log('Not possible yet');
-	}
-
-	depth.setDepth(depth.depth);
-
-	// Redraw static layers after change
-	if (static) {
-		// If changed to static redraw static layers instantly
-		engine.redrawStaticLayers();
-	}
-	else {
-		// If changed to non - static wait one frame before redrawing static layer
-		// This prevents that old ctx from being cleared before the depth has been drawn in the new ctx
-		setTimeout(function () {
-			engine.redrawStaticLayers();
-		}, engine.loopSpeed);
-	}
-
-	return true;
-};
-
-JsEngine.prototype.redrawStaticLayers = function () {
-	for (var i = 0; i < this.depth.length; i ++) {
-		var d = this.depth[i];
-		if (d.static) {
-			if (d.first) {d.ctx.clearRect (0, 0, engine.canvasResX, engine.canvasResY)};
-			d.drawChildren();
-		}
-	}
-};
-
-JsEngine.prototype.redrawNonStaticLayers = function () {
-	var time = new Date().getTime(),
-		i,
-		d;
+// Function for redrawing an array of depths
+JsEngine.prototype.redraw = function (depthTypes) {
+	var i, d;
 
 	for (i = 0; i < this.depth.length; i ++) {
 		d = this.depth[i];
-		if (!d.static) {
+		if (d.manualRedraw == depthTypes) {
 			if (d.first) {d.ctx.clearRect(0, 0, engine.canvasResX, engine.canvasResY); }
 			d.drawChildren();
 		}
 	}
-
-	if (this.drawTimes === undefined) {
-		this.drawTimes = 0;
-		this.drawTime = 0;
-	}
-	this.drawTimes ++;
-	this.drawTime += new Date().getTime() - time;
 };

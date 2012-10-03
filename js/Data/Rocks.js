@@ -1,3 +1,4 @@
+if (window.data === undefined) {window.data = {}; }
 data.rocks = {
 	// Orange rocks
 	orange: {

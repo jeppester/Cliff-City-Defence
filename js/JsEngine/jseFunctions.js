@@ -11,7 +11,7 @@ copyVars = function (from, to) {
 };
 
 jseCreateClass = function (className) {
-	if (!/^\w*$/.test(className)) {throw new Error('Invalid class name: ' + className); }
+	if (!/^\w*$/.test(className)) {throw new Error("Invalid class name: " + className); }
 
 	var constructorName = className.charAt(0).toLowerCase() + className.slice(1);
 	eval('window.' + className + ' = function () {this.' + constructorName + '.apply(this, arguments); }');
@@ -61,7 +61,7 @@ jseArraySortByNumericProperty = function (array, property, desc) {
 };
 
 jseExtend = function (extendingClass, extendedClass) {
-	var functionName
+	var functionName;
 	for (functionName in extendedClass.prototype) {
 		if (typeof extendedClass.prototype[functionName] === "function") {
 			extendingClass.prototype[functionName] = extendedClass.prototype[functionName];
@@ -71,7 +71,7 @@ jseExtend = function (extendingClass, extendedClass) {
 
 // Function to clean every trace of an element in the engine
 jsePurge = function (obj) {
-	if (obj === undefined) {throw new Error(console.log(obj)); }
+	if (obj === undefined) {throw new Error(obj); }
 	if (typeof obj === "string") {
 		obj = engine.objectIndex[obj];
 	}
@@ -132,6 +132,9 @@ jseSyncLoad = function (filePaths) {
 			throw new Error('Failed loading "' + filePaths[i] + '": ' + e.type + ' "' + e.arguments[0] + '"');
 		}
 	}
+
+	if (window.loadedFiles === undefined) {window.loadedFiles = []; }
+	window.loadedFiles = window.loadedFiles.concat(filePaths);
 };
 
 // Function for turning an object with properties into a json string

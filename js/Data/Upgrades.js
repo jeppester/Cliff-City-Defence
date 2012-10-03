@@ -1,4 +1,5 @@
 // Upgrades
+if (window.data === undefined) {window.data = {}; }
 data.upgradeTypes = [
 
 	// Weapon upgrades

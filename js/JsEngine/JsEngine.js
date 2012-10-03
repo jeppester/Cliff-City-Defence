@@ -40,7 +40,7 @@ JsEngine = function (_opt) {
 	}
 
 	// If jseFunctions is not loaded, load them
-	if (typeof jseCreateObject === "undefined") {
+	if (typeof jseCreateClass === "undefined") {
 		// Load loader class
 		req = new XMLHttpRequest();
 		req.open('GET', this.enginePath + '/jseFunctions.js', false);

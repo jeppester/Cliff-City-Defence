@@ -5,12 +5,13 @@ Game.prototype.game = function () {
 	this.dialogObjects = [];
 
 	// Load game data
-	data = [];
-	jseSyncLoad([
-		'js/Data/Upgrades.js',
-		'js/Data/Rocks.js',
-		'js/Data/Editor.js',
-	]);
+	if (typeof data === undefined)  {
+		jseSyncLoad([
+			'js/Data/Upgrades.js',
+			'js/Data/Rocks.js',
+			'js/Data/Editor.js',
+		]);
+	}
 
 	// Load game classes
 	loader.loadClasses([

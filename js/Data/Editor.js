@@ -1,3 +1,4 @@
+if (window.data === undefined) {window.data = {}; }
 data.editor = {
 	"spawnPositionStepSize": 50,
 	"spawnAngleStepSize": 15,

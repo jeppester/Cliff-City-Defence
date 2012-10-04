@@ -143,6 +143,7 @@ CannonBuilding.prototype.revive = function () {
 	this.cannon.opacity = 1;
 	this.building.animate({"bmSize": 1}, {'dur': 200});
 	this.cannon.animate({"bmSize": 1}, {'dur': 200});
+	this.nightLight.opacity = 1;
 	this.alive = true;
 };
 

@@ -12,6 +12,7 @@ jseExtend(UpgradeIcon, Sprite);
 
 // Constructor
 UpgradeIcon.prototype.upgradeIcon = function (_upgradeType, _buttonType, _level, _x, _y, _animate) {
+	var spr;
 	this.buttonType = _buttonType !== undefined  ?  _buttonType : 0;
 	this.upgradeType = _upgradeType ? _upgradeType: false;
 	this.level = _level !== undefined ? _level: false;
@@ -19,7 +20,6 @@ UpgradeIcon.prototype.upgradeIcon = function (_upgradeType, _buttonType, _level,
 	animate = _animate ? _animate: false;
 
 	// Use the right button background
-	var spr;
 	switch (this.buttonType) {
 	case 0:
 		spr = '0';

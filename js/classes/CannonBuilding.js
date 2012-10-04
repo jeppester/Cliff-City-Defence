@@ -33,16 +33,13 @@ CannonBuilding.prototype.remove = function () {
 };
 
 CannonBuilding.prototype.update = function () {
+	var x, y, mDir, shoot, rockets;
+
 	if (this.cannon.alive === false) {return; }
 
-	var x = this.cannon.x,
-		y = this.cannon.y,
-		mDir = Math.atan2(mouse.y - y, mouse.x - x),
-
-		// For shooting
-		shoot,
-		rockets;
-
+	x = this.cannon.x;
+	y = this.cannon.y;
+	mDir = Math.atan2(mouse.y - y, mouse.x - x);
 
 	if (mDir > -10 / 180 * Math.PI || mDir < -170 / 180 * Math.PI) {
 		if (mDir > 90 / 180 * Math.PI || mDir < -170 / 180 * Math.PI) {
@@ -104,13 +101,12 @@ CannonBuilding.prototype.update = function () {
 };
 
 CannonBuilding.prototype.cols = function () {
+	var rocks, i, cObj, cDist;
+
 	// Check for collisions
 	if (!this.alive) {return; }
 
-	var rocks = engine.depth[5].getChildren(),
-		i,
-		cObj,
-		cDist;
+	rocks = engine.depth[5].getChildren();
 
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
@@ -156,9 +152,9 @@ CannonBuilding.prototype.die = function () {
 };
 
 CannonBuilding.prototype.setCannon = function (alive) {
-	this.cannon.alive = alive;
-
 	var deadDir;
+
+	this.cannon.alive = alive;
 	if (this.cannon.alive === false) {
 		if (this.cannon.dir > -Math.PI / 2) {
 			deadDir = 10 / 180 * Math.PI;

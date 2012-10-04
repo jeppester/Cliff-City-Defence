@@ -11,17 +11,13 @@ jseCreateClass('Animator');
 
 // Function for adding a new animation
 Animator.prototype.addAnimation = function (animation, loop) {
+	var anim, propList, currentAnimations, i, cur, propName;
 	if (!animation) {throw new Error('Missing argument: animation'); }
 	if (!loop) {throw new Error('Missing argument: loop'); }
 
 	loop = engine.loops[loop];
-	var anim = animation,
-		propList,
-		currentAnimations,
-		i,
-		cur,
-		propName;
 
+	anim = animation;
 	anim.start = loop.time;
 
 	// If there are other animations of the same properties, stop the current animation of these properties
@@ -42,7 +38,9 @@ Animator.prototype.addAnimation = function (animation, loop) {
 };
 
 Animator.prototype.updateAllLoops = function () {
-	for (var name in engine.loops) {
+	var name;
+
+	for (name in engine.loops) {
 		if (engine.loops.hasOwnProperty(name)) {
 			this.updateLoop(name);
 		}
@@ -50,15 +48,12 @@ Animator.prototype.updateAllLoops = function () {
 };
 
 Animator.prototype.updateLoop = function (loop) {
+	var animId, a, propId, t;
+
 	if (!loop) {throw new Error('Missing argument: loop'); }
 	loop = engine.loops[loop];
 
 	// Run through the layer an update all animations
-	var animId,
-		a,
-		propId,
-		t;
-
 	for (animId = loop.animations.length - 1; animId > -1; animId --) {
 		a = loop.animations[animId];
 		t = loop.time - a.start;

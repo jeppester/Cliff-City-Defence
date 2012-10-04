@@ -25,6 +25,8 @@ StageController.prototype.stageController = function () {
 };
 
 StageController.prototype.prepareBackgrounds = function () {
+	var i;
+
 	// Make cliff
 	if (typeof this.ground === "undefined") {
 		this.ground = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityGround', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
@@ -34,7 +36,7 @@ StageController.prototype.prepareBackgrounds = function () {
 		engine.redraw(1);
 
 		// Make some clouds
-		for (var i = 0;i < 5;i++) {
+		for (i = 0;i < 5;i++) {
 			engine.depth[1].addChild(new Cloud());
 		}
 		console.log('Stage background created');
@@ -45,6 +47,8 @@ StageController.prototype.prepareBackgrounds = function () {
 };
 
 StageController.prototype.prepareGame = function () {
+	var b, d;
+
 	// Make score - object
 	player = new Player();
 
@@ -85,8 +89,8 @@ StageController.prototype.prepareGame = function () {
 		new Destroyable('Trees.Tree', 473, 694)
 	);
 
-	var d = this.destroyables,
-		b = this.buildings;
+	d = this.destroyables,
+	b = this.buildings;
 
 	engine.depth[4].addChildren(d[0], d[1], b[0], b[1], d[2], b[2], b[3], b[4], b[5], d[3], d[4], d[5], d[6], d[7], d[8]);
 };
@@ -94,6 +98,7 @@ StageController.prototype.prepareGame = function () {
 // For ending all game related activities
 StageController.prototype.destroyGame = function () {
 	var i;
+
 	this.running = false;
 
 	// Remove buildings
@@ -206,9 +211,10 @@ StageController.prototype.loadPlayerState = function (playerState) {
 };
 
 StageController.prototype.update = function () {
+	var i, t, r, l, rock;
+
 	// If paused, return
 	if (game.pause) {return; }
-	var i, t, r, l, rock;
 
 	for (i = 0; i < this.scheduledTasks.length; i ++) {
 		t = this.scheduledTasks[i];
@@ -369,6 +375,8 @@ StageController.prototype.checkPlayerAlive = function () {
 
 // Function for scheduling tasks within the game (works like setTimeout() but integrates with the game)
 StageController.prototype.scheduleTask = function (callback, delayTime, loop, id, caller) {
+	var task;
+
 	if (callback === undefined) {
 		throw new Error('Missing argument: callback');
 	}
@@ -380,7 +388,7 @@ StageController.prototype.scheduleTask = function (callback, delayTime, loop, id
 	}
 	id = id === undefined ? false: id;
 
-	var task = {
+	task = {
 		callback: callback,
 		fireTime: engine.loops[loop].time + delayTime,
 		loop: loop,
@@ -394,7 +402,9 @@ StageController.prototype.scheduleTask = function (callback, delayTime, loop, id
 // Function for stopping a single scheduled task (requires that the task has an id)
 // Calling this function with the taskId "false" will stop all tasks which has no id
 StageController.prototype.stopTask = function (taskId) {
-	for (var i = 0; i < this.scheduledTasks.length; i ++) {
+	var i;
+
+	for (i = 0; i < this.scheduledTasks.length; i ++) {
 		if (this.scheduledTasks[i].id === taskId) {
 			this.scheduledTasks.splice(i, 1);
 			return true;
@@ -440,21 +450,25 @@ StageController.prototype.createDummies = function () {
 };
 
 StageController.prototype.removeDummies = function () {
+	var i;
+
 	if (typeof this.dummies === "undefined") {return; }
 
-	for (var i = 0;i < this.dummies.length;i++) {
+	for (i = 0;i < this.dummies.length;i++) {
 		jsePurge(this.dummies[i]);
 	}
 	delete this.dummies;
 };
 
 StageController.prototype.shakeCliff = function () {
+	var nextX;
+
 	stageController.cliff.shakes = 0;
 
 	stageController.cliff.shake = function () {
 		if (this.shakes < 16) {
 			this.shakes++;
-			var nextX = this.shakes % 2 ? this.x + 5 : this.x - 5;
+			nextX = this.shakes % 2 ? this.x + 5 : this.x - 5;
 			this.animate({x: nextX}, {dur: 130, callback: this.shake, loop: 'onRunning'});
 		}
 	};

@@ -81,10 +81,12 @@ TextBlock.prototype.cacheRendering = function () {
 };
 
 TextBlock.prototype.drawCanvas = function () {
+	var c;
+
 	// Draw on canvas
 	if (/^\s*$/.test(this.string)) {return; }
 
-	var c = this.ctx;
+	c = this.ctx;
 	c.save();
 	c.translate(this.x, this.y);
 	c.globalAlpha = this.opacity;

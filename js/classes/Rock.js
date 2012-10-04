@@ -2,6 +2,8 @@ jseCreateClass('Rock');
 jseExtend(Rock, GravityObject);
 
 Rock.prototype.rock = function (x, y, type, level, dir, speed) {
+	var sprite, dmgSprite, acc, grav, dX, dY;
+
 	if (x === undefined) {
 		throw new Error('Missing argument: x');
 	}
@@ -18,8 +20,6 @@ Rock.prototype.rock = function (x, y, type, level, dir, speed) {
 	dir = dir !== undefined ? dir : Math.PI / 2;
 	acc = 5000;
 	speed = speed !== undefined ? speed : acc * engine.loopSpeed / 1000;
-
-	var sprite, dmgSprite, acc, grav, dX, dY;
 
 	// Fetch rock details based on type and level
 	this.type = type;
@@ -52,6 +52,8 @@ Rock.prototype.rock = function (x, y, type, level, dir, speed) {
 };
 
 Rock.prototype.damage = function (dhp, damagedBy) {
+	var relDist, value;
+
 	this.life = Math.max(0, this.life - dhp);
 
 	this.dmgSprite.opacity = (this.maxLife - this.life) / this.maxLife;
@@ -67,8 +69,8 @@ Rock.prototype.damage = function (dhp, damagedBy) {
 		player.rocksDestroyed ++;
 
 		// Calculate the points, based on how far the rock got
-		var relDist = 1 - (this.y - 150) / 450,
-			value = Math.min(1, relDist) * this.value;
+		relDist = 1 - (this.y - 150) / 450;
+		value = Math.min(1, relDist) * this.value;
 
 		if (AiGun.prototype.isPrototypeOf(damagedBy)) {
 			value *= player.rockValueFactorAiGun;
@@ -90,12 +92,14 @@ Rock.prototype.step = function () {
 };
 
 Rock.prototype.remove = function (time) {
+	var animOpt;
+
 	if (this.alive) {
 		this.alive = false;
 
 		// Animate removal
 		time = time  ?  time : 150;
-		var animOpt = {'bmSize': 1.5, 'opacity': 0};
+		animOpt = {'bmSize': 1.5, 'opacity': 0};
 		this.animate(animOpt, {'dur': time, callback: "jsePurge('" + this.id + "')", 'layer': 1});
 		this.dmgSprite.animate(animOpt, {'dur': time, callback: "jsePurge('" + this.dmgSprite.id + "')", 'layer': 1});
 

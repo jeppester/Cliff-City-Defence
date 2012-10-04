@@ -179,13 +179,12 @@ Building.prototype.update = function () {
 };
 
 Building.prototype.cols = function () {
+	var rocks, i, cObj, cDist;
+
 	// Check for collisions with rocks
 	if (!this.life) {return; }
 
-	var rocks = engine.depth[5].getChildren(),
-		i,
-		cObj,
-		cDist;
+	rocks = engine.depth[5].getChildren();
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
 

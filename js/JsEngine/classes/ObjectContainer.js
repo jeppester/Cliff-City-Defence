@@ -27,7 +27,8 @@ ObjectContainer.prototype.addChild = function (child) {
 };
 
 ObjectContainer.prototype.addChildren = function (child1, child2) {
-	for (var i = 0; i < arguments.length; i ++) {
+	var i;
+	for (i = 0; i < arguments.length; i ++) {
 		this.addChild(arguments[i]);
 	}
 	return arguments;
@@ -67,12 +68,14 @@ ObjectContainer.prototype.getChildren = function () {
 };
 
 ObjectContainer.prototype.setDepth = function (depth) {
+	var i;
+
 	// Store depth and ctx in object (ctx is for improving performance)
 	this.depth = depth;
 	this.ctx = engine.depth[depth].ctx;
 
 	if (this.children) {
-		for (var i = 0;i < this.children.length;i ++) {
+		for (i = 0;i < this.children.length;i ++) {
 			if (this.children[i].setDepth) {
 				this.children[i].setDepth(this.depth);
 			}
@@ -81,9 +84,11 @@ ObjectContainer.prototype.setDepth = function (depth) {
 };
 
 ObjectContainer.prototype.applyToThisAndChildren = function (func) {
+	var i;
+
 	func.call(this);
 	if (this.children) {
-		for (var i = 0;i < this.children.length;i ++) {
+		for (i = 0;i < this.children.length;i ++) {
 			this.children[i].applyToThisAndChildren(func);
 		}
 	}

@@ -11,6 +11,8 @@ jseExtend(CustomMenu, Animation);
 jseExtend(CustomMenu, ObjectContainer);
 
 CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
+	var i, b;
+
 	if (_x === undefined) {
 		throw new Error('Missing argument: x');
 	}
@@ -35,8 +37,6 @@ CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
 	engine.addActivityToLoop(this, this.update, 'onRunning');
 	engine.addActivityToLoop(this, this.update, 'onPaused');
 
-	var i,
-		b;
 	for (i = 0; i < _buttons.length; i ++) {
 		b = _buttons[i];
 
@@ -47,13 +47,17 @@ CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
 };
 
 CustomMenu.prototype.enable = function () {
-	for (var i = 0; i < this.children.length; i ++) {
+	var i;
+
+	for (i = 0; i < this.children.length; i ++) {
 		this.children[i].enable();
 	}
 };
 
 CustomMenu.prototype.disable = function () {
-	for (var i = 0; i < this.children.length; i ++) {
+	var i;
+
+	for (i = 0; i < this.children.length; i ++) {
 		this.children[i].disable();
 	}
 };

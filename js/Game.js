@@ -94,10 +94,10 @@ Game.prototype.onLoaded = function () {
 };
 
 Game.prototype.showDialog = function (obj1, obj2, obj3) {
+	var i, obj;
+
 	this.dialogObjects.push.apply(this.dialogObjects, arguments);
 
-	var i,
-		obj;
 	for (i = 0; i < this.dialogObjects.length; i ++) {
 		obj = engine.depth[9].addChild(this.dialogObjects[i]);
 		obj.animate({opacity: 1, x: 300}, {dur: 500});
@@ -289,9 +289,11 @@ Game.prototype.showSpecialUpgradesMenu = function () {
 };
 
 Game.prototype.showUpgradeMenu = function () {
+	var menu;
+
 	this.pause = 1;
 
-	var menu = new UpgradeMenu(function () {
+	menu = new UpgradeMenu(function () {
 		// If the player has gained access to an upgrade that gives access to a building enhancement, show an instructions window
 		if (this.player.shieldsAvailable + this.player.weaponsAvailable === 0 && player.shieldsAvailable + player.weaponsAvailable > 0) {
 			game.showDialog(

@@ -2,6 +2,8 @@ jseCreateClass('GunShot');
 jseExtend(GunShot, GameObject);
 
 GunShot.prototype.gunShot = function (_x, _y, _dir, _speed, _damage, _blastRange, _bmSource, _target, _gun) {
+	var _dX, _dY;
+
 	this.target = _target !== undefined ? _target: false;
 
 	this.speed = _speed;
@@ -13,8 +15,8 @@ GunShot.prototype.gunShot = function (_x, _y, _dir, _speed, _damage, _blastRange
 	_x = _x ? _x: 0;
 	_y = _y ? _y: 0;
 
-	var _dX = Math.cos(_dir) * this.speed,
-		_dY = Math.sin(_dir) * this.speed;
+	_dX = Math.cos(_dir) * this.speed,
+	_dY = Math.sin(_dir) * this.speed;
 
 	this.gameObject(_bmSource, _x, _y, _dir, {'dX': _dX, 'dY': _dY, 'loop': 'onRunning', 'xOff': 17, 'yOff': 1});
 	if (this.gun.type==1) {
@@ -44,7 +46,7 @@ GunShot.prototype.cols = function () {
 	}
 
 	// Check for collisions with rocks
-	var rocks = engine.depth[5].getChildren();
+	rocks = engine.depth[5].getChildren();
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
 		if (!cObj.alive) {continue; }

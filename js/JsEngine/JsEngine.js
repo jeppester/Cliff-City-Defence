@@ -12,6 +12,9 @@ Requires:
 */
 
 JsEngine = function (_opt) {
+	// Define all used vars
+	var copyOpt, i, opt, req, gc;
+
 	// Set global engine variable
 	engine = this;
 
@@ -24,9 +27,6 @@ JsEngine = function (_opt) {
 	this.enginePath = 'JsEngine';
 	this.arena = document.getElementById('arena');
 	this.compositedDepths = [];
-
-	// Define all used vars
-	var copyOpt, i, opt, req, gc;
 
 	// Copy options to engine (except those which are only used for engine initialization)
 	this.options = _opt ? _opt: {};
@@ -86,6 +86,8 @@ JsEngine = function (_opt) {
 };
 
 JsEngine.prototype.initialize = function () {
+	var lastIsManualRedrawed, lastIsComposited, i, d, objectName;
+
 	// Make array for containing references to all game objects
 	this.objectIndex = {};
 
@@ -109,11 +111,8 @@ JsEngine.prototype.initialize = function () {
 
 	// Create the depths
 	this.depthMap = [];
-	var lastIsManualRedrawed = -1,
-		lastIsComposited = false,
-		i,
-		d,
-		objectName;
+	lastIsManualRedrawed = -1;
+	lastIsComposited = false;
 
 	for (i = 0; i < this.options.depths; i ++) {
 		d = new ObjectContainer(i);
@@ -274,6 +273,8 @@ JsEngine.prototype.stopLoop = function () {
 
 // The main loop
 JsEngine.prototype.mainLoop = function () {
+	var name, timer, loop, f, i;
+
 	// Get the current time (for calculating movement based on the precise time change)
 	this.now = new Date().getTime();
 
@@ -284,12 +285,6 @@ JsEngine.prototype.mainLoop = function () {
 	animator.updateAllLoops(1);
 
 	// Add queued activities to loops
-	var name,
-		timer,
-		loop,
-		f,
-		i;
-
 	for (name in this.loops) {
 		if (this.loops.hasOwnProperty(name)) {
 			loop = this.loops[name];

@@ -11,9 +11,7 @@ jseCreateClass('Destroyable');
 jseExtend(Destroyable, Sprite);
 
 Destroyable.prototype.destroyable = function (_src, _depth, _x, _y, _dir) {
-	if (_src === undefined) {
-		return false;
-	}
+	if (_src === undefined) {return false; }
 
 	// Extend Sprite
 	this.sprite(_src, _depth, _x, _y, _dir);
@@ -36,13 +34,12 @@ Destroyable.prototype.remove = function (time) {
 };
 
 Destroyable.prototype.cols = function () {
+	var rocks, i, cObj, cDist;
+
 	// Check for collisions
 	if (!this.alive) {return; }
 
-	var rocks = engine.depth[5].getChildren(),
-		i,
-		cObj,
-		cDist;
+	rocks = engine.depth[5].getChildren();
 
 	for (i = 0; i < rocks.length; i++) {
 		cObj = rocks[i];

@@ -1,12 +1,11 @@
 jseCreateClass('Animation');
 
 Animation.prototype.animate = function (_prop, _options) {
-	var anim = {},
-		i,
-		c,
-		loop,
-		map = _prop,
-		opt = _options  ?  _options : {};
+	var anim, i, c, loop, map, opt;
+
+	anim = {},
+	map = _prop,
+	opt = _options  ?  _options : {};
 
 	if (!map) {
 		return false;

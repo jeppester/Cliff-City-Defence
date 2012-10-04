@@ -12,6 +12,8 @@ Requires:
 jseCreateClass('Editor');
 
 Editor.prototype.editor = function () {
+	var count, i, ii, btn, onRockButtonClick;
+
 	// Make cliff
 	stageController.prepareBackgrounds();
 
@@ -26,11 +28,7 @@ Editor.prototype.editor = function () {
 
 	// Create rock type buttons
 	this.rockButtons = [];
-	var count = 0,
-		i,
-		ii,
-		btn,
-		onRockButtonClick;
+	count = 0;
 
 	onRockButtonClick = function () {
 		editor.rockType = this.rockType;
@@ -108,6 +106,8 @@ Editor.prototype.editor = function () {
 };
 
 Editor.prototype.remove = function () {
+	var i, markers, ii, markerRemoveAnimCallback;
+
 	this.btnTestMode.remove();
 	this.btnSave.remove();
 	this.btnMainMenu.remove();
@@ -115,8 +115,6 @@ Editor.prototype.remove = function () {
 	this.spawnArrow.remove();
 	this.btnChangeTheme.remove();
 	stageController.removeDummies();
-
-	var i, markers, ii, markerRemoveAnimCallback;
 
 	for (i = 0; i < this.rockButtons.length; i ++) {
 		this.rockButtons[i].remove();
@@ -146,22 +144,23 @@ Editor.prototype.newSpawnArrow = function () {
 };
 
 Editor.prototype.startTestMode = function () {
+	var i, rock, ii;
+
 	// If the level does not contain any rocks, do nothing
 	if (this.rocks.length === 0) {
 		return;
 	}
 
-	this.saveTest = false;
 
+	this.saveTest = false;
 	// Hide menu
 	this.testModeStarted = true;
 	this.btnTestMode.fg.setSource('Editor.Stop');
 	this.selector.animate({x: - 65}, {dur: 200});
 	this.btnSave.animate({x: - 30}, {dur: 200});
 	this.btnMainMenu.animate({x: - 30}, {dur: 200});
-	this.btnChangeTheme.animate({x: - 30}, {dur: 200});
 
-	var i, rock, ii;
+	this.btnChangeTheme.animate({x: - 30}, {dur: 200});
 	for (i = 0; i < this.rocks.length; i ++) {
 		rock = this.rocks[i];
 
@@ -265,6 +264,8 @@ Editor.prototype.testBeforeSave = function () {
 };
 
 Editor.prototype.endTestMode = function () {
+	var i;
+
 	// Show menu
 	this.testModeStarted = false;
 	this.btnTestMode.fg.setSource('Editor.Play');
@@ -274,7 +275,7 @@ Editor.prototype.endTestMode = function () {
 	this.btnChangeTheme.animate({x: 25}, {dur: 200});
 	this.updateRockQueue();
 
-	for (var i = 0; i < this.rockButtons.length; i ++) {
+	for (i = 0; i < this.rockButtons.length; i ++) {
 		this.rockButtons[i].animate({x: 25}, {dur: 200});
 	}
 
@@ -374,12 +375,14 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 	}, 'Editor.Up');
 
 	down = new SpriteButton(575, 230, function () {
+		var rock;
+
 		// If the rock is the first rock, do nothing
 		if (!this.position) {
 			return;
 		}
 
-		var rock = editor.rocks[this.position];
+		rock = editor.rocks[this.position];
 
 		editor.rocks.splice(this.position, 1);
 		editor.rocks.splice(this.position - 1, 0, rock);

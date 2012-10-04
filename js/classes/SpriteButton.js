@@ -31,6 +31,8 @@ SpriteButton.prototype.disable = function () {
 };
 
 SpriteButton.prototype.update = function () {
+	var sprX, sprY;
+
 	this.bg.x = this.x;
 	this.bg.y = this.y;
 	this.bg.opacity = this.opacity;
@@ -48,8 +50,8 @@ SpriteButton.prototype.update = function () {
 	}
 
 	// Check for hover and click
-	var sprX = this.bg.x - this.bg.xOff,
-		sprY = this.bg.y - this.bg.yOff;
+	sprX = this.bg.x - this.bg.xOff;
+	sprY = this.bg.y - this.bg.yOff;
 
 	button = mouse.squareIsPressed(sprX, sprY, this.bg.bmWidth, this.bg.bmHeight);
 	if (button) {

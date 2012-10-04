@@ -41,10 +41,13 @@ ShopCircle.prototype.update = function () {
 };
 
 ShopCircle.prototype.circleMenu = function (upgradeType) {
+	var u;
+
 	this.removeChildren();
 
-	var u = upgradeType;
+	u = upgradeType;
 
+	//noinspection FallthroughInSwitchStatementJS
 	switch (player[u.lockVar]) {
 	case 4:
 		this.addChild(new ShopIcon(u, 4, this.x, this.y, this.x + 15, this.y + 15));

@@ -203,7 +203,6 @@ MouseIndex.prototype.squareIsPressed = function (x, y, w, h) {
 	if (btn && this.x > x && this.x < x + w && this.y > y && this.y < y + h) {
 		return btn;
 	}
-	return 
 };
 
 MouseIndex.prototype.squareOutsideIsPressed = function (x, y, w, h) {
@@ -233,9 +232,5 @@ MouseIndex.prototype.unPress = function (button) {
 };
 
 MouseIndex.prototype.outside = function () {
-	if (this.x < 0 || this.x > arena.offsetWidth || this.y < 0 || this.y > arena.offsetHeight) {
-		return true;
-	} else {
-		return false;
-	}
+	return this.x < 0 || this.x > arena.offsetWidth || this.y < 0 || this.y > arena.offsetHeight;
 };

@@ -55,8 +55,10 @@ Loader.prototype.getImage = function (source) {
 };
 
 Loader.prototype.getSound = function (source, clone) {
+	var sfx;
+
 	clone = clone === undefined  ?  true : clone;
-	var sfx = this.getRessource(source, 'sfx');
+	sfx = this.getRessource(source, 'sfx');
 	return sfx  ?  (clone  ?  sfx.cloneNode() : sfx) : false;
 };
 Loader.prototype.getMusic = function (source) {
@@ -74,7 +76,9 @@ Loader.prototype.getRessource = function (source, typeString) {
 	res = false;
 	try {
 		eval('res = this.themes.' + engine.theme + '.' + typeString + '.' + source);
-	} catch (e) {}
+	} catch (e) {
+		console.log('Trying to inherit theme ressource: '+source);
+	}
 
 	// Search for the image in inherited themes
 	if (!res) {

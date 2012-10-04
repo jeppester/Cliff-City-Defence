@@ -108,21 +108,15 @@ data.rocks = {
 			}
 		},
 		onStep: function () {
+			var rockets, i, cObj, dist, dir, b, distDivider, acc;
+
 			// Only check every second frame
 			if (engine.frames % 3) {return; }
 
 			// Check for collisions
 			if (!this.alive) {return; }
 
-			var rockets = engine.depth[3].getChildren(),
-				i,
-				cObj,
-				dist,
-				dir,
-				b,
-				distDivider,
-				acc;
-
+			rockets = engine.depth[3].getChildren();
 			for (i = 0; i < rockets.length; i ++) {
 				cObj = rockets[i];
 

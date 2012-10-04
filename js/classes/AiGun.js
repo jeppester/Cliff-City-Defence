@@ -12,6 +12,7 @@ jseCreateClass('AiGun');
 jseExtend(AiGun, Sprite);
 
 AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
+	var _offSet;
 	if (_type === undefined || _x === undefined || _y === undefined || _parent === undefined) {
 		return false;
 	}
@@ -23,7 +24,6 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 	this.kills = 0;
 
 	// Set gun offset
-	var _offset;
 	switch (this.type) {
 	case 1:
 		_offset = {'xOff': 10, 'yOff': 5.5};
@@ -198,10 +198,10 @@ AiGun.prototype.findShootDirection = function (target, dT) {
 };
 
 AiGun.prototype.getOccupiedTargets = function () {
-	var i, target, dist1, dist2;
+	var i, target, dist1, dist2, targets;
 
 	// Check that no other building is aiming for the same target
-	var targets = [];
+	targets = [];
 	for (i = 0; i < stageController.buildings.length; i++) {
 		building = stageController.buildings[i];
 		if (building !== this.parent && building.gun && building.gun.targetId) {
@@ -224,8 +224,9 @@ AiGun.prototype.getOccupiedTargets = function () {
 };
 
 AiGun.prototype.update = function () {
-	if (!this.alive) {return; }
 	var t, relDir, tDir, findDirRes, dDist, otherGunTargets, ignoreList, newTarget, id, lx, ly, beam, i;
+
+	if (!this.alive) {return; }
 
 	// If the gun does not have a target, find a target
 	t = engine.objectIndex[this.targetId];
@@ -256,7 +257,6 @@ AiGun.prototype.update = function () {
 				this.dir += Math.max(relDir, - this.rotSpeed);
 			}
 		}
-		return;
 	}
 	else {
 		// Rotate towards the target
@@ -389,13 +389,12 @@ AiGun.prototype.remove = function (time) {
  */
 
 AiGun.prototype.cols = function () {
+	var rocks, i, cObj, cDist;
+
 	// Check for collisions with rocks
 	if (!this.alive) {return; }
 
-	var rocks = engine.depth[5].getChildren(),
-		i,
-		cObj,
-		cDist;
+	rocks = engine.depth[5].getChildren();
 
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];

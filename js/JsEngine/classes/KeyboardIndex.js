@@ -20,11 +20,13 @@ KeyboardIndex.prototype.keyboardIndex = function () {
 };
 
 KeyboardIndex.prototype.onKeyDown = function (event) {
+	var frame;
+
 	if (this.isDown(event.keyCode)) {
 		return;
 	}
 
-	var frame = engine.frames;
+	frame = engine.frames;
 
 	if (engine.updatesPerformed) {
 		frame ++;

@@ -13,6 +13,8 @@ TestModeController.prototype.onReady = function () {
 };
 
 TestModeController.prototype.onLevelStart = function () {
+	var messageColor, textOpt, text, firstDelay;
+
 	// Elevate unlocked upgrades
 	player.shieldsAvailable = 4;
 	player.weaponsAvailable = 4;
@@ -24,11 +26,8 @@ TestModeController.prototype.onLevelStart = function () {
 	player.addPoints(10000);
 
 	// Set day -/ night mode
-	var messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000",
-		textOpt = {align: 'center', font: 'normal 58px Verdana', bmSize: 3, opacity: 0, xOff: 300, yOff: 60, fillStyle: messageColor},
-		text,
-		firstDelay;
-
+	messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000";
+	textOpt = {align: 'center', font: 'normal 58px Verdana', bmSize: 3, opacity: 0, xOff: 300, yOff: 60, fillStyle: messageColor};
 
 	// Show level text
 	text = editor.saveTest  ?  "Prepare for\nsave test" : "Prepare for\nlevel test";

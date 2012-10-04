@@ -11,9 +11,11 @@ copyVars = function (from, to) {
 };
 
 jseCreateClass = function (className) {
+	var constructorName;
+
 	if (!/^\w*$/.test(className)) {throw new Error("Invalid class name: " + className); }
 
-	var constructorName = className.charAt(0).toLowerCase() + className.slice(1);
+	constructorName = className.charAt(0).toLowerCase() + className.slice(1);
 	eval('window.' + className + ' = function () {this.' + constructorName + '.apply(this, arguments); }');
 	window[className].prototype[constructorName] = function () {};
 	return window[className];
@@ -71,14 +73,12 @@ jseExtend = function (extendingClass, extendedClass) {
 
 // Function to clean every trace of an element in the engine
 jsePurge = function (obj) {
+	var name, loop, i;
+
 	if (obj === undefined) {throw new Error(obj); }
 	if (typeof obj === "string") {
 		obj = engine.objectIndex[obj];
 	}
-
-	var name,
-		loop,
-		i;
 
 	// Delete all references from loops
 	for (name in engine.loops) {
@@ -113,12 +113,11 @@ jsePurge = function (obj) {
 };
 
 jseSyncLoad = function (filePaths) {
+	var i, req;
+
 	if (typeof filePaths === "string") {
 		filePaths = [filePaths];
 	}
-
-	var i,
-		req;
 
 	for (i = 0; i < filePaths.length; i ++) {
 		// console.log('Loading: ' + filePaths[i])
@@ -140,9 +139,9 @@ jseSyncLoad = function (filePaths) {
 // Function for turning an object with properties into a json string
 jsonEncode = function (obj, ignore) {
 	function jsonIterate(obj, ignore) {
+		var ret, i;
+
 		ignore = ignore === undefined ? []: ignore;
-		var ret = '',
-			i;
 
 		switch (typeof obj) {
 		// If string or number, save directly

@@ -5,13 +5,15 @@ LevelServer.prototype.levelServer = function (serverUrl) {
 };
 
 LevelServer.prototype.doRequest = function (request, data, callback) {
+	var xmlHttp;
+
 	if (callback === undefined) {
 		console.log('Doing request without callback');
 		callback = function () {};
 	}
 
 	// Do http request
-	var xmlHttp = new XMLHttpRequest();
+	xmlHttp = new XMLHttpRequest();
 	xmlHttp.onreadystatechange = function () {
 		if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
 			callback(xmlHttp.responseText);

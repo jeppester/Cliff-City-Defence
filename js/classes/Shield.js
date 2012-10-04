@@ -12,6 +12,7 @@ jseCreateClass('Shield');
 jseExtend(Shield, Sprite);
 
 Shield.prototype.shield = function (_building, _x, _y) {
+	var _spr;
 	if (_building === undefined || _x === undefined || _y === undefined) {
 		throw new Error('Arguments: building, x or y missing');
 	}
@@ -20,7 +21,7 @@ Shield.prototype.shield = function (_building, _x, _y) {
 	this.building = _building;
 
 	// Extent sprite
-	var _spr = 'BuildingEnhancements.Building' + this.building + 'Shield1';
+	_spr = 'BuildingEnhancements.Building' + this.building + 'Shield1';
 	this.sprite(_spr, _x, _y, 0, {'bmSize': 0});
 	engine.addActivityToLoop(this, this.fade, 'eachFrame');
 	this.fadeStart = Math.random() * Math.PI * 2;
@@ -29,11 +30,14 @@ Shield.prototype.shield = function (_building, _x, _y) {
 
 // Function for fading the shield in and out based on how damaged it is
 Shield.prototype.fade = function () {
+	var damageFactor, time;
+
 	if (this.enabled === false || this.life === this.maxLife) {
 		return;
 	}
-	var damageFactor = (this.life / this.maxLife),
-		time = engine.loops.onRunning.time;
+
+	damageFactor = (this.life / this.maxLife);
+	time = engine.loops.onRunning.time;
 
 	this.opacity = 1 - (1 - damageFactor) * Math.cos(time / (100 + 400 * damageFactor) + this.fadeStart);
 

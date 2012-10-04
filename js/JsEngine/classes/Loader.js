@@ -175,7 +175,7 @@ Loader.prototype.loadThemes = function (themeNames) {
 		req.send();
 
 		// Check that the theme is actually there
-		if (req.responseText === "Not Found") {continue; }
+		if (req.status === 404) {console.log('Theme not found: '+name); continue; }
 
 		// Get theme details
 		eval('var theme = ' + req.responseText);

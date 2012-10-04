@@ -44,7 +44,7 @@ if (in_array("--nominify",$argv)) {
 
 if (!in_array("--keepcomments",$argv)) {
 	// remove all occurrences of "console.log([something])"
-	$filesContent=preg_replace ('/console\.log[^\n|;]*(\n|;)/', '', $filesContent);
+	$filesContent=preg_replace ('/console\.log\s*\([^\)]*\);?/', '', $filesContent);
 };
 
 require dirname(__FILE__).'/jsmin.php';

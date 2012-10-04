@@ -34,7 +34,7 @@ ObjectContainer.prototype.addChildren = function (child1, child2) {
 };
 
 ObjectContainer.prototype.insertBefore = function (insertChildren, child) {
-	var curChild, arr, i;
+	var arr, i;
 
 	if (this.children === undefined) {
 		this.children = [];
@@ -46,13 +46,8 @@ ObjectContainer.prototype.insertBefore = function (insertChildren, child) {
 		insertChildren = arr;
 	}
 
-	for (i = 0; i < this.children.length; i ++) {
-		curChild = this.children[i];
-
-		if (curChild === child) {
-			this.children.splice.apply(this.children, [i, 0].concat(insertChildren));
-			break;
-		}
+	if ((i = this.children.indexOf(child)) !== -1) {
+		this.children.splice.apply(this.children, [i, 0].concat(insertChildren));
 	}
 
 	for (i = 0; i < insertChildren.length; i ++) {

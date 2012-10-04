@@ -5,7 +5,7 @@ Game.prototype.game = function () {
 	this.dialogObjects = [];
 
 	// Load game data
-	if (typeof data === undefined)  {
+	if (typeof data === "undefined")  {
 		jseSyncLoad([
 			'js/Data/Upgrades.js',
 			'js/Data/Rocks.js',
@@ -216,7 +216,7 @@ Game.prototype.spawnMainMenu = function () {
 				else {
 					// Show denial message
 					game.showDialog(
-						new Sprite('EditorDenial', 320, 345, 0, {opacity: 0}),
+						new Sprite('Dialog.EditorDenial', 320, 345, 0, {opacity: 0}),
 						new Button(320, 421, 0, 'Back to menu', function () {
 							game.clearDialog();
 

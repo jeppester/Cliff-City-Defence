@@ -1,6 +1,4 @@
-jseCreateClass('TestModeController');
-
-TestModeController.prototype.testModeController = function () {
+TestModeController = function () {
 	this.levels = [{'name': 'Level test', 'rocks': editor.rocks, theme: engine.theme}];
 
 	setTimeout(function () {
@@ -23,22 +21,23 @@ TestModeController.prototype.onLevelStart = function () {
 	player.rocketFirePowerLevel = 4;
 	player.cannonAutomatic = 0;
 	player.rocketBounces = 0;
+	player.shieldAutoRepair = 1;
 	player.addPoints(10000);
 
 	// Set day -/ night mode
 	messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000";
-	textOpt = {align: 'center', font: 'normal 58px Verdana', bmSize: 3, opacity: 0, xOff: 300, yOff: 60, fillStyle: messageColor};
+	textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor};
 
 	// Show level text
 	text = editor.saveTest  ?  "Prepare for\nsave test" : "Prepare for\nlevel test";
-	engine.depth[8].addChild(
+	main.depths[8].addChildren(
 		new FadeMessage(text, 200, 0, 1500, textOpt)
 	);
 
 	// Make countdowntimer for incoming rocks
 	firstDelay = stageController.level.rocks[0].spawnDelay;
 
-	engine.depth[8].addChildren(
+	main.depths[8].addChildren(
 		new FadeMessage('5', 260, 3000 + firstDelay, 1000, textOpt),
 		new FadeMessage('4', 260, 4000 + firstDelay, 1000, textOpt),
 		new FadeMessage('3', 260, 5000 + firstDelay, 1000, textOpt),
@@ -52,12 +51,12 @@ TestModeController.prototype.onLevelStart = function () {
 TestModeController.prototype.onLevelEnd = function () {
 	// Run callbackfunctions depending on the outcome of the level
 	var messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000",
-		textOpt = {align: 'center', font: 'normal 58px Verdana', bmSize: 3, opacity: 0, xOff: 300, yOff: 60, fillStyle: messageColor};
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor};
 
 	if (editor.saveTest) {
 		if (!stageController.checkPlayerAlive()) {
 			// Show save test failed text
-			engine.depth[8].addChild(
+			main.depths[8].addChildren(
 				new FadeMessage("Save test\nfailed", 200, 0, 1500, textOpt)
 			);
 
@@ -77,16 +76,16 @@ TestModeController.prototype.onLevelEnd = function () {
 				stageController.prepareBackgrounds();
 
 				// Hide pause button
-				game.btnPause.animate({x: - 30}, {dur: 200});
+				main.btnPause.animate({x: - 30}, {duration: 200});
 
 				// Show "level saved" dialog
-				game.showDialog(
-					new Sprite('Dialog.EditorSaved', 320, 345, 0, {opacity: 0}),
+				main.showDialog(
+					new View.Sprite('Dialog.EditorSaved', 320, 345, 0, {opacity: 0}),
 					new Button(320, 421, 0, 'To main menu', function () {
-						game.clearDialog();
+						main.clearDialog();
 
 						// Spawn main menu again
-						game.spawnMainMenu();
+						main.spawnMainMenu();
 					})
 				);
 			});
@@ -94,7 +93,7 @@ TestModeController.prototype.onLevelEnd = function () {
 	}
 	else {
 		// Show level completed text
-		engine.depth[8].addChild(
+		main.depths[8].addChildren(
 			new FadeMessage("Level test\nfinished", 200, 0, 1500, textOpt)
 		);
 

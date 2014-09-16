@@ -1,20 +1,23 @@
-jseCreateClass('CannonBuilding');
-jseExtend(CannonBuilding, ObjectContainer);
+CannonBuilding = function () {
+	// Extend view
+	View.Container.call(this);
 
-CannonBuilding.prototype.cannonBuilding = function () {
 	// Make cannon
-	this.cannon = this.addChild(new Sprite('Buildings.Cannon', 300, 628, - Math.PI / 2, {'xOff': 0, 'yOff': 10}));
+	this.cannon = new View.Sprite('Buildings.Cannon', 300, 628, - Math.PI / 2, {offset: new Math.Vector(0, 10)});
 	this.cannon.alive = true;
 
-	// Extend Sprite
-	this.building = this.addChild(new Sprite('Buildings.RocketBuilding', 315, 660));
+	// Create building sprite
+	this.building = new View.Sprite('Buildings.RocketBuilding', 315, 660);
 
 	// Add object in update array
-	engine.addActivityToLoop(this, this.update, 'onRunning');
-	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
+	engine.currentRoom.loops.collisionChecking.attachFunction(this, this.cols);
 
 	// Prepare night mode
-	this.nightLight = engine.depth[7].addChild(new Sprite('Effects.NightLight', 300, 628, 0, {composite: 'destination-out', opacity: 0, yOff: 900}));
+	this.nightLight = new View.Sprite('Effects.NightLight', 300, 628, 0, {composite: 'destination-out', opacity: 0, offset: new Math.Vector('center', 900)});
+	main.depths[7].addChildren(this.nightLight);
+
+	this.addChildren(this.cannon, this.building);
 
 	// Enable night light if the night theme is enabled
 	if (engine.theme === "Night") {
@@ -26,10 +29,12 @@ CannonBuilding.prototype.cannonBuilding = function () {
 	this.loadedAfter = 0;
 };
 
+CannonBuilding.prototype = Object.create(View.Container.prototype);
+
 CannonBuilding.prototype.remove = function () {
 	this.nightLight.remove();
-	this.removeChildren();
-	jsePurge(this);
+	this.removeAllChildren();
+	engine.purge(this);
 };
 
 CannonBuilding.prototype.update = function () {
@@ -39,7 +44,7 @@ CannonBuilding.prototype.update = function () {
 
 	x = this.cannon.x;
 	y = this.cannon.y;
-	mDir = Math.atan2(mouse.y - y, mouse.x - x);
+	mDir = Math.atan2(pointer.mouse.y - y, pointer.mouse.x - x);
 
 	if (mDir > -10 / 180 * Math.PI || mDir < -170 / 180 * Math.PI) {
 		if (mDir > 90 / 180 * Math.PI || mDir < -170 / 180 * Math.PI) {
@@ -50,53 +55,53 @@ CannonBuilding.prototype.update = function () {
 	}
 
 	// Update cannon position
-	this.cannon.dir = mDir;
+	this.cannon.direction = mDir;
 	if (this.nightLight) {
-		this.nightLight.dir = mDir + Math.PI / 2;
+		this.nightLight.direction = mDir + Math.PI / 2;
 	}
 
-	if (mouse.y > y) {return; }
+	if (pointer.mouse.y > y) {return; }
 
-	shoot = player.cannonAutomatic  ?  mouse.isDown(1) : mouse.isPressed(1);
-	if (shoot && this.loadedAfter <= engine.loops.onRunning.time) {
+	shoot = player.cannonAutomatic  ?  pointer.isDown(MOUSE_TOUCH_ANY) : pointer.isPressed(MOUSE_TOUCH_ANY);
+	if (shoot && this.loadedAfter <= engine.currentRoom.loops.onRunning.time) {
 		if (player.rocketMultiLoad) {
-			rockets = Math.min(5, 1 + Math.floor((engine.loops.onRunning.time - this.loadedAfter) / (player.rocketReloadTime * 2)));
+			rockets = Math.min(5, 1 + Math.floor((engine.currentRoom.loops.onRunning.time - this.loadedAfter) / (player.rocketReloadTime * 2)));
 
 			switch (rockets) {
 			case 1:
-				engine.depth[3].addChild(new Rocket(this.cannon.dir));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction));
 				break;
 			case 2:
-				engine.depth[3].addChild(new Rocket(this.cannon.dir));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 5 / 180 * Math.PI));
 				break;
 			case 3:
-				engine.depth[3].addChild(new Rocket(this.cannon.dir));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 5 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir - 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction - 5 / 180 * Math.PI));
 				break;
 			case 4:
-				engine.depth[3].addChild(new Rocket(this.cannon.dir));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 5 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir - 5 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 10 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction - 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 10 / 180 * Math.PI));
 				break;
 			case 5:
-				engine.depth[3].addChild(new Rocket(this.cannon.dir));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 5 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir - 5 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir + 10 / 180 * Math.PI));
-				engine.depth[3].addChild(new Rocket(this.cannon.dir - 10 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction - 5 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction + 10 / 180 * Math.PI));
+				main.depths[3].addChildren(new Rocket(this.cannon.direction - 10 / 180 * Math.PI));
 				break;
 			}
 		}
 		else {
-			engine.depth[3].addChild(new Rocket(this.cannon.dir));
+			main.depths[3].addChildren(new Rocket(this.cannon.direction));
 		}
 
-		this.loadedAfter = engine.loops.onRunning.time + player.rocketReloadTime;
-		this.cannon.xOff = 5;
-		this.cannon.animate({'xOff': 0}, {'dur': 300});
+		this.loadedAfter = engine.currentRoom.loops.onRunning.time + player.rocketReloadTime;
+		this.cannon.offset.x = 5;
+		this.cannon.offset.animate({'x': 0}, {'dur': 300});
 	}
 };
 
@@ -106,13 +111,13 @@ CannonBuilding.prototype.cols = function () {
 	// Check for collisions
 	if (!this.alive) {return; }
 
-	rocks = engine.depth[5].getChildren();
+	rocks = main.depths[5].getChildren();
 
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
 		if (!cObj.alive) {continue; }
 
-		cDist = this.building.bmWidth / 2 + cObj.bmWidth / 2;
+		cDist = this.building.bm.width / 2 + cObj.bm.width / 2;
 		if (Math.sqrt(Math.pow(cObj.x - this.building.x, 2) + Math.pow(cObj.y - this.building.y, 2)) < cDist) {
 			this.die();
 			cObj.impacted = true;
@@ -133,19 +138,19 @@ CannonBuilding.prototype.setLight = function (enable) {
 };
 
 CannonBuilding.prototype.revive = function () {
-	this.building.bmSize = 0;
+	this.building.size = 0;
 	this.building.opacity = 1;
-	this.cannon.bmSize = 0;
+	this.cannon.size = 0;
 	this.cannon.opacity = 1;
-	this.building.animate({"bmSize": 1}, {'dur': 200});
-	this.cannon.animate({"bmSize": 1}, {'dur': 200});
+	this.building.animate({"size": 1}, {'dur': 200});
+	this.cannon.animate({"size": 1}, {'dur': 200});
 	this.nightLight.opacity = 1;
 	this.alive = true;
 };
 
 CannonBuilding.prototype.die = function () {
-	this.building.animate({"bmSize": 1.5, "opacity": 0}, {'dur': 200});
-	this.cannon.animate({"bmSize": 1.5, "opacity": 0}, {'dur': 200});
+	this.building.animate({"size": 1.5, "opacity": 0}, {'dur': 200});
+	this.cannon.animate({"size": 1.5, "opacity": 0}, {'dur': 200});
 	this.cannon.alive = false;
 	this.nightLight.opacity = 0;
 	this.alive = false;
@@ -156,13 +161,14 @@ CannonBuilding.prototype.setCannon = function (alive) {
 
 	this.cannon.alive = alive;
 	if (this.cannon.alive === false) {
-		if (this.cannon.dir > -Math.PI / 2) {
+		if (this.cannon.direction > -Math.PI / 2) {
 			deadDir = 10 / 180 * Math.PI;
 		} else {
 			deadDir = -190 / 180 * Math.PI;
 		}
-		this.cannon.animate({'dir': deadDir, 'xOff': 7}, {'dur': 200, 'easing': 'quadOut'});
+		this.cannon.animate({'dir': deadDir}, {'dur': 200, 'easing': 'quadOut'});
+		this.cannon.offset.animate({'x': 7}, {'dur': 200, 'easing': 'quadOut'});
 	} else {
-		this.cannon.animate({'xOff': 0, bmSize: 1, opacity: 1}, {dur: 200});
+		this.cannon.offset.animate({'x': 0, size: 1, opacity: 1}, {duration: 200});
 	}
 };

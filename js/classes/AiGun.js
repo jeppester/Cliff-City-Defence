@@ -3,20 +3,17 @@ AiGun:
 An automatic gun.
 
 Requires:
-    Sprite
+    View.Sprite
     Animator
     Loader
 */
 
-jseCreateClass('AiGun');
-jseExtend(AiGun, Sprite);
-
-AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
+AiGun = function (_type, _x, _y, _parent) {
 	var _offSet;
 	if (_type === undefined || _x === undefined || _y === undefined || _parent === undefined) {
 		return false;
 	}
-	
+
 	this.type = _type;
 	this.parent = _parent;
 	this.bulletBmSource = 'Projectiles.GunShot' + this.type;
@@ -26,8 +23,8 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 	// Set gun offset
 	switch (this.type) {
 	case 1:
-		_offset = {'xOff': 10, 'yOff': 5.5};
-		this.rotSpeed = 4 / 180 * Math.PI;
+		_offset = new Math.Vector(10, 5.5);
+		this.rotSpeed = 132 / 180 * Math.PI;
 		this.loadTime = 500;
 		this.range = 400;
 		this.spread = 8 / 180 * Math.PI;
@@ -37,8 +34,8 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 		this.bulletSpeed = 700;
 		break;
 	case 2:
-		_offset = {'xOff': 10, 'yOff': 9};
-		this.rotSpeed = 6 / 180 * Math.PI;
+		_offset = new Math.Vector(10, 9);
+		this.rotSpeed = 198 / 180 * Math.PI;
 		this.loadTime = 75;
 		this.range = 300;
 		this.spread = 20 / 180 * Math.PI;
@@ -48,8 +45,8 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 		this.bulletSpeed = 600;
 		break;
 	case 3:
-		_offset = {'xOff': 10, 'yOff': 9};
-		this.rotSpeed = 5 / 180 * Math.PI;
+		_offset = new Math.Vector(10, 9);
+		this.rotSpeed = 165 / 180 * Math.PI;
 		this.loadTime = 700;
 		this.range = 400;
 		this.spread = 10 / 180 * Math.PI;
@@ -59,8 +56,8 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 		this.bulletSpeed = 400;
 		break;
 	case 4:
-		_offset = {'xOff': 8, 'yOff': 6};
-		this.rotSpeed = 4 / 180 * Math.PI;
+		_offset = new Math.Vector(8, 6);
+		this.rotSpeed = 132 / 180 * Math.PI;
 		this.loadTime = 1200;
 		this.range = 400;
 		this.spread = 0;
@@ -72,11 +69,11 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 	}
 
 	// Extent sprite
-	this.sprite('BuildingEnhancements.Gun' + this.type, _x, _y, -Math.random() * Math.PI, _offset);
+	View.Sprite.call(this, 'BuildingEnhancements.Gun' + this.type, _x, _y, -Math.random() * Math.PI, {offset: _offset});
 
 	// Add object in update array
-	engine.addActivityToLoop(this, this.update, 'onRunning');
-	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
+	engine.currentRoom.loops.collisionChecking.attachFunction(this, this.cols);
 
 	// Set object vars
 	this.alive = true;
@@ -89,6 +86,8 @@ AiGun.prototype.aiGun = function (_type, _x, _y, _parent) {
 
 	return this;
 };
+
+AiGun.prototype = Object.create(View.Sprite.prototype);
 
 AiGun.prototype.addKill = function () {
 	this.kills ++;
@@ -113,14 +112,14 @@ AiGun.prototype.addLevel = function (levels) {
 	this.kills = 0;
 
 	if (this.levelStar) {
-		this.levelStar.animate({opacity: 0, bmSize: 0, dir: Math.PI}, {dur: 1000, callback: function () {
-			this.remove();
+		this.levelStar.animate({opacity: 0, size: 0, direction: Math.PI}, {duration: 1000, callback: function () {
+			engine.purge(this);
 		}});
 	}
 
-	this.levelStar = new Sprite('Upgrades.Star' + this.level, this.x + 12, this.y + 12, 0, {opacity: 0, dir: - Math.PI, bmSize: 20});
-	this.addChild(this.levelStar);
-	this.levelStar.animate({bmSize: 1, opacity: 1, dir: 0}, {dur: 1000});
+	this.levelStar = new View.Sprite('Upgrades.Star' + this.level, this.x + 12, this.y + 12, 0, {opacity: 0, direction: - Math.PI, size: 20});
+	this.addChildren(this.levelStar);
+	this.levelStar.animate({size: 1, opacity: 1, direction: 0}, {duration: 1000});
 };
 
 AiGun.prototype.findTarget = function (compareBy, ignoreList) {
@@ -134,7 +133,7 @@ AiGun.prototype.findTarget = function (compareBy, ignoreList) {
 
 	var bestVal, best, rocks, i, ii, building, rock, rockDist, rockDir, relDir, dirDist;
 
-	rocks = engine.depth[5].getChildren();
+	rocks = main.depths[5].getChildren();
 	bestVal = false;
 	best = false;
 	for (i = 0; i < rocks.length; i ++) {
@@ -157,7 +156,7 @@ AiGun.prototype.findTarget = function (compareBy, ignoreList) {
 			break;
 		case 1:
 			rockDir = Math.atan2(rock.y - this.y, rock.x - this.x);
-			relDir = rockDir - this.dir + 2 * Math.PI;
+			relDir = rockDir - this.direction + 2 * Math.PI;
 
 			while (relDir > Math.PI) {
 				relDir -= Math.PI * 2;
@@ -176,8 +175,8 @@ AiGun.prototype.findTarget = function (compareBy, ignoreList) {
 
 AiGun.prototype.findShootDirection = function (target, dT) {
 	// Find new rock position
-	var nextX = target.x + target.dX * (engine.now - engine.last) / 1000 * (dT + 2),
-		nextY = target.y + target.dY * (engine.now - engine.last) / 1000 * (dT + 2),
+	var nextX = target.x + target.speed.x * (engine.now - engine.last) / 1000 * (dT + 2),
+		nextY = target.y + target.speed.y * (engine.now - engine.last) / 1000 * (dT + 2),
 
 		// Calculate how long it will take for a shot to reach the new rock location
 		dist = Math.sqrt(Math.pow(nextX - this.x, 2) + Math.pow(nextY - this.y, 2)),
@@ -186,14 +185,14 @@ AiGun.prototype.findShootDirection = function (target, dT) {
 	// If the new rock position can be reached with a bullet, return the direction to the new position
 	if (reachT <= dT) {
 		return {
-			dir: Math.atan2(nextY - this.y, nextX - this.x),
+			direction: Math.atan2(nextY - this.y, nextX - this.x),
 			dist: dist,
 			lastDist: Math.sqrt(Math.pow(target.x - this.x, 2) + Math.pow(target.y - this.y, 2)),
 			steps: dT
 		};
 	}
 	else {
-		return this.findShootDirection(target, dT + 4);
+		return this.findShootDirection(target, dT + 10);
 	}
 };
 
@@ -233,7 +232,7 @@ AiGun.prototype.update = function () {
 	if (!t || t.y > this.y) {
 		if (player.weaponIntelligence > 3) {
 			this.targetId = this.findTarget(0, this.getOccupiedTargets());
-			if (this.targetId === false) {	
+			if (this.targetId === false) {
 				this.targetId = this.findTarget(0);
 			}
 		}
@@ -246,27 +245,26 @@ AiGun.prototype.update = function () {
 	if (!t) {
 		if (player.weaponIntelligence > 0) {
 			// If there is no target, move to PI / 2 (facing up)
-			relDir = Math.PI * 1.5 - this.dir + 2 * Math.PI;
+			relDir = Math.PI * 1.5 - this.direction + 2 * Math.PI;
 			while (relDir > Math.PI) {
 				relDir -= Math.PI * 2;
 			}
 
 			if (relDir > 0) {
-				this.dir += Math.min(relDir, this.rotSpeed);
+				this.direction += Math.min(relDir, engine.convertSpeed(this.rotSpeed));
 			} else {
-				this.dir += Math.max(relDir, - this.rotSpeed);
+				this.direction += Math.max(relDir, - engine.convertSpeed(this.rotSpeed));
 			}
 		}
 	}
 	else {
-		// Rotate towards the target
 		// Find the direction to the target relative to the guns rotation
 		if (player.weaponIntelligence < 2 || this.type === 4) {
 			tDir = Math.atan2(t.y - this.y, t.x - this.x);
 		}
 		else {
 			findDirRes = this.findShootDirection(t, 4);
-			tDir = findDirRes.dir;
+			tDir = findDirRes.direction;
 
 			if (player.weaponIntelligence > 2) {
 				// Check that the distance to the target is not increasing
@@ -292,7 +290,7 @@ AiGun.prototype.update = function () {
 					ignoreList.push(this.targetId);
 
 					newTarget = false;
-					
+
 					while (id = this.findTarget(0, ignoreList)) {
 						ignoreList.push(id);
 						findDirRes = this.findShootDirection(engine.objectIndex[id], 5);
@@ -310,28 +308,28 @@ AiGun.prototype.update = function () {
 			}
 		}
 
-		// Move towards target
-		relDir = tDir - this.dir + 2 * Math.PI;
+		// Rotate towards the target
+		relDir = tDir - this.direction + 2 * Math.PI;
 		while (relDir > Math.PI) {
 			relDir -= Math.PI * 2;
 		}
 		if (relDir > 0) {
-			this.dir += Math.min(relDir, this.rotSpeed);
+			this.direction += Math.min(relDir, engine.convertSpeed(this.rotSpeed));
 		} else {
-			this.dir += Math.max(relDir, - this.rotSpeed);
+			this.direction += Math.max(relDir, - engine.convertSpeed(this.rotSpeed));
 		}
 
 		// Shoot if the gun is loaded
 		if (engine.gameTime > this.loadedAfter) {
-			if (Math.abs(relDir) < this.rotSpeed) {
+			if (this.direction === tDir) {
 				// All guns, except the laser, fires a bullet.
 				if (this.type < 4) {
 					// Fire the gun's ammunition type
-					engine.depth[2].addChild(
+					main.depths[2].addChildren(
 						new GunShot(
 							this.x,
 							this.y,
-							this.dir - this.spread / 2 + Math.random() * this.spread,
+							this.direction - this.spread / 2 + Math.random() * this.spread,
 							this.bulletSpeed,
 							this.bulletDamage * Math.pow(1.3, this.level),
 							this.bulletBlastRange,
@@ -346,22 +344,22 @@ AiGun.prototype.update = function () {
 					// Make laser beam on rock
 					lx = t.x + 0 * Math.cos(tDir + Math.PI);
 					ly = t.y + 0 * Math.sin(tDir + Math.PI);
-					beam = new Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "bmSize": 1.5});
-					engine.depth[6].addChild(beam);
+					beam = new View.Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "size": 1.5});
+					main.depths[6].addChildren(beam);
 					beam.animate({"opacity": 1}, {'dur': 200, easing: 'quadIn', callback: function () {
-						this.animate({"bmSize": 0, "opacity": 0}, {"dur": 400, easing: 'quadOut', callback: function () {
-							this.remove();
+						this.animate({"size": 0, "opacity": 0}, {"dur": 400, easing: 'quadOut', callback: function () {
+							engine.purge(this);
 						}});
 					}});
 
 					// Make laser beam on canon
 					lx = this.x + 24 * Math.cos(tDir);
 					ly = this.y + 24 * Math.sin(tDir);
-					beam = new Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "bmSize": 0});
-					engine.depth[8].addChild(beam);
-					beam.animate({"bmSize": 0.5, "opacity": 1}, {'dur': 100, easing: 'quadIn', callback: function () {
-						this.animate({"bmSize": 0, "opacity": 0}, {"dur": 100, easing: 'quadOut', callback: function () {
-							this.remove();
+					beam = new View.Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "size": 0});
+					main.depths[8].addChildren(beam);
+					beam.animate({"size": 0.5, "opacity": 1}, {'dur': 100, easing: 'quadIn', callback: function () {
+						this.animate({"size": 0, "opacity": 0}, {"dur": 100, easing: 'quadOut', callback: function () {
+							engine.purge(this);
 						}});
 					}});
 
@@ -379,7 +377,7 @@ AiGun.prototype.remove = function (time) {
 	if (this.alive) {
 		this.alive = false;
 		time = time  ?  time : 200;
-		this.animate({"bmSize": 0}, {'dur': time, callback: "jsePurge('" + this.id + "')", 'layer': 1});
+		this.animate({"size": 0}, {'dur': time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
 		this.parent.gun = false;
 		this.parent.gunType = 0;
 		return true;
@@ -394,13 +392,13 @@ AiGun.prototype.cols = function () {
 	// Check for collisions with rocks
 	if (!this.alive) {return; }
 
-	rocks = engine.depth[5].getChildren();
+	rocks = main.depths[5].getChildren();
 
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
 
 		if (!cObj.alive) {continue; }
-		cDist = this.bmWidth / 2 + cObj.bmWidth / 2;
+		cDist = this.bm.width / 2 + cObj.bm.width / 2;
 		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
 			cObj.remove();
 			this.parent.setGun(0);

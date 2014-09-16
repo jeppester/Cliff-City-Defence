@@ -1,124 +1,50 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-	"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html>
 <html>
-	<head>
-		<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-		<title>JsEngine Playground</title>
+<head>
+    <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
+    <title>Cliff City Defence</title>
 
-		<!-- IMPROVE MOBILE DEVICE SUPPORT -->
-		<!-- Disable pinch zoom -->
-		<meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="format-detection" content="telephone=no">
+    <!-- IMPROVE MOBILE DEVICE SUPPORT -->
+    <!-- Disable pinch zoom -->
+    <meta name="viewport" content="user-scalable=1.0,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    <style type="text/css">
+        @import "css/LoadOverlay.css";
 
-		<!-- Meta tags for social sites -->
-		<meta id="docTitle" property="og:title" content="Cliff City Defence"/>
-		<meta property="og:image" content="http://jsorensen.dk/Spil/CCD/og:image.png"/>
-		<meta property="og:type" content="game"/>
-		<meta property="og:url" content="http://jsorensen.dk/Spil/CCD"/>
-		<meta property="og:site_name" content="JSorensen.dk" />
-		<link rel="shortcut icon" type="image/x-icon" href="favicon.ico" />
+        body {
+            background-color: #000;
+        }
+    </style>
 
-		<!-- Remote debugging for mobile devices -->
-		<!--<script src="http://debug.phonegap.com/target/target-script-min.js#ccd"></script>-->
-		
-		<style type="text/css">
-			html {
-                background: #222 url(bg.png);
-            }
-			body {
-				margin:0;
-			}
+    <!-- Google analytics -->
+    <script type="text/javascript">
 
-			/* An arena should not have a border (It messes with the mouse's coordinates)
-			   if you want a border, put the arena inside a container with a border. */
-			#arena {
-				position:absolute;
-			}
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-37042773-1']);
+      _gaq.push(['_trackPageview']);
 
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
 
-			/* Style load overlay */
-			#loadOverlay {
-				background-color:#222;
-				box-shadow: inset 0 2px 8px rgba(0,0,0,.8);
-			}
+    </script>
+</head>
+<body>
+<div id="arena"></div>
 
-			#loadOverlayText {
-				width:200px;
-				height:30px;
-				position:absolute;
-				top:50%;
-				left:50%;
-				margin-top:-15px;
-				margin-left:-100px;
+<!-- JsEngine -->
+<script type="text/javascript" src="js/jsEngine.min.js"></script>
 
-				background-color:#444;
-				color:#ddd;
-				font-family:Verdana, sans-serif;
-				text-align:center;
-				font-size:12px;
-				line-height:28px;
-				border:2px solid #aaa;
-				border-radius:10px;
-				box-shadow: 0 2px 40px rgba(0,0,0,.8);
-			}
-		</style>
-	</head>
-	<body>
-		<div id="arena"></div>
-		<!-- JsEngine -->
-		<script type="text/javascript" src="js/JsEngine/JsEngine.js"></script>
-
-		<!-- Start engine -->
-		<script type="text/javascript">
-			new JsEngine({
-				enginePath:'js/JsEngine',
-				gameClassPath:'js/Game.js',
-				themesPath:'themes',
-				themes:['Day','Night'],
-
-				loopSpeed:30,
-
-				// Set number of depth layers. Remember that 10 layers will spawn layer 0-9, but not layer 10
-				depths:10,
-
-				// Set static depth layers (Static layers are layers that has to be manually redrawn)
-				// Use static depth layers as much as possible (for backgrounds and such), since non-static layers are ressource hungry.
-				manualRedrawDepths:[0],
-				compositedDepths:[7],
-				canvasResX:600,
-				canvasResY:750
-
-                // Cursor
-				//cursor:'Projectiles.Rocket',
-			});
-		</script>
-
-		<!-- Resize canvas to window size -->
-		<script type="text/javascript" src="js/autoResize.js"></script>
-
-		<!-- Other games overlay -->
-		<script type="text/javascript" src="jquery.js"></script>
-		<script type="text/javascript" src="otherGamesOverlay.js"></script>
-		<link type="text/css" rel="stylesheet" href="otherGamesOverlay.css" />
-		<script type="text/javascript">
-			setTimeout(function () {
-				otherGamesOverlay('Cliff City Defence');
-			},90000);
-		</script>
-
-		<!-- Disable iPad scroll -->
-		<script type="text/javascript">
-			// Disable scrolling by touch move
-			document.addEventListener('touchmove', function(event) {
-				event.preventDefault();
-			}, false)
-		</script>
-		<script type="text/javascript">
-			// Disable scrolling by touch start
-			document.addEventListener('touchstart', function(event) {
-				event.preventDefault();
-			}, false)
-		</script>
-	</body>
+<!-- Start engine -->
+<script type="text/javascript">
+    new Engine({
+        themes:['Day','Night'],
+        canvasResX:600,
+        canvasResY:750,
+    });
+</script>
+</body>
 </html>

@@ -4,16 +4,14 @@ data.rocks = {
 	orange: {
 		description: "A regular piece of orange cliff.",
 		onDestroy: function () {
-			var i, speed, dir, dX, dY;
+			var i, dir, speed;
 
 			for (i = 0;i < 5;i ++) {
-				speed = 100 + Math.random() * 100;
 				dir = Math.random() * 2 * Math.PI;
-				dX = Math.cos(dir) * speed;
-				dY = Math.sin(dir) * speed;
+				speed = new Math.Vector().setFromDirection(dir, 100 + Math.random() * 100);
 
-				engine.depth[2].addChild(
-					new Particle('Particles.OrangeFracture', this.x, this.y, dir, 300 + Math.random() * 300, {dX: dX, dY: dY})
+				main.depths[2].addChildren(
+					new Particle('Particles.OrangeFracture', this.x, this.y, dir, 300 + Math.random() * 300, {speed: speed})
 				);
 			}
 		},
@@ -49,8 +47,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}
@@ -77,8 +75,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}
@@ -90,20 +88,14 @@ data.rocks = {
 	magnetic: {
 		description: "A solid and magnetic rock.",
 		onDestroy: function () {
-			var i,
-				speed,
-				dir,
-				dX,
-				dY;
+			var i, dir, speed;
 
 			for (i = 0;i < 5;i ++) {
-				speed = 100 + Math.random() * 100,
-				dir = Math.random() * 2 * Math.PI,
-				dX = Math.cos(dir) * speed,
-				dY = Math.sin(dir) * speed;
+				dir = Math.random() * 2 * Math.PI;
+				speed = new Math.Vector().setFromDirection(dir, 100 + Math.random() * 100);
 
-				engine.depth[4].addChild(
-					new Particle('Particles.MagneticFracture', this.x, this.y, dir, 300 + Math.random() * 300, {dX: dX, dY: dY})
+				main.depths[2].addChildren(
+					new Particle('Particles.MagneticFracture', this.x, this.y, dir, 300 + Math.random() * 300, {speed: speed})
 				);
 			}
 		},
@@ -116,7 +108,7 @@ data.rocks = {
 			// Check for collisions
 			if (!this.alive) {return; }
 
-			rockets = engine.depth[3].getChildren();
+			rockets = main.depths[3].getChildren();
 			for (i = 0; i < rockets.length; i ++) {
 				cObj = rockets[i];
 
@@ -129,8 +121,8 @@ data.rocks = {
 				distDivider = 5 - this.maxLife / 180;
 				acc = 100 * Math.pow(b, dist / distDivider);
 
-				this.dX += Math.cos(dir) * acc;
-				this.dY += Math.sin(dir) * acc;
+				this.speed.x += Math.cos(dir) * acc;
+				this.speed.y += Math.sin(dir) * acc;
 			}
 		},
 		levels: [
@@ -165,8 +157,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}
@@ -193,8 +185,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}
@@ -206,19 +198,14 @@ data.rocks = {
 	fast: {
 		description: "A fast but not very solid rock.",
 		onDestroy: function () {
-			var i,
-				speed,
-				dir,
-				dX,
-				dY;
+			var i, dir, speed;
 
-			for (i = 0; i < 5; i ++) {
-				speed = 100 + Math.random() * 100;
+			for (i = 0;i < 5;i ++) {
 				dir = Math.random() * 2 * Math.PI;
-				dX = Math.cos(dir) * speed;
-				dY = Math.sin(dir) * speed;
-				engine.depth[3].addChild(
-					new Particle('Particles.OrangeFracture', this.x, this.y, dir, 300 + Math.random() * 300, {dX: dX, dY: dY})
+				speed = new Math.Vector().setFromDirection(dir, 100 + Math.random() * 100);
+
+				main.depths[2].addChildren(
+					new Particle('Particles.OrangeFracture', this.x, this.y, dir, 300 + Math.random() * 300, {speed: speed})
 				);
 			}
 		},
@@ -254,8 +241,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}
@@ -282,8 +269,8 @@ data.rocks = {
 
 					// If damaged by a rocket, spawn a level 1 rock
 					stageController.scheduleTask(function() {
-						engine.depth[5].insertBefore(
-							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 5000 * engine.loopSpeed / 1000),
+						main.depths[5].insertBelow(
+							new Rock(this.x, this.y, this.type, this.level - 1, - Math.random() * Math.PI, 100),
 						this);
 					}, 1, 'onRunning', undefined, this);
 				}

@@ -1,12 +1,13 @@
-jseCreateClass('Game');
+Main = function () {
+	var i;
 
-Game.prototype.game = function () {
 	// Make game properties
 	this.dialogObjects = [];
 
 	// Load game data
 	if (typeof data === "undefined")  {
-		jseSyncLoad([
+		engine.loadFiles([
+			'js/helpers.js',
 			'js/Data/Upgrades.js',
 			'js/Data/Rocks.js',
 			'js/Data/Editor.js',
@@ -18,6 +19,7 @@ Game.prototype.game = function () {
 		'js/classes/GameModes/StoryModeController.js',
 		'js/classes/GameModes/TestModeController.js',
 		'js/classes/GameModes/CustomLevelModeController.js',
+		'js/classes/GravityObject.js',
 		'js/classes/Rocket.js',
 		'js/classes/Cloud.js',
 		'js/classes/Destroyable.js',
@@ -29,6 +31,7 @@ Game.prototype.game = function () {
 		'js/classes/ScorePoints.js',
 		'js/classes/Player.js',
 		'js/classes/Rock.js',
+		'js/classes/Particle.js',
 
 		// Bullets
 		'js/classes/Explosion.js',
@@ -50,78 +53,89 @@ Game.prototype.game = function () {
 		'js/classes/Editor/LevelServer.js'
 	]);
 
+	// Create depths
+	this.depths = [];
+	for (i = 0; i < 10; i++) {
+		this.depths.push(new View.Container());
+	}
+	engine.currentRoom.addChildren.apply(engine.currentRoom, this.depths);
+
 	setTimeout(function () {
 		loader.hideOverlay(function () {
-			game.spawnMainMenu();
+			main.spawnMainMenu();
 		});
-		game.onLoaded();
+		main.onLoaded();
 	}, 1);
 };
 
-Game.prototype.onLoaded = function () {
+Main.prototype.onLoaded = function () {
 	this.pause = 0;
-	engine.newLoop('onRunning', 1, function () {
-		return !game.pause;
-	});
-	engine.newLoop('onPaused', 1, function () {
-		return game.pause;
-	});
-	engine.newLoop('collisionChecking', 2, function () {
-		return !game.pause;
-	});
+	engine.currentRoom.addLoop('onRunning', new Engine.CustomLoop(1, function () {
+		return !main.pause;
+	}));
+	engine.currentRoom.addLoop('onPaused', new Engine.CustomLoop(1, function () {
+		return main.pause;
+	}));
+	engine.currentRoom.addLoop('collisionChecking', new Engine.CustomLoop(2, function () {
+		return !main.pause;
+	}));
+
+	this.runningLoop = engine.currentRoom.loops.onRunning;
+	this.pauseLoop = engine.currentRoom.loops.onPaused;
 
 	// engine.newLoop('animations', 2);
 	// engine.defaultAnimationLoop = 'animations';
 
 	// Open static objects
 	stageController = new StageController();
-	levelServer = new LevelServer(location.href.replace(/\/\w*\.*\w*$/, '') + '/levelServer');
+	levelServer = new LevelServer(location.href.replace(/\/[^\/]*$/, '') + '/levelServer');
 
 	// Set levels completed to default value
 	this.store = localStorage;
-	this.store.levelsCompleted = game.store.levelsCompleted ? game.store.levelsCompleted: 0;
+	this.store.levelsCompleted = main.store.levelsCompleted ? main.store.levelsCompleted: 0;
 
 	// Make pause / menu button
 	this.btnPause = new SpriteButton(-30, 723, function () {
-		game.spawnInGameMenu();
+		main.spawnInGameMenu();
 	}, "Editor.RockButtonBackground", "Editor.Pause");
-	this.btnPause.bg.xOff += 5;
-	engine.depth[9].addChild(this.btnPause);
+	this.btnPause.bg.offset.x += 5;
+
+	this.depths[9].addChildren(this.btnPause);
 
 	// Create background and dummies
 	stageController.prepareBackgrounds();
 	stageController.createDummies();
 };
 
-Game.prototype.showDialog = function (obj1, obj2, obj3) {
+Main.prototype.showDialog = function (obj1, obj2, obj3) {
 	var i, obj;
 
 	this.dialogObjects.push.apply(this.dialogObjects, arguments);
+	this.depths[9].addChildren.apply(this.depths[9], this.dialogObjects);
 
-	for (i = 0; i < this.dialogObjects.length; i ++) {
-		obj = engine.depth[9].addChild(this.dialogObjects[i]);
-		obj.animate({opacity: 1, x: 300}, {dur: 500});
-	}
+	this.dialogObjects.forEach(function (d) {
+		d.animate({opacity: 1, x: 300}, {duration: 500});
+	})
 };
 
-Game.prototype.setNightMode = function (enable, time) {
+Main.prototype.setNightMode = function (enable, time) {
 	var themeName,
 		fader;
 
 	time = time !== undefined ? time / 2 : 500;
 	themeName = enable ? 'Night' : 'Day';
-	if (themeName === engine.theme) {
+	if (themeName === engine.defaultTheme) {
 		return;
 	}
 
-	fader = new Sprite('Effects.FadeOut', 0, 0, 0, {xOff: 0, yOff: 0, opacity: 0});
+	fader = new View.Sprite('Effects.FadeOut', 0, 0, 0, {offset: new Math.Vector(0, 0), opacity: 0});
 	fader.newTheme = themeName;
 	fader.time = time;
 
-	engine.depth[8].addChild(fader);
+	this.depths[8].addChildren(fader);
 
-	fader.animate({opacity: 1}, {easing: 'linear', dur: time, callback: function () {
-		engine.setTheme(this.newTheme);
+	fader.animate({opacity: 1}, {easing: 'linear', duration: time, callback: function () {
+		engine.setDefaultTheme(this.newTheme);
 		if (this.newTheme === "Night") {
 			if (window.cannonBuilding) {
 				cannonBuilding.setLight(true);
@@ -139,30 +153,32 @@ Game.prototype.setNightMode = function (enable, time) {
 			stageController.messageColor = "#000000";
 		}
 
-		this.animate({opacity: 0}, {easing: 'linear', dur: this.time, callback: function () {
-			this.remove();
+		this.animate({opacity: 0}, {easing: 'linear', duration: this.time, callback: function () {
+			engine.purge(this);
 		}});
 	}});
 };
 
-Game.prototype.clearDialog = function () {
-	var obj,
-		removeAnimCallback = function () {
-			this.remove();
-		};
+Main.prototype.clearDialog = function () {
+	var obj, removeAnimCallback, len;
 
-	while (this.dialogObjects.length) {
-		obj = this.dialogObjects[0];
+	removeAnimCallback = function () {
+		engine.purge(this);
+	};
+
+	len = this.dialogObjects.length;
+	while (len --) {
+		obj = this.dialogObjects[len];
 		if (obj.disable) {
 			obj.disable();
 		}
-		obj.animate({opacity: 0, bmSize: 1.2}, {dur: 200, callback: removeAnimCallback});
 
-		this.dialogObjects.splice(0, 1);
+		obj.animate({opacity: 0, size: 1.2}, {duration: 200, callback: removeAnimCallback});
 	}
+	this.dialogObjects = [];
 };
 
-Game.prototype.spawnMainMenu = function () {
+Main.prototype.spawnMainMenu = function () {
 	var buttons;
 
 	this.setNightMode(0);
@@ -176,10 +192,10 @@ Game.prototype.spawnMainMenu = function () {
 			stageController.removeDummies();
 
 			// Remove main menu
-			game.clearDialog();
+			main.clearDialog();
 
 			// Make dialog
-			game.pause = 0;
+			main.pause = 0;
 			player.currentLevel = 0;
 
 			// Fetch levels from database
@@ -191,10 +207,10 @@ Game.prototype.spawnMainMenu = function () {
 			stageController.removeDummies();
 
 			// Remove main menu
-			game.clearDialog();
+			main.clearDialog();
 
 			// Make dialog
-			game.pause = 0;
+			main.pause = 0;
 			player.currentLevel = 0;
 
 			// Fetch levels from database
@@ -207,21 +223,21 @@ Game.prototype.spawnMainMenu = function () {
 		buttons.push(
 			{text: "CREATE LEVELS", onClick: function () {
 				// Remove main menu
-				game.clearDialog();
+				main.clearDialog();
 
 				// The player will have to complete at least three levels in order to open the level editor
-				if (game.store.levelsCompleted > 2) {
+				if (main.store.levelsCompleted > 2) {
 					editor = new Editor();
 				}
 				else {
 					// Show denial message
-					game.showDialog(
-						new Sprite('Dialog.EditorDenial', 320, 345, 0, {opacity: 0}),
+					main.showDialog(
+						new View.Sprite('Dialog.EditorDenial', 320, 345, 0, {opacity: 0}),
 						new Button(320, 421, 0, 'Back to menu', function () {
-							game.clearDialog();
+							main.clearDialog();
 
 							// Spawn main menu again
-							game.spawnMainMenu();
+							main.spawnMainMenu();
 						}, {opacity: 0})
 					);
 				}
@@ -229,10 +245,10 @@ Game.prototype.spawnMainMenu = function () {
 		);
 	}
 
-	game.showDialog(
-		new Sprite('Dialog.GameLogoPipes', 320, 340, 0, {opacity: 0}),
-		new Sprite('Dialog.GameLogoPipes', 320, 490, 0, {opacity: 0}),
-		new Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
+	main.showDialog(
+		new View.Sprite('Dialog.GameLogoPipes', 320, 340, 0, {opacity: 0}),
+		new View.Sprite('Dialog.GameLogoPipes', 320, 490, 0, {opacity: 0}),
+		new View.Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
 		new CustomMenu(320, 476, buttons, {opacity: 0})
 	);
 
@@ -240,55 +256,57 @@ Game.prototype.spawnMainMenu = function () {
 };
 
 // For showing in game menu
-Game.prototype.spawnInGameMenu = function () {
+Main.prototype.spawnInGameMenu = function () {
 	this.pause = 1;
-	this.btnPause.animate({x: - 30}, {dur: 200});
+	this.btnPause.animate({x: - 30}, {duration: 200});
 
 	this.showDialog(
-		new Sprite('Dialog.GameLogoPipes', 320, 430, 0, {opacity: 0}),
-		new Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
+		new View.Sprite('Dialog.GameLogoPipes', 320, 430, 0, {opacity: 0}),
+		new View.Sprite('Dialog.GameLogo', 320, 254, 0, {opacity: 0}),
 		new CustomMenu(320, 450, [{text: 'CONTINUE', onClick: function () {
-				game.clearDialog();
-				game.btnPause.animate({x: 25}, {dur: 200});
+				main.clearDialog();
+				main.btnPause.animate({x: 25}, {duration: 200});
 
 				setTimeout(function () {
-					game.pause = 0;
+					main.pause = 0;
 				}, 500);
 			}}, {text: "TO MAIN MENU", onClick: function () {
-				game.clearDialog();
+				main.clearDialog();
 
 				stageController.destroyGame();
-				game.spawnMainMenu();
+				main.spawnMainMenu();
 			}}
 		], {opacity: 0})
 	);
 };
 
-Game.prototype.showGameplayInstructions = function () {
+Main.prototype.showGameplayInstructions = function () {
 	this.pause = 1;
 
 	this.showDialog(
-		new Sprite('Dialog.Instructions', 320, 375, 0, {opacity: 0}),
+		new View.Sprite('Dialog.Instructions', 320, 375, 0, {opacity: 0}),
 		new Button(320, 412, 0, 'Start playing', function () {
-			game.clearDialog();
-			game.btnPause.animate({x: 25}, {dur: 200, callback: function () {game.pause = 0; }});
+			main.clearDialog();
+			main.btnPause.animate({x: 25}, {duration: 200, callback: function () {main.pause = 0; }});
 		}, {opacity: 0})
 	);
 };
 
-Game.prototype.showSpecialUpgradesMenu = function () {
-	var currentSpecialUpgradeIndex = Math.floor(player.currentLevel / 6),
-		menu = new SpecialUpgrades(data.specialUpgrades[currentSpecialUpgradeIndex], function () {
-			game.showUpgradeMenu();
-		});
+Main.prototype.showSpecialUpgradesMenu = function () {
+	var currentSpecialUpgradeIndex, menu;
+
+	currentSpecialUpgradeIndex = Math.floor(player.currentLevel / 6),
+	menu = new SpecialUpgrades(data.specialUpgrades[currentSpecialUpgradeIndex], function () {
+		main.showUpgradeMenu();
+	});
 
 	this.pause = 1;
-	this.btnPause.animate({x: - 30}, {dur: 200});
+	this.btnPause.animate({x: - 30}, {duration: 200});
 
-	engine.depth[9].addChild(menu);
+	this.depths[9].addChildren(menu);
 };
 
-Game.prototype.showUpgradeMenu = function () {
+Main.prototype.showUpgradeMenu = function () {
 	var menu;
 
 	this.pause = 1;
@@ -296,26 +314,26 @@ Game.prototype.showUpgradeMenu = function () {
 	menu = new UpgradeMenu(function () {
 		// If the player has gained access to an upgrade that gives access to a building enhancement, show an instructions window
 		if (this.player.shieldsAvailable + this.player.weaponsAvailable === 0 && player.shieldsAvailable + player.weaponsAvailable > 0) {
-			game.showDialog(
-				new Sprite('Dialog.EnhancementInstructions', 320, 375, 0, {opacity: 0}),
+			main.showDialog(
+				new View.Sprite('Dialog.EnhancementInstructions', 320, 375, 0, {opacity: 0}),
 				new Button(320, 466, 0, 'Continue', function () {
-					game.clearDialog();
+					main.clearDialog();
 					stageController.startLevel(stageController.controller.getNextLevel());
-					game.pause = 0;
+					main.pause = 0;
 				}, {opacity: 0})
 			);
 		}
 		else {
 			stageController.startLevel(stageController.controller.getNextLevel());
-			game.pause = 0;
+			main.pause = 0;
 		}
 
 		stageController.running = true;
-		game.btnPause.animate({x: 25}, {dur: 200});
+		main.btnPause.animate({x: 25}, {duration: 200});
 	});
-	engine.depth[9].addChild(menu);
+	this.depths[9].addChildren(menu);
 
-	this.btnPause.animate({x: - 30}, {dur: 200});
+	this.btnPause.animate({x: - 30}, {duration: 200});
 
 	// Store current upgrades in the upgradeMenu object
 	menu.player = {

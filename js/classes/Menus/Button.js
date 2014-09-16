@@ -8,24 +8,23 @@ Requires:
 	TextBlock
 */
 
-jseCreateClass('Button');
-jseExtend(Button, Sprite);
-jseExtend(Button, ObjectContainer);
-
 // Constructor
-Button.prototype.button = function (_x, _y, _dir, _text, _onClick, _addOpt) {
-	// Extend Sprite
-	this.sprite('Dialog.Button', _x, _y, _dir, _addOpt);
+Button = function (_x, _y, _dir, _text, _onClick, _additionalProperties) {
+	// Extend View.Sprite
+	View.Sprite.call(this, 'Dialog.Button', _x, _y, _dir, _additionalProperties);
 
 	this.disabled = false;
 
 	if (!_onClick || !_text) {return false; }
 	this.onClick = _onClick;
-	this.textBlock = this.addChild(new TextBlock(_text, this.x - 108, this.y - 13, 217, {'font': '16px Verdana', 'lineHeight': 20, 'align': 'center', opacity: this.opacity}));
+	this.text = new View.TextBlock(_text, -108, -13, 217, {'font': '16px Verdana', 'lineHeight': 20, 'alignment': 'center', opacity: this.opacity});
+	this.addChildren(this.text);
 
-	engine.addActivityToLoop(this, this.update, 'onPaused');
-	engine.addActivityToLoop(this, this.update, 'onRunning');
+	engine.currentRoom.loops.onPaused.attachFunction(this, this.update);
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
 };
+
+Button.prototype = Object.create(View.Sprite.prototype);
 
 Button.prototype.enable = function () {
 	this.disabled = false;
@@ -36,9 +35,9 @@ Button.prototype.disable = function () {
 };
 
 Button.prototype.update = function () {
-	this.textBlock.x = this.x - 108;
-	this.textBlock.y = this.y - 13;
-	this.textBlock.opacity = this.opacity;
+	var pos, checkShape;
+
+	this.text.opacity = this.opacity;
 
 	if (this.disabled) {
 		this.setSource('Dialog.ButtonDisabled');
@@ -46,7 +45,10 @@ Button.prototype.update = function () {
 	}
 
 	// Check for hover
-	if (Math.abs(mouse.x - this.x) < 84 && Math.abs(mouse.y - this.y) < 27) {
+	pos = this.getRoomPosition();
+	checkShape = new Math.Rectangle(pos.x - 84, pos.y - 28, 168, 54);
+
+	if (pointer.shapeIsHovered(checkShape)) {
 		this.setSource('Dialog.ButtonSelected');
 	}
 	else {
@@ -54,7 +56,7 @@ Button.prototype.update = function () {
 	}
 
 	// Check for pressed
-	if (mouse.squareIsPressed(this.x - 84, this.y - 27, 168, 54)) {
+	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, checkShape)) {
 		this.onClick();
 	}
 };

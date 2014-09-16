@@ -8,10 +8,10 @@ Requires:
 	Animator
 */
 
-jseCreateClass('Building');
-jseExtend(Building, ObjectContainer);
+Building = function (type, _x, _y, _dir) {
+	// extend view
+	View.Container.call(this);
 
-Building.prototype.building = function (type, _x, _y, _dir) {
 	if (type === undefined) {
 		return false;
 	}
@@ -61,34 +61,35 @@ Building.prototype.building = function (type, _x, _y, _dir) {
 	}
 
 	// Prepare upgrade sprites
-	this.gunStand = new Sprite('BuildingEnhancements.GunStand', this.x + this.spritePos.gunStand.x, this.y + this.spritePos.gunStand.y, this.spritePos.gunStand.dir, {opacity: 0});
-	this.addChild(this.gunStand);
+	this.gunStand = new View.Sprite('BuildingEnhancements.GunStand', this.x + this.spritePos.gunStand.x, this.y + this.spritePos.gunStand.y, this.spritePos.gunStand.direction, {opacity: 0});
 	this.gun = false;
 
-	// Extend Sprite
-	this.sprite = new Sprite('Buildings.Building' + this.type, this.x, this.y, _dir);
-	this.addChild(this.sprite);
+	// Extend View.Sprite
+	this.sprite = new View.GameObject('Buildings.Building' + this.type, this.x, this.y, _dir);
 
 	// Prepare shield
 	this.shield = new Shield(this.type, this.x, this.y);
-	this.addChild(this.shield);
 	this.gunType = 0;
 
+	this.addChildren(this.gunStand, this.sprite, this.shield);
+
 	// Add to updated objects
-	engine.addActivityToLoop(this, this.update, 'onRunning');
-	engine.addActivityToLoop(this, this.cols, 'collisionChecking');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
+	engine.currentRoom.loops.collisionChecking.attachFunction(this, this.cols);
 
 	this.life = 2;
 };
+
+Building.prototype = Object.create(View.Container.prototype);
 
 Building.prototype.die = function (time) {
 	if (this.life) {
 		this.life = 0;
 		time = time  ?  time : 200;
-		this.sprite.animate({"bmSize": 1.5, "opacity": 0}, {'dur': time});
+		this.sprite.animate({"size": 1.5, "opacity": 0}, {'dur': time});
 
 		// Remove upgrades
-		this.gunStand.animate({"bmSize": 1.5, "opacity": 0}, {'dur': time});
+		this.gunStand.animate({"size": 1.5, "opacity": 0}, {'dur': time});
 		this.gunType = 0;
 		if (this.gun) {
 			this.gun.remove();
@@ -106,7 +107,7 @@ Building.prototype.setLife = function (life) {
 	}
 
 	if (this.life === 0) {
-		this.sprite.bmSize = 0;
+		this.sprite.size = 0;
 		this.sprite.opacity = 1;
 	}
 
@@ -122,13 +123,13 @@ Building.prototype.setLife = function (life) {
 		break;
 	}
 
-	this.sprite.animate({"bmSize": 1}, {'dur': 200});
+	this.sprite.animate({"size": 1}, {'dur': 200});
 	this.life = life;
 };
 
 // Upgrade functions
 Building.prototype.setShield = function (type) {
-	this.shield.set(type);
+	this.shield.setLevel(type);
 };
 
 Building.prototype.setGun = function (type) {
@@ -149,18 +150,19 @@ Building.prototype.setGun = function (type) {
 	}
 
 	this.gun = new AiGun(type, this.x + this.spritePos.gun.x, this.y + this.spritePos.gun.y, this);
-	this.addChild(this.gun);
-	this.gunStand.bmSize = 1;
+	this.addChildren(this.gun);
+	this.gunStand.size = 1;
 	this.gunStand.animate({'opacity': 1}, {'dur': 200});
 };
 
 Building.prototype.update = function () {
 	// Use update to check for mouse clicks
-	var cDist = this.sprite.bmWidth / 2,
+	var width = this.sprite.bm.width,
+		height = this.sprite.bm.height,
 		len,
 		b;
 
-	if (mouse.circleIsPressed(this.x, this.y, cDist) && this.life) {
+	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, new Math.Rectangle(this.x - width / 2, this.y - height / 2, width, height)) && this.life) {
 		if (!this.shop) {
 			len = stageController.buildings.length;
 
@@ -173,25 +175,24 @@ Building.prototype.update = function () {
 			}
 
 			this.shop = new ShopCircle(this);
-			engine.depth[8].addChild(this.shop);
+			main.depths[8].addChildren(this.shop);
 		}
 	}
 };
 
 Building.prototype.cols = function () {
-	var rocks, i, cObj, cDist;
+	var rocks, i, cObj;
 
 	// Check for collisions with rocks
 	if (!this.life) {return; }
 
-	rocks = engine.depth[5].getChildren();
+	rocks = main.depths[5].getChildren();
+
 	for (i = 0; i < rocks.length; i ++) {
 		cObj = rocks[i];
-
 		if (!cObj.alive) {continue; }
 
-		cDist = this.sprite.bmWidth / 2 + cObj.bmWidth / 2;
-		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
+		if (this.sprite.collidesWith(cObj)) {
 			if (this.shield.enabled) {
 				this.shield.life -= cObj.life;
 				if (this.shield.life <= 0) {

@@ -6,9 +6,7 @@ Requires:
 	Level vars to be set
  */
 
-jseCreateClass('StageController');
-
-StageController.prototype.stageController = function () {
+StageController = function () {
 	this.id = 'StageController';
 	this.level = 0;
 	this.curObj = 0;
@@ -21,7 +19,7 @@ StageController.prototype.stageController = function () {
 	this.stats = {
 		rocks: []
 	};
-	engine.addActivityToLoop(this, this.update, 'onRunning');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
 };
 
 StageController.prototype.prepareBackgrounds = function () {
@@ -29,31 +27,34 @@ StageController.prototype.prepareBackgrounds = function () {
 
 	// Make cliff
 	if (typeof this.ground === "undefined") {
-		this.ground = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityGround', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
-		this.road = engine.depth[0].addChild(new Sprite('Backgrounds.cliffCityRoad', 0, 0, 0, {'xOff': 0, 'yOff': 0}));
-		this.cliff = engine.depth[6].addChild(new Sprite('Backgrounds.cliffSide', 0, 0, 0, {'xOff': 10, 'yOff': 0}));
-		this.nightOverlay = engine.depth[7].addChild(new Sprite('Effects.NightOverlay', 0, 0, 0, {'xOff': 0, 'yOff': 0, opacity: 0}));
+		this.ground = new View.Sprite('Backgrounds.cliffCityGround', 0, 0, 0, {offset: new Math.Vector()});
+		this.road = new View.Sprite('Backgrounds.cliffCityRoad', 0, 0, 0, {offset: new Math.Vector()});
+		main.depths[0].addChildren(this.ground, this.road);
+
+		this.cliff = new View.Sprite('Backgrounds.cliffSide', 0, 0, 0, {offset: new Math.Vector(10)});
+		main.depths[6].addChildren(this.cliff);
+
+		this.nightOverlay = new View.Sprite('Effects.NightOverlay', 0, 0, 0, {offset: new Math.Vector(), opacity: 0});
+		main.depths[7].addChildren(this.nightOverlay);
 		engine.redraw(1);
 
 		// Make some clouds
 		for (i = 0;i < 5;i++) {
-			engine.depth[1].addChild(new Cloud());
+			main.depths[1].addChildren(new Cloud());
 		}
-		console.log('Stage background created');
+		// console.log('Stage background created');
 	}
 	else {
-		console.log('Stage background already created');
+		// console.log('Stage background already created');
 	}
 };
 
 StageController.prototype.prepareGame = function () {
 	var b, d;
 
-	// Make score - object
-	player = new Player();
-
 	// Make cannon building
-	cannonBuilding = engine.depth[4].addChild(new CannonBuilding());
+	cannonBuilding = new CannonBuilding();
+	main.depths[4].addChildren(cannonBuilding);
 
 	// Make buildings and trees (the order is important for depth)
 	this.destroyables = [];
@@ -92,7 +93,11 @@ StageController.prototype.prepareGame = function () {
 	d = this.destroyables,
 	b = this.buildings;
 
-	engine.depth[4].addChildren(d[0], d[1], b[0], b[1], d[2], b[2], b[3], b[4], b[5], d[3], d[4], d[5], d[6], d[7], d[8]);
+	// Add all buildings and trees in the correct order
+	main.depths[4].addChildren(d[0], d[1], b[0], b[1], d[2], b[2], b[3], b[4], b[5], d[3], d[4], d[5], d[6], d[7], d[8]);
+
+	// Make player-object
+	player = new Player();
 };
 
 // For ending all game related activities
@@ -116,8 +121,8 @@ StageController.prototype.destroyGame = function () {
 	}
 
 	// Remove rocks and rockets
-	engine.depth[5].removeChildren();
-	engine.depth[3].removeChildren();
+	main.depths[5].removeAllChildren();
+	main.depths[3].removeAllChildren();
 
 	// Remove messages, if there are any
 	for (i in this.messages) {
@@ -132,7 +137,7 @@ StageController.prototype.destroyGame = function () {
 
 	// Remove player object
 	if (player) {
-		jsePurge(player.inGameScore);
+		engine.purge(player.inGameScore);
 		delete player;
 	}
 
@@ -151,12 +156,12 @@ StageController.prototype.destroyBackgrounds = function () {
 		delete this.cliff;
 
 		// Remove clouds
-		engine.depth[1].removeChildren();
-		console.log('Stage background removed');
+		main.depths[1].removeAllChildren();
+		// console.log('Stage background removed');
 		engine.redraw(1);
 	}
 	else {
-		console.log('Stage background not there');
+		// console.log('Stage background not there');
 	}
 };
 
@@ -207,18 +212,18 @@ StageController.prototype.loadPlayerState = function (playerState) {
 
 	player.points = playerState.player.points;
 	player.pointsTotal = playerState.player.pointsTotal;
-	player.inGameScore.setString(player.points.toString() + "$");
+	player.inGameScore.string = player.points.toString() + "$";
 };
 
 StageController.prototype.update = function () {
 	var i, t, r, l, rock;
 
 	// If paused, return
-	if (game.pause) {return; }
+	if (main.pause) {return; }
 
 	for (i = 0; i < this.scheduledTasks.length; i ++) {
 		t = this.scheduledTasks[i];
-		if (engine.loops[t.loop].time >= t.fireTime) {
+		if (engine.currentRoom.loops[t.loop].time >= t.fireTime) {
 			if (t.caller) {
 				t.callback.call(t.caller);
 			}
@@ -237,7 +242,7 @@ StageController.prototype.update = function () {
 	this.levelTime += engine.now - engine.last;
 
 	if (engine.frames % 4 === 0) {
-		if (this.curObj === this.level.rocks.length && engine.depth[5].children.length === 0) {
+		if (this.curObj === this.level.rocks.length && main.depths[5].children.length === 0) {
 			this.endLevel();
 		}
 
@@ -250,17 +255,17 @@ StageController.prototype.update = function () {
 				this.cumulatedTime += r.spawnDelay;
 
 				// If direction and startposition is not set, randomize them
-				r.dir = r.dir ? r.dir: Math.random() * Math.PI;
+				r.direction = r.direction ? r.direction: Math.random() * Math.PI;
 				r.x = r.x ? r.x: 55 + Math.random() * (arena.offsetWidth - 110);
 
 				// Create a rock by putting together the gathered information
-				engine.depth[5].addChild(
+				main.depths[5].addChildren(
 					rock = new Rock(
 						r.x, // Start position
 						- 50, // Start direction
 						r.type.toLowerCase(), // Type
 						r.level - 1,
-						r.dir
+						r.direction
 					)
 				);
 				this.curObj++;
@@ -295,7 +300,7 @@ StageController.prototype.startLevel = function (levelNumber) {
 
 	// If night theme is enabled fade in night overlay
 	if (this.level.theme === "Night") {
-		this.nightOverlay.animate({opacity: 1}, {dur: 2000});
+		this.nightOverlay.animate({opacity: 0.6}, {duration: 2000});
 	}
 
 	this.running = true;
@@ -314,7 +319,7 @@ StageController.prototype.endLevel = function () {
 
 	// If night theme is enabled fade out night overlay
 	if (engine.theme === "Night") {
-		this.nightOverlay.animate({opacity: 0}, {dur: 2000});
+		this.nightOverlay.animate({opacity: 0}, {duration: 2000});
 	}
 
 	this.running = false;
@@ -331,7 +336,7 @@ StageController.prototype.calculateLevelStats = function () {
 	totalImpacts = 0,
 	totalFallDistance = 0,
 	stats = {};
-	
+
 	for (i = 0; i < this.stats.rocks.length; i ++) {
 		r = this.stats.rocks[i];
 
@@ -390,7 +395,7 @@ StageController.prototype.scheduleTask = function (callback, delayTime, loop, id
 
 	task = {
 		callback: callback,
-		fireTime: engine.loops[loop].time + delayTime,
+		fireTime: engine.currentRoom.loops[loop].time + delayTime,
 		loop: loop,
 		id: id,
 		caller: caller
@@ -420,32 +425,35 @@ StageController.prototype.stopAllTasks = function () {
 };
 
 StageController.prototype.createDummies = function () {
-	if (typeof this.dummies !== "undefined") {console.log('Dummies already created'); return; }
+	if (typeof this.dummies !== "undefined") {
+		// console.log('Dummies already created');
+		return;
+	}
 
-	this.dummies = engine.depth[4].addChildren(
+	this.dummies = main.depths[4].addChildren(
 		// Make canon building
-		new Sprite('Buildings.RocketBuilding', 315, 660),
+		new View.Sprite('Buildings.RocketBuilding', 315, 660),
 
 		// Make buildings and trees (the order is important for depth)
-		new Sprite('Trees.Tree', 421, 680),
-		new Sprite('Trees.AppleTree', 520, 673),
+		new View.Sprite('Trees.Tree', 421, 680),
+		new View.Sprite('Trees.AppleTree', 520, 673),
 
-		new Sprite('Buildings.Building1', 91, 665),
-		new Sprite('Buildings.Building2', 163, 665),
+		new View.Sprite('Buildings.Building1', 91, 665),
+		new View.Sprite('Buildings.Building2', 163, 665),
 
-		new Sprite('Trees.Tree', 200, 690),
+		new View.Sprite('Trees.Tree', 200, 690),
 
-		new Sprite('Buildings.Building3', 232, 680),
-		new Sprite('Buildings.Building4', 392, 687),
-		new Sprite('Buildings.Building5', 446, 663),
-		new Sprite('Buildings.Building6', 490, 668),
+		new View.Sprite('Buildings.Building3', 232, 680),
+		new View.Sprite('Buildings.Building4', 392, 687),
+		new View.Sprite('Buildings.Building5', 446, 663),
+		new View.Sprite('Buildings.Building6', 490, 668),
 
-		new Sprite('Trees.Tree', 98, 700),
-		new Sprite('Trees.AppleTree', 151, 725),
-		new Sprite('Trees.Tree', 225, 718),
-		new Sprite('Trees.AppleTree', 362, 700),
-		new Sprite('Trees.AppleTree', 436, 718),
-		new Sprite('Trees.Tree', 473, 694)
+		new View.Sprite('Trees.Tree', 98, 700),
+		new View.Sprite('Trees.AppleTree', 151, 725),
+		new View.Sprite('Trees.Tree', 225, 718),
+		new View.Sprite('Trees.AppleTree', 362, 700),
+		new View.Sprite('Trees.AppleTree', 436, 718),
+		new View.Sprite('Trees.Tree', 473, 694)
 	);
 };
 
@@ -455,7 +463,7 @@ StageController.prototype.removeDummies = function () {
 	if (typeof this.dummies === "undefined") {return; }
 
 	for (i = 0;i < this.dummies.length;i++) {
-		jsePurge(this.dummies[i]);
+		engine.purge(this.dummies[i]);
 	}
 	delete this.dummies;
 };
@@ -469,7 +477,7 @@ StageController.prototype.shakeCliff = function () {
 		if (this.shakes < 16) {
 			this.shakes++;
 			nextX = this.shakes % 2 ? this.x + 5 : this.x - 5;
-			this.animate({x: nextX}, {dur: 130, callback: this.shake, loop: 'onRunning'});
+			this.animate({x: nextX}, {duration: 130, callback: this.shake, loop: main.runningLoop});
 		}
 	};
 

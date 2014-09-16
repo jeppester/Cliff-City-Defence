@@ -7,11 +7,8 @@ Requires:
 	Mouse
 */
 
-jseCreateClass('UpgradeIcon');
-jseExtend(UpgradeIcon, Sprite);
-
 // Constructor
-UpgradeIcon.prototype.upgradeIcon = function (_upgradeType, _buttonType, _level, _x, _y, _animate) {
+UpgradeIcon = function (_upgradeType, _buttonType, _level, _x, _y, _animate) {
 	var spr;
 	this.buttonType = _buttonType !== undefined  ?  _buttonType : 0;
 	this.upgradeType = _upgradeType ? _upgradeType: false;
@@ -48,20 +45,22 @@ UpgradeIcon.prototype.upgradeIcon = function (_upgradeType, _buttonType, _level,
 		break;
 	}
 
-	this.sprite('Upgrades.btn' + spr, _x, _y, 0);
-	this.icon = new Sprite('Upgrades.' + this.upgradeType.folder + '.l' + this.level + (this.buttonType === 3 ? 2: 1), _x, _y, 0);
-	this.addChild(this.icon);
+	View.Sprite.call(this, 'Upgrades.btn' + spr, _x, _y, 0);
+	this.icon = new View.Sprite('Upgrades.' + this.upgradeType.folder + '.l' + this.level + (this.buttonType === 3 ? 2: 1), _x, _y, 0);
+	this.addChildren(this.icon);
 
-	engine.addActivityToLoop(this, this.update, 'onPaused');
+	engine.currentRoom.loops.onPaused.attachFunction(this, this.update);
 
 	if (animate) {
 		this.bmSize = 0;
 		this.icon.bmSize = 0;
 
-		this.animate({bmSize: 1}, {dur: 400});
-		this.icon.animate({bmSize: 1}, {dur: 400});
+		this.animate({bmSize: 1}, {duration: 400});
+		this.icon.animate({bmSize: 1}, {duration: 400});
 	}
 };
+
+UpgradeIcon.prototype = Object.create(View.Sprite.prototype);
 
 UpgradeIcon.prototype.select = function () {
 	// Deselect all other buttons
@@ -79,12 +78,12 @@ UpgradeIcon.prototype.select = function () {
 		this.setSource('Upgrades.btn2c');
 		this.parent.btnBuy.disable();
 	}
-	this.parent.btnBuy.animate({opacity: 1}, {dur: 500});
+	this.parent.btnBuy.animate({opacity: 1}, {duration: 500});
 
 	// Set upgrade menu info test
 	this.parent.infoCurrent = this.id;
-	this.parent.infoHeader.setString(this.name);
-	this.parent.infoText.setString(this.description);
+	this.parent.infoHeader.string = this.name;
+	this.parent.infoText.string = this.description;
 	this.parent.iconSelected = this;
 	this.selected = true;
 };
@@ -104,7 +103,7 @@ UpgradeIcon.prototype.deselect = function () {
 
 UpgradeIcon.prototype.update = function () {
 	if (this.buttonType === 2) {
-		if (mouse.squareIsPressed(this.x - 36, this.y - 36, 72, 72)) {
+		if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, new Math.Rectangle(this.x - 36, this.y - 36, 72, 72))) {
 			// Change menu text
 			this.select();
 		}

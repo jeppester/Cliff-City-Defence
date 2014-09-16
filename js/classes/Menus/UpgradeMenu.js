@@ -10,21 +10,21 @@ Requires:
 	Shop
 */
 
-jseCreateClass('UpgradeMenu');
-jseExtend(UpgradeMenu, ObjectContainer);
+UpgradeMenu = function (onContinue) {
+	// Extend view
+	View.Container.call(this);
 
-UpgradeMenu.prototype.upgradeMenu = function (onContinue) {
 	// Make upgrade header
-	this.headerBox = new Sprite('Dialog.HeaderBox', 300, 55, 0);
-	this.headerText = new TextBlock('UPGRADES AVAILABLE: ', 0, 24, 600, {'font': 'normal 36px Verdana', 'align': 'center'});
+	this.headerBox = new View.Sprite('Dialog.HeaderBox', 300, 55, 0);
+	this.headerText = new View.TextBlock('UPGRADES AVAILABLE: ', 0, 24, 600, {'font': 'normal 36px Verdana', 'alignment': 'center'});
 	this.icons = [];
 	this.onContinue = onContinue ? onContinue: function () {};
 	this.iconSelected = false;
 
 	// Make info text
-	this.infoBox = new Sprite('Dialog.TextBox', 300, 568, 0);
-	this.infoHeader = new TextBlock(' ', 80, 510, 400, {'font': 'bold 14px Verdana'});
-	this.infoText = new TextBlock(' ', 80, 540, 440);
+	this.infoBox = new View.Sprite('Dialog.TextBox', 300, 568, 0);
+	this.infoHeader = new View.TextBlock(' ', 80, 510, 400, {'font': 'bold 14px Verdana'});
+	this.infoText = new View.TextBlock(' ', 80, 540, 440);
 	this.infoCurrent = '';
 
 	// Make buy button
@@ -53,14 +53,13 @@ UpgradeMenu.prototype.upgradeMenu = function (onContinue) {
 	engine.redraw(1);
 };
 
+UpgradeMenu.prototype = Object.create(View.Container);
+
 // Function for drawing upgrade "tree"
 UpgradeMenu.prototype.makeUpgradeTree = function (_animate) {
-	var animate = _animate ? _animate: 0,
-		c,
-		t,
-		i,
-		ii,
-		lock;
+	var animate, c, t, i, ii, lock;
+
+	animate = _animate ? _animate : 0;
 
 	while (this.icons.length > 0) {
 		this.icons[0].remove();
@@ -101,9 +100,9 @@ UpgradeMenu.prototype.resetInfo = function () {
 		return;
 	}
 	this.infoCurrent = 'default';
-	this.infoHeader.setString('UPGRADES');
-	this.infoText.setString('Click on an update see a description of it.\nTo purchase an upgrade, click the "BUY" - button below it\'s description. You can only purchase an upgrade if you have enough game points.');
+	this.infoHeader.string = 'UPGRADES';
+	this.infoText.string = 'Click on an update see a description of it.\nTo purchase an upgrade, click the "BUY" - button below it\'s description. You can only purchase an upgrade if you have enough game points.';
 	this.iconSelected = false;
 	this.btnBuy.disable();
-	this.btnBuy.animate({opacity: 0}, {dur: 200});
+	this.btnBuy.animate({opacity: 0}, {duration: 200});
 };

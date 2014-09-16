@@ -1,26 +1,33 @@
-jseCreateClass('SpriteButton');
-jseExtend(SpriteButton, ObjectContainer);
-jseExtend(SpriteButton, Animation);
-
-SpriteButton.prototype.spriteButton = function (x, y, onClick, sprite1, sprite2) {
+SpriteButton = function (x, y, onClick, sprite1, sprite2) {
 	if (x === undefined) {throw new Error('Argument missing: x'); }
 	if (y === undefined) {throw new Error('Argument missing: y'); }
 	if (sprite1 === undefined) {throw new Error('Argument missing: sprite1'); }
 	if (onClick === undefined) {throw new Error('Argument missing: onClick'); }
 
+	// Extend view
+	View.Container.call(this);
+
 	this.disabled = false;
 
-	engine.addActivityToLoop(this, this.update, 'eachFrame');
+	engine.currentRoom.loops.eachFrame.attachFunction(this, this.update);
 
 	this.x = x;
 	this.y = y;
 	this.opacity = 1;
-	this.dir = 0;
+	this.direction = 0;
 
 	this.onClick = onClick;
-	this.bg = this.addChild(new Sprite(sprite1, x, y, 0));
-	this.fg = sprite2 === undefined  ?  false : this.addChild(new Sprite(sprite2, x, y, 0));
+	this.bg = new View.Sprite(sprite1, x, y, 0);
+	this.fg = sprite2 === undefined  ?  false : new View.Sprite(sprite2, x, y, 0);
+
+	this.addChildren(this.bg);
+	if (this.fg) {
+		this.addChildren(this.fg);
+	}
 };
+
+SpriteButton.prototype = Object.create(View.Container.prototype);
+SpriteButton.import(Mixin.Animatable);
 
 SpriteButton.prototype.enable = function () {
 	this.disabled = false;
@@ -31,18 +38,12 @@ SpriteButton.prototype.disable = function () {
 };
 
 SpriteButton.prototype.update = function () {
-	var sprX, sprY;
+	var sprX, sprY, pos, checkShape;
 
-	this.bg.x = this.x;
-	this.bg.y = this.y;
 	this.bg.opacity = this.opacity;
-	this.bg.dir = this.dir;
 
 	if (this.fg) {
-		this.fg.x = this.x;
-		this.fg.y = this.y;
 		this.fg.opacity = this.opacity;
-		this.fg.dir = this.dir;
 	}
 
 	if (this.disabled) {
@@ -50,11 +51,13 @@ SpriteButton.prototype.update = function () {
 	}
 
 	// Check for hover and click
-	sprX = this.bg.x - this.bg.xOff;
-	sprY = this.bg.y - this.bg.yOff;
+	sprX = this.bg.x - this.bg.offset.x;
+	sprY = this.bg.y - this.bg.offset.y;
 
-	button = mouse.squareIsPressed(sprX, sprY, this.bg.bmWidth, this.bg.bmHeight);
-	if (button) {
-		this.onClick(button);
+	pos = this.bg.getRoomPosition().subtract(this.bg.offset);
+	checkShape = new Math.Rectangle(pos.x, pos.y, this.bg.bm.width, this.bg.bm.height);
+
+	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, checkShape)) {
+		this.onClick();
 	}
 };

@@ -6,11 +6,7 @@ Requires:
 	Button
 */
 
-jseCreateClass('CustomMenu');
-jseExtend(CustomMenu, Animation);
-jseExtend(CustomMenu, ObjectContainer);
-
-CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
+CustomMenu = function (_x, _y, _buttons, _additionalProperties) {
 	var i, b;
 
 	if (_x === undefined) {
@@ -26,25 +22,31 @@ CustomMenu.prototype.customMenu = function (_x, _y, _buttons, _addOpt) {
 		throw new Error('Argument buttons is empty');
 	}
 
+	// Extend view
+	View.Container.call(this);
+
 	this.x = _x;
 	this.y = _y;
 	this.opacity = 1;
 
-	// Load additional options
-	copyVars(_addOpt, this);
+	// Load additional properties
+	this.importProperties(_additionalProperties);
 
 	engine.registerObject(this);
-	engine.addActivityToLoop(this, this.update, 'onRunning');
-	engine.addActivityToLoop(this, this.update, 'onPaused');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
+	engine.currentRoom.loops.onPaused.attachFunction(this, this.update);
 
 	for (i = 0; i < _buttons.length; i ++) {
 		b = _buttons[i];
 
-		this.addChild(
-			new Button(this.x, this.y - 62 * (_buttons.length - 1) / 2 + i * 62, 0, b.text, b.onClick, {opacity: this.opacity})
+		this.addChildren(
+			new Button(0, - 62 * (_buttons.length - 1) / 2 + i * 62, 0, b.text, b.onClick, {opacity: this.opacity})
 		);
 	}
 };
+
+CustomMenu.prototype = Object.create(View.Container.prototype);
+CustomMenu.prototype.import(Mixin.Animatable);
 
 CustomMenu.prototype.enable = function () {
 	var i;
@@ -67,8 +69,6 @@ CustomMenu.prototype.update = function () {
 		btn;
 	for (i = 0; i < this.children.length; i ++) {
 		btn = this.children[i];
-		btn.x = this.x;
-		btn.y = this.y - 62 * (this.children.length - 1) / 2 + i * 62;
 		btn.opacity = this.opacity;
 	}
 };

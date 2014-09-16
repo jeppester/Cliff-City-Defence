@@ -5,13 +5,11 @@ The game's level editor.
 Requires:
 	Sprite
 	TextBlock
-	MouseIndex
+	Mouse
 	StageController
  */
 
-jseCreateClass('Editor');
-
-Editor.prototype.editor = function () {
+Editor = function () {
 	var count, i, ii, btn, onRockButtonClick;
 
 	// Make cliff
@@ -33,71 +31,71 @@ Editor.prototype.editor = function () {
 	onRockButtonClick = function () {
 		editor.rockType = this.rockType;
 		editor.rockLevel = this.rockLevel;
-		editor.selector.animate({y: this.y}, {dur: 400});
+		editor.selector.animate({y: this.y}, {duration: 400});
 	};
 
 	for (i in data.rocks) {
 		if (data.rocks.hasOwnProperty(i)) {
 			for (ii = 0; ii < data.rocks[i].levels.length; ii ++) {
-				btn = new SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", data.rocks[i].levels[ii].sprite);
+				btn = new View.SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", data.rocks[i].levels[ii].sprite);
 				btn.rockType = i;
 
-				// If the rocks bmSize to fit the button
+				// If the rocks size to fit the button
 				switch (ii) {
 				case 1:
-					btn.fg.bmSize = 0.85;
+					btn.fg.size = 0.85;
 					break;
 				case 2:
-					btn.fg.bmSize = 0.7;
+					btn.fg.size = 0.7;
 					break;
 				}
 
 				btn.rockLevel = ii + 1;
-				btn.bg.xOff += 5;
+				btn.bg.offset.x += 5;
 				count ++;
 				this.rockButtons.push(btn);
-				engine.depth[8].addChild(btn);
+				main.depths[8].addChildren(btn);
 			}
 		}
 	}
 
 	// Create selectorbox
-	this.selector = new Sprite("Editor.RockSelectorBox", -10, 27, 0, {xOff: 0});
+	this.selector = new View.Sprite("Editor.RockSelectorBox", -10, 27, 0, {offset: new Math.Vector(0, 'center')});
 
 	// Theme change button
-	this.btnChangeTheme = new SpriteButton(25, 558, function () {
-		game.setNightMode(engine.theme !== 'Night');
+	this.btnChangeTheme = new View.SpriteButton(25, 558, function () {
+		main.setNightMode(engine.defaultTheme !== 'Night');
 	}, "Editor.RockButtonBackground", "Editor.NightDay");
-	this.btnChangeTheme.bg.xOff += 5;
+	this.btnChangeTheme.bg.offset.x += 5;
 
 	// Save button
-	this.btnSave = new SpriteButton(25, 613, function () {
+	this.btnSave = new View.SpriteButton(25, 613, function () {
 		editor.testBeforeSave();
 	}, "Editor.RockButtonBackground", "Editor.Floppy");
-	this.btnSave.bg.xOff += 5;
+	this.btnSave.bg.offset.x += 5;
 
 	// Test level button
-	this.btnTestMode = new SpriteButton(25, 668, function () {
+	this.btnTestMode = new View.SpriteButton(25, 668, function () {
 		if (editor.testModeStarted) {
 			editor.endTestMode();
 		} else {
 			editor.startTestMode();
 		}
 	}, "Editor.RockButtonBackground", "Editor.Play");
-	this.btnTestMode.bg.xOff += 5;
+	this.btnTestMode.bg.offset.x += 5;
 
 	// Back to menu button
-	this.btnMainMenu = new SpriteButton(25, 723, function () {
+	this.btnMainMenu = new View.SpriteButton(25, 723, function () {
 		editor.remove();
-		game.spawnMainMenu();
+		main.spawnMainMenu();
 	}, "Editor.RockButtonBackground", "Editor.Quit");
-	this.btnMainMenu.bg.xOff += 5;
+	this.btnMainMenu.bg.offset.x += 5;
 
 	// Add all buttons to depth[10]
-	engine.depth[8].addChildren(this.selector, this.btnChangeTheme, this.btnSave, this.btnTestMode, this.btnMainMenu);
+	main.depths[8].addChildren(this.selector, this.btnChangeTheme, this.btnSave, this.btnTestMode, this.btnMainMenu);
 
 	// Add to update array
-	engine.addActivityToLoop(this, this.update, 'onRunning');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
 
 	stageController.createDummies();
 
@@ -121,26 +119,26 @@ Editor.prototype.remove = function () {
 	}
 
 	markerRemoveAnimCallback = function () {
-		jsePurge(this);
+		engine.purge(this);
 	};
 
 	for (i = 0; i < this.rocks.length; i ++) {
 		markers = this.rocks[i].markers;
 		for (ii = 0; ii < markers.length; ii ++) {
-			markers[ii].animate({opacity: 0}, {dur: 200, callback: markerRemoveAnimCallback});
+			markers[ii].animate({opacity: 0}, {duration: 200, callback: markerRemoveAnimCallback});
 		}
 	}
 	delete this.rocks;
 
 	stageController.destroyBackgrounds();
 
-	jsePurge(this);
+	engine.purge(this);
 };
 
 Editor.prototype.newSpawnArrow = function () {
-	this.spawnArrow = new Sprite("Editor.SpawnArrow", - 50, - 25, Math.PI / 2, {xOff: - 50, opacity: 0});
-	this.spawnArrow.x = Math.max(100, Math.min(500, Math.round(mouse.x / data.editor.spawnPositionStepSize) * 50));
-	engine.depth[8].addChild(this.spawnArrow);
+	this.spawnArrow = new View.Sprite("Editor.SpawnArrow", - 50, - 25, Math.PI / 2, {offset: new Math.Vector(-50, 'center'), opacity: 0});
+	this.spawnArrow.x = Math.max(100, Math.min(500, Math.round(pointer.mouse.x / data.editor.spawnPositionStepSize) * 50));
+	main.depths[8].addChildren(this.spawnArrow);
 };
 
 Editor.prototype.startTestMode = function () {
@@ -151,25 +149,24 @@ Editor.prototype.startTestMode = function () {
 		return;
 	}
 
-
 	this.saveTest = false;
 	// Hide menu
 	this.testModeStarted = true;
 	this.btnTestMode.fg.setSource('Editor.Stop');
-	this.selector.animate({x: - 65}, {dur: 200});
-	this.btnSave.animate({x: - 30}, {dur: 200});
-	this.btnMainMenu.animate({x: - 30}, {dur: 200});
+	this.selector.animate({x: - 65}, {duration: 200});
+	this.btnSave.animate({x: - 30}, {duration: 200});
+	this.btnMainMenu.animate({x: - 30}, {duration: 200});
 
-	this.btnChangeTheme.animate({x: - 30}, {dur: 200});
+	this.btnChangeTheme.animate({x: - 30}, {duration: 200});
 	for (i = 0; i < this.rocks.length; i ++) {
 		rock = this.rocks[i];
 
 		for (ii = 0; ii < rock.markers.length; ii ++) {
-			rock.markers[ii].animate({opacity: 0}, {dur: 500});
+			rock.markers[ii].animate({opacity: 0}, {duration: 500});
 		}
 	}
 	for (i = 0; i < this.rockButtons.length; i ++) {
-		this.rockButtons[i].animate({x: - 30}, {dur: 200});
+		this.rockButtons[i].animate({x: - 30}, {duration: 200});
 	}
 
 	// Start running level;
@@ -203,12 +200,12 @@ Editor.prototype.testBeforeSave = function () {
 			this.rockButtons[i].disable();
 		}
 
-		game.showDialog(
-			new Sprite('Dialog.EditorNotEnoughRocks', 320, 345, 0, {opacity: 0}),
+		main.showDialog(
+			new View.Sprite('Dialog.EditorNotEnoughRocks', 320, 345, 0, {opacity: 0}),
 			new Button(320, 421, 0, 'Back to editor', function () {
 				var i, rock, ii;
 
-				game.clearDialog();
+				main.clearDialog();
 
 				// Enable all buttons
 				editor.testModeStarted = false;
@@ -240,20 +237,20 @@ Editor.prototype.testBeforeSave = function () {
 	// Hide menu
 	this.testModeStarted = true;
 	this.btnTestMode.fg.setSource('Editor.Stop');
-	this.selector.animate({x: - 65}, {dur: 200});
-	this.btnSave.animate({x: - 30}, {dur: 200});
-	this.btnMainMenu.animate({x: - 30}, {dur: 200});
-	this.btnChangeTheme.animate({x: - 30}, {dur: 200});
+	this.selector.animate({x: - 65}, {duration: 200});
+	this.btnSave.animate({x: - 30}, {duration: 200});
+	this.btnMainMenu.animate({x: - 30}, {duration: 200});
+	this.btnChangeTheme.animate({x: - 30}, {duration: 200});
 
 	for (i = 0; i < this.rocks.length; i ++) {
 		rock = this.rocks[i];
 
 		for (ii = 0; ii < rock.markers.length; ii ++) {
-			rock.markers[ii].animate({opacity: 0}, {dur: 500});
+			rock.markers[ii].animate({opacity: 0}, {duration: 500});
 		}
 	}
 	for (i = 0; i < this.rockButtons.length; i ++) {
-		this.rockButtons[i].animate({x: - 30}, {dur: 200});
+		this.rockButtons[i].animate({x: - 30}, {duration: 200});
 	}
 
 	// Start running level
@@ -269,14 +266,14 @@ Editor.prototype.endTestMode = function () {
 	// Show menu
 	this.testModeStarted = false;
 	this.btnTestMode.fg.setSource('Editor.Play');
-	this.selector.animate({x: - 10}, {dur: 200});
-	this.btnSave.animate({x: 25}, {dur: 200});
-	this.btnMainMenu.animate({x: 25}, {dur: 200});
-	this.btnChangeTheme.animate({x: 25}, {dur: 200});
+	this.selector.animate({x: - 10}, {duration: 200});
+	this.btnSave.animate({x: 25}, {duration: 200});
+	this.btnMainMenu.animate({x: 25}, {duration: 200});
+	this.btnChangeTheme.animate({x: 25}, {duration: 200});
 	this.updateRockQueue();
 
 	for (i = 0; i < this.rockButtons.length; i ++) {
-		this.rockButtons[i].animate({x: 25}, {dur: 200});
+		this.rockButtons[i].animate({x: 25}, {duration: 200});
 	}
 
 	// Enable level save button
@@ -294,79 +291,79 @@ Editor.prototype.update = function () {
 		return;
 	}
 
-	if (mouse.y < 200 && mouse.x > 52) {
-		if (this.spawnArrow.opacity !== 1 && !animator.isAnimated(this.spawnArrow)) {
-			this.spawnArrow.animate({opacity: 1}, {dur: 200});
+	if (pointer.mouse.y < 200 && pointer.mouse.x > 52) {
+		if (this.spawnArrow.opacity !== 1 && !this.spawnArrow.isAnimated()) {
+			this.spawnArrow.animate({opacity: 1}, {duration: 200});
 		}
 
 		if (this.placeMode === 0) {
-			x = Math.max(100, Math.min(500, Math.round(mouse.x / data.editor.spawnPositionStepSize) * 50));
+			x = Math.max(100, Math.min(500, Math.round(pointer.mouse.x / data.editor.spawnPositionStepSize) * 50));
 			this.spawnArrow.x = x;
 
-			if (mouse.isPressed(1)) {
+			if (pointer.isPressed(MOUSE_1)) {
 				this.placeX = this.spawnArrow.x;
 				this.placeMode = 1;
 			}
 		}
 		else {
-			d = Math.atan2(mouse.y - this.spawnArrow.y, mouse.x - this.spawnArrow.x);
+			d = Math.atan2(pointer.mouse.y - this.spawnArrow.y, pointer.mouse.x - this.spawnArrow.x);
 
 			d = Math.max(Math.PI / 6, Math.min(Math.PI / 6 * 5, Math.round(d / (Math.PI / 6)) * Math.PI / 6));
-			this.spawnArrow.dir = d;
+			this.spawnArrow.direction = d;
 
-			if (mouse.isPressed(3)) {
+			if (pointer.isPressed(MOUSE_3)) {
 				this.placeMode = 0;
-				this.spawnArrow.dir = Math.PI / 2;
-				x = Math.max(100, Math.min(500, Math.round(mouse.x / data.editor.spawnPositionStepSize) * 50));
+				this.spawnArrow.direction = Math.PI / 2;
+				x = Math.max(100, Math.min(500, Math.round(pointer.mouse.x / data.editor.spawnPositionStepSize) * 50));
 				this.spawnArrow.x = x;
 				this.placeX = this.spawnArrow.x;
 			}
 
-			if (mouse.isPressed(1)) {
-				this.addRock(this.spawnArrow.x, this.spawnArrow.dir, this.rockType, this.rockLevel);
+			if (pointer.isPressed(MOUSE_1)) {
+				this.addRock(this.spawnArrow.x, this.spawnArrow.direction, this.rockType, this.rockLevel);
 			}
 		}
 	}
 	else {
-		if (this.spawnArrow.opacity !== 0 && !animator.isAnimated(this.spawnArrow)) {
-			this.spawnArrow.animate({opacity: 0}, {dur: 200});
+		if (this.spawnArrow.opacity !== 0 && !this.spawnArrow.isAnimated()) {
+			this.spawnArrow.animate({opacity: 0}, {duration: 200});
 		}
-		this.spawnArrow.dir = Math.PI / 2;
+		this.spawnArrow.direction = Math.PI / 2;
 		this.placeMode = 0;
 	}
 };
 
 Editor.prototype.showTooltips = function () {
-	game.pause = 1;
+	main.pause = 1;
 
-	game.showDialog(
-		new Sprite('Dialog.EditorHelp', 320, 375, 0, {opacity: 0}),
+	main.showDialog(
+		new View.Sprite('Dialog.EditorHelp', 320, 375, 0, {opacity: 0}),
 		new Button(320, 436, 0, 'Continue', function () {
-			game.clearDialog();
-			game.pause = 0;
+			main.clearDialog();
+			main.pause = 0;
 		})
 	);
 };
 
 Editor.prototype.addRock = function (position, dir, type, level) {
-	var rock = new Sprite(data.rocks[type].levels[level - 1].sprite, 545, 230),
+	var rock = new View.Sprite(data.rocks[type].levels[level - 1].sprite, 545, 230),
 		up,
 		down,
 		cross,
 		timer,
 		line;
 
-	// Scale the rocks bmSize to fit the button
+	// Scale the rock's size to fit the button
 	switch (level) {
 	case 2:
-		rock.bmSize =  0.85;
+		rock.size =  0.85;
 		break;
 	case 3:
-		rock.bmSize =  0.7;
+		rock.size =  0.7;
 		break;
 	}
 
-	up = new SpriteButton(560, 230, function () {
+	up = new View.SpriteButton(560, 230, function () {
 		var rock = editor.rocks[this.position];
 
 		editor.rocks.splice(this.position, 1);
@@ -374,7 +371,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		editor.updateRockQueue();
 	}, 'Editor.Up');
 
-	down = new SpriteButton(575, 230, function () {
+	down = new View.SpriteButton(575, 230, function () {
 		var rock;
 
 		// If the rock is the first rock, do nothing
@@ -389,12 +386,12 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		editor.updateRockQueue();
 	}, 'Editor.Down');
 
-	cross = new SpriteButton(590, 230, function () {
+	cross = new View.SpriteButton(590, 230, function () {
 		var markers = editor.rocks[this.position].markers,
 			i,
 			m,
 			removeAnimCallback = function () {
-				this.remove();
+				engine.purge(this);
 			};
 		for (i = 0; i < markers.length; i ++) {
 			m = markers[i];
@@ -402,14 +399,14 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 				m.disable();
 			}
 
-			m.animate({opacity: 0}, {dur: 200, callback: removeAnimCallback});
+			m.animate({opacity: 0}, {duration: 200, callback: removeAnimCallback});
 		}
 
 		editor.rocks.splice(this.position, 1);
 		editor.updateRockQueue();
 	}, 'Editor.Cross');
 
-	timer = new SpriteButton(571, 230, function (btn) {
+	timer = new View.SpriteButton(571, 230, function (btn) {
 		var t = parseFloat(this.text.string),
 			tMin = 0;
 
@@ -433,20 +430,21 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 			t += '.0';
 		}
 
-		this.text.setString(t.toString());
+		this.text.string = t.toString();
 	}, 'Editor.IntervalTimer');
 
-	up.bg.yOff = down.bg.yOff = cross.bg.yOff = 15;
+	up.bg.offset.y = down.bg.offset.y = cross.bg.offset.y = 15;
 	up.position = down.position = this.rocks.length;
-	timer.bg.yOff = 0;
+	timer.bg.offset.y = 0;
 
-	line = new Sprite('Editor.EditorLine', 300, 230, 0, {'opacity': 0});
+	line = new View.Sprite('Editor.EditorLine', 300, 230, 0, {'opacity': 0});
 
-	// Set all buttons opacity to 0 (THIS WILL BE DONE WITH ADDOPT ARGUMENT IN THE FUTURE)
+	// Set all buttons opacity to 0 (THIS WILL BE DONE WITH additionalProperties ARGUMENT IN THE FUTURE)
 	up.bg.opacity = down.bg.opacity = cross.bg.opacity = timer.bg.opacity = 0;
 	rock.opacity = up.opacity = down.opacity = cross.opacity = timer.opacity = 0;
 
-	timer.text = timer.addChild(new TextBlock(editor.rocks.length === 0 ? '0.0': '1.0', 570, 230, 18, {opacity: 0, font: 'normal 9px Verdana', align: 'right', fillStyle: '#fff', yOff: - 1}));
+	timer.text = new View.TextBlock(editor.rocks.length === 0 ? '0.0': '1.0', 570, 230, 18, {opacity: 0, font: 'normal 9px Verdana', align: 'right', color: '#fff', offset: new Math.Vector('center', -1)});
+	timer.addChildren(timer.text);
 
 	this.rocks.push({
 		'spawnDelay': Math.round(parseFloat(timer.text.string) * 1000),
@@ -468,12 +466,12 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 
 	this.placeMode = 0;
 
-	this.spawnArrow.animate({xOff: 19}, {dur: 200});
+	this.spawnArrow.offset.animate({x: 19}, {duration: 200});
 
 	this.newSpawnArrow();
 	this.updateRockQueue(1);
 
-	engine.depth[8].addChildren(line, rock, down, up, cross, timer);
+	main.depths[8].addChildren(line, rock, down, up, cross, timer);
 };
 
 Editor.prototype.updateRockQueue = function () {
@@ -508,10 +506,10 @@ Editor.prototype.updateRockQueue = function () {
 			props = {opacity: newOpacity, y: newY};
 
 			if (marker.depth === 11) {
-				props.xOff = marker.bmWidth / 2;
+				props.offset.x = marker.bm.width / 2;
 			}
 
-			marker.animate(props, {dur: 200, callback: updateAnimCallback});
+			marker.animate(props, {duration: 200, callback: updateAnimCallback});
 		}
 	}
 };

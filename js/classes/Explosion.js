@@ -7,16 +7,15 @@ Requires:
 	Animator
 */
 
-jseCreateClass('Explosion');
-jseExtend(Explosion, Sprite);
-
-Explosion.prototype.explosion = function (_spr, _x, _y, _radius, _dur) {
+Explosion = function (_spr, _x, _y, _radius, _dur) {
 	// Extend sprite
-	this.sprite(_spr, _x, _y, Math.random() * Math.PI * 2, {bmSize: 0, opacity: 0});
-	
-	this.animate({bmSize: _radius / this.bmWidth, opacity: 1}, {easing: 'quadOut', dur: _dur / 2, callback: function () {
-		this.animate({opacity: 0}, {dur: _dur / 2, callback: function () {
-			this.remove();
+	View.Sprite.call(this, _spr, _x, _y, Math.random() * Math.PI * 2, {size: 0, opacity: 0});
+
+	this.animate({size: _radius / this.bm.width, opacity: 1}, {easing: 'quadOut', duration: _dur / 2, callback: function () {
+		this.animate({opacity: 0}, {duration: _dur / 2, callback: function () {
+			engine.purge(this);
 		}});
 	}});
 };
+
+Explosion.prototype = Object.create(View.Sprite.prototype);

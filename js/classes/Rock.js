@@ -1,8 +1,5 @@
-jseCreateClass('Rock');
-jseExtend(Rock, GravityObject);
-
-Rock.prototype.rock = function (x, y, type, level, dir, speed) {
-	var sprite, dmgSprite, acc, grav, dX, dY;
+Rock = function (x, y, type, level, dir, speed) {
+	var sprite, dmgSprite, grav;
 
 	if (x === undefined) {
 		throw new Error('Missing argument: x');
@@ -18,8 +15,7 @@ Rock.prototype.rock = function (x, y, type, level, dir, speed) {
 	}
 
 	dir = dir !== undefined ? dir : Math.PI / 2;
-	acc = 5000;
-	speed = speed !== undefined ? speed : acc * engine.loopSpeed / 1000;
+	speed = speed !== undefined ? speed : 150;
 
 	// Fetch rock details based on type and level
 	this.type = type;
@@ -32,24 +28,26 @@ Rock.prototype.rock = function (x, y, type, level, dir, speed) {
 	sprite = level.sprite !== undefined ? level.sprite : data.rocks[type].sprite;
 	dmgSprite = level.damageSprite !== undefined ? level.damageSprite : data.rocks[type].dmgSprite;
 	grav = level.gravity;
-	dX = Math.cos(dir) * speed;
-	dY = Math.sin(dir) * speed;
+	speed = new Math.Vector(Math.cos(dir) * speed, Math.sin(dir) * speed);
 
 	// Extend GravityObject
-	this.gravityObject(sprite, x, y, dir, {'dX': dX, 'dY': dY, 'gravity': grav, loop: "onRunning"});
-	this.dmgSprite = this.addChild(new Sprite(dmgSprite, x, y, dir));
+	GravityObject.call(this, sprite, x, y, dir, {speed: speed, gravity: grav, loop: main.runningLoop});
+	this.dmgSprite = new View.Sprite(dmgSprite, x, y, dir);
 	this.dmgSprite.opacity = 0;
+	this.addChildren(this.dmgSprite);
 
 	if (level.onStep) {
-		engine.addActivityToLoop(this, level.onStep, 'onRunning');
+		engine.currentRoom.loops.onRunning.attachFunction(this, level.onStep);
 	} else if (data.rocks[type].onStep) {
-		engine.addActivityToLoop(this, data.rocks[type].onStep, 'onRunning');
+		engine.currentRoom.loops.onRunning.attachFunction(this, data.rocks[type].onStep);
 	}
 
-	engine.addActivityToLoop(this, this.step, 'onRunning');
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.step);
 
 	this.impacted = false;
 };
+
+Rock.prototype = Object.create(GravityObject.prototype);
 
 Rock.prototype.damage = function (dhp, damagedBy) {
 	var relDist, value;
@@ -65,7 +63,7 @@ Rock.prototype.damage = function (dhp, damagedBy) {
 	}
 
 	if (this.life === 0) {
-		this.remove();
+		engine.purge(this);
 		player.rocksDestroyed ++;
 
 		// Calculate the points, based on how far the rock got
@@ -81,14 +79,14 @@ Rock.prototype.damage = function (dhp, damagedBy) {
 
 		value = Math.round(value / 10) * 10;
 
-		engine.depth[8].addChild(new ScorePoints(value, this.x, this.y));
+		main.depths[8].addChildren(new ScorePoints(value, this.x, this.y));
 	}
 };
 
 Rock.prototype.step = function () {
 	this.dmgSprite.x = this.x;
 	this.dmgSprite.y = this.y;
-	this.dmgSprite.dir = this.dir;
+	this.dmgSprite.direction = this.direction;
 };
 
 Rock.prototype.remove = function (time) {
@@ -99,9 +97,9 @@ Rock.prototype.remove = function (time) {
 
 		// Animate removal
 		time = time  ?  time : 150;
-		animOpt = {'bmSize': 1.5, 'opacity': 0};
-		this.animate(animOpt, {'dur': time, callback: "jsePurge('" + this.id + "')", 'layer': 1});
-		this.dmgSprite.animate(animOpt, {'dur': time, callback: "jsePurge('" + this.dmgSprite.id + "')", 'layer': 1});
+		animOpt = {'size': 1.5, 'opacity': 0};
+		this.animate(animOpt, {'dur': time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
+		this.dmgSprite.animate(animOpt, {'dur': time, callback: "engine.purge('" + this.dmgSprite.id + "')", 'layer': 1});
 
 		// Save rock stats for level stat calculation
 		stageController.stats.rocks.push({
@@ -127,20 +125,20 @@ Rock.prototype.doBorders = function () {
 	if (this.x < 50 || this.x > engine.canvasResX - 50) {
 
 		while (this.x < 50 || this.x > engine.canvasResX - 50) {
-			this.x -= this.dX * (engine.now - engine.last) / 1000;
+			this.x -= this.speed.x * (engine.now - engine.last) / 1000;
 		}
 
-		this.dX = -this.dX;
+		this.speed.x = -this.speed.x;
 	}
 
 	if (this.y > engine.canvasResY - 35) {
 		this.impacted = true;
-		this.remove();
+		engine.purge(this);
 	}
 
-	if (this.dY > this.maxSpeed) {
-		this.dY = this.maxSpeed;
+	if (this.speed.y > this.maxSpeed) {
+		this.speed.y = this.maxSpeed;
 	}
 
-	this.dir = Math.atan2(this.dY, this.dX);
+	this.direction = Math.atan2(this.speed.y, this.speed.x);
 };

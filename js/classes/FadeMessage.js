@@ -6,15 +6,12 @@ Requires:
 	StageController
 */
 
-jseCreateClass('FadeMessage');
-jseExtend(FadeMessage, TextBlock);
-
 // Constructor
-FadeMessage.prototype.fadeMessage = function (text, y, spawnTime, lifeTime, addOpt) {
-	engine.addActivityToLoop(this, this.update, 'onRunning');
-	this.loop = engine.loops.onRunning;
+FadeMessage = function (text, y, spawnTime, lifeTime, additionalProperties) {
+	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
+	this.loop = engine.currentRoom.loops.onRunning;
 
-	this.textBlock(text, 300, y, 600, addOpt);
+	View.TextBlock.call(this, text, 300, y, 600, additionalProperties);
 	this.timeOfBirth = this.loop.time + spawnTime;
 	this.spawned = false;
 	this.timeOfDeath = this.loop.time + spawnTime + lifeTime - 300;
@@ -23,19 +20,21 @@ FadeMessage.prototype.fadeMessage = function (text, y, spawnTime, lifeTime, addO
 	stageController.messages[this.id] = this;
 };
 
+FadeMessage.prototype = Object.create(View.TextBlock.prototype);
+
 FadeMessage.prototype.update = function () {
 	if (this.loop.time > this.timeOfBirth && this.spawned === false) {
 		this.spawned = true;
-		this.animate({bmSize: 1, opacity: 1}, {dur: 300});
+		this.animate({opacity: 1}, {duration: 300});
 	}
 
 	if (this.loop.time > this.timeOfDeath && this.dead === false) {
 		this.dead = true;
 
 		// Fade out and destroy object
-		this.animate({bmSize: 3, opacity: 0}, {dur: 300, callback: function () {
+		this.animate({opacity: 0}, {duration: 300, callback: function () {
 			delete stageController.messages[this.id];
-			jsePurge(this);
+			engine.purge(this);
 		}});
 	}
 };

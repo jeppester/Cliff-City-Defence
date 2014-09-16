@@ -8,9 +8,7 @@ Requires:
 	Sprite
  */
 
-jseCreateClass('Player');
-
-Player.prototype.player = function () {
+Player = function () {
 	// Set player points and stats
 	this.points = 0;
 
@@ -48,12 +46,12 @@ Player.prototype.player = function () {
 	this.aiGunInitialLevel = 0;
 
 	// Make in - game score
-	this.inGameScore = new TextBlock(this.points.toString() + "$", 590, 740, 200, {'font': 'bold 30px Verdana', 'align': 'right', 'xOff': 200, 'yOff': 40, 'fillStyle': '#ff2200'});
-	engine.depth[8].addChild(this.inGameScore);
+	this.inGameScore = new View.TextBlock(this.points.toString() + "$", 590, 740, 200, {'font': 'bold 30px Verdana', 'alignment': 'right', offset: new Math.Vector(200, 40), 'color': '#ff2200'});
+	main.depths[8].addChildren(this.inGameScore);
 
 	this.addPoints = function (points) {
 		this.points += points;
 		this.pointsTotal += Math.max(0, points);
-		this.inGameScore.setString(this.points.toString() + "$");
+		this.inGameScore.string = this.points.toString() + "$";
 	};
 };

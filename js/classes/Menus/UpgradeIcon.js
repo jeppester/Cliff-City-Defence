@@ -46,7 +46,7 @@ UpgradeIcon = function (_upgradeType, _buttonType, _level, _x, _y, _animate) {
 	}
 
 	View.Sprite.call(this, 'Upgrades.btn' + spr, _x, _y, 0);
-	this.icon = new View.Sprite('Upgrades.' + this.upgradeType.folder + '.l' + this.level + (this.buttonType === 3 ? 2: 1), _x, _y, 0);
+	this.icon = new View.Sprite('Upgrades.' + this.upgradeType.folder + '.l' + this.level + (this.buttonType === 3 ? 2: 1));
 	this.addChildren(this.icon);
 
 	engine.currentRoom.loops.onPaused.attachFunction(this, this.update);

@@ -72,6 +72,8 @@ Rocket = function (_dir) {
 	this.bounces = 0;
 };
 
+Rocket.prototype = Object.create(GravityObject.prototype);
+
 Rocket.prototype.updateBlastRangeIndicator = function () {
 	this.blastRangeIndicator.x = this.x;
 	this.blastRangeIndicator.y = this.y;
@@ -110,8 +112,6 @@ Rocket.prototype.doBorders = function () {
 	// Set the sprites direction to the direction of the rockets vector
 	this.direction = Math.atan2(this.speed.y, this.speed.x);
 };
-
-Rocket.prototype = Object.create(GravityObject.prototype);
 
 Rocket.prototype.cols = function () {
 	var rocks, cObj;

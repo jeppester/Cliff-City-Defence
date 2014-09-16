@@ -53,7 +53,7 @@ UpgradeMenu = function (onContinue) {
 	engine.redraw(1);
 };
 
-UpgradeMenu.prototype = Object.create(View.Container);
+UpgradeMenu.prototype = Object.create(View.Container.prototype);
 
 // Function for drawing upgrade "tree"
 UpgradeMenu.prototype.makeUpgradeTree = function (_animate) {

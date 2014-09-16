@@ -26,4 +26,4 @@ ScorePoints = function (points, _x, _y) {
 	}});
 };
 
-ScorePoints.prototype = Object.create(View.TextBlock);
+ScorePoints.prototype = Object.create(View.TextBlock.prototype);

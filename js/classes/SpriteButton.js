@@ -17,8 +17,8 @@ SpriteButton = function (x, y, onClick, sprite1, sprite2) {
 	this.direction = 0;
 
 	this.onClick = onClick;
-	this.bg = new View.Sprite(sprite1, x, y, 0);
-	this.fg = sprite2 === undefined  ?  false : new View.Sprite(sprite2, x, y, 0);
+	this.bg = new View.Sprite(sprite1);
+	this.fg = sprite2 === undefined  ?  false : new View.Sprite(sprite2);
 
 	this.addChildren(this.bg);
 	if (this.fg) {

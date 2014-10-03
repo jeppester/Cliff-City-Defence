@@ -15,12 +15,12 @@ ScorePoints = function (points, _x, _y) {
 	// Inherit from View.TextBlock
 	View.TextBlock.call(this, "+" + this.points.toString() + "$", _x, _y, 200, {'font': 'bold 30px Verdana', 'alignment': 'right', offset: new Math.Vector(200, 40), 'size': 0, 'color': '#ff2200'});
 
-	this.animate({'x': 590, 'y': 700, 'size': 1}, {'dur': 300, 'easing': 'quadOut', 'callback': function () {
+	this.animate({'x': 590, 'y': 700, 'size': 1}, {duration: 300, 'easing': 'quadOut', 'callback': function () {
 		if (typeof player !== "undefined") {
 			player.addPoints(this.points);
 		}
 
-		this.animate({'opacity': 0}, {'dur': 1000, 'easing': 'linear', 'callback': function () {
+		this.animate({'opacity': 0}, {duration: 1000, 'easing': 'linear', 'callback': function () {
 			engine.purge(this);
 		}});
 	}});

@@ -72,7 +72,7 @@ ShopIcon.prototype.update = function () {
 	}
 
 	// Check for click
-	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, new Math.Rectangle(this.x - 15, this.y - 15, 30, 30))) {
+	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, new Math.Rectangle(this.parent.x - 15, this.parent.y - 15, 30, 30))) {
 		if (this.level === 0) {
 			this.parent.circleMenu(this.type);
 		} else {
@@ -88,7 +88,7 @@ ShopIcon.prototype.update = function () {
 			pointer.unPress(MOUSE_TOUCH_ANY);
 
 			this.parent.building.shop = false;
-			this.parent.remove();
+			engine.purge(this.parent);
 		}
 	}
 };

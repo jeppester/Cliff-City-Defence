@@ -26,7 +26,7 @@ TestModeController.prototype.onLevelStart = function () {
 
 	// Set day -/ night mode
 	messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000";
-	textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor};
+	textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor};
 
 	// Show level text
 	text = editor.saveTest  ?  "Prepare for\nsave test" : "Prepare for\nlevel test";
@@ -51,7 +51,7 @@ TestModeController.prototype.onLevelStart = function () {
 TestModeController.prototype.onLevelEnd = function () {
 	// Run callbackfunctions depending on the outcome of the level
 	var messageColor = engine.theme === "Night"  ?  "#eeeeee" : "#000000",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor};
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor};
 
 	if (editor.saveTest) {
 		if (!stageController.checkPlayerAlive()) {

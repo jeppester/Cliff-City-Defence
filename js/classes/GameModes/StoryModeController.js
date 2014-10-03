@@ -22,7 +22,7 @@ StoryModeController.prototype.onLevelStart = function () {
 		messageColor = this.currentLevel % 2  ?  "#eeeeee" : "#000000",
 		dayNumber = 1 + Math.floor(this.currentLevel / 2),
 		levelTextBlock = "Prepare for\n" + (dayNight) + ' ' + (dayNumber) + " / " + (this.levels.length / 2),
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor},
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor},
 		firstDelay;
 
 	main.depths[8].addChildren(
@@ -60,7 +60,7 @@ StoryModeController.prototype.onLevelSucceed = function () {
 		messageColor = this.currentLevel % 2  ?  "#eeeeee" : "#000000",
 		dayNumber = 1 + Math.floor(this.currentLevel / 2),
 		levelTextBlock = (dayNight) + ' ' + (dayNumber) + "\nCompleted ! ",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor},
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor},
 
 		// For building data collection loop
 		i,
@@ -150,7 +150,7 @@ StoryModeController.prototype.onLevelSucceed = function () {
 
 StoryModeController.prototype.onLevelFail = function () {
 	var messageColor = this.currentLevel % 2  ?  "#eeeeee" : "#000000",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', offset: new Math.Vector(300, 60), color: messageColor};
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', offset: new Math.Vector(0, 60), color: messageColor};
 
 	// Show level fail message
 	main.depths[8].addChildren(

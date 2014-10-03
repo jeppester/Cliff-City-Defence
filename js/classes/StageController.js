@@ -90,7 +90,7 @@ StageController.prototype.prepareGame = function () {
 		new Destroyable('Trees.Tree', 473, 694)
 	);
 
-	d = this.destroyables,
+	d = this.destroyables;
 	b = this.buildings;
 
 	// Add all buildings and trees in the correct order
@@ -110,13 +110,13 @@ StageController.prototype.destroyGame = function () {
 	cannonBuilding.remove();
 	i = this.buildings.length;
 	while (i--) {
-		this.buildings[i].remove();
+		engine.purge(this.buildings[i]);
 	}
 
 	// Remove trees
 	i = this.destroyables.length;
 	while (i--) {
-		this.destroyables[i].remove();
+		engine.purge(this.destroyables[i]);
 		this.destroyables.splice(i, 1);
 	}
 
@@ -127,7 +127,7 @@ StageController.prototype.destroyGame = function () {
 	// Remove messages, if there are any
 	for (i in this.messages) {
 		if (this.messages.hasOwnProperty(i)) {
-			this.messages[i].remove();
+			engine.purge(this.messages[i]);
 			delete this.messages[i];
 		}
 	}
@@ -147,9 +147,9 @@ StageController.prototype.destroyGame = function () {
 // For removing game backgrounds
 StageController.prototype.destroyBackgrounds = function () {
 	if (typeof ground !== "undefined") {
-		this.ground.remove();
-		this.road.remove();
-		this.cliff.remove();
+		engine.purge(this.ground);
+		engine.purge(this.road);
+		engine.purge(this.cliff);
 
 		delete this.ground;
 		delete this.road;
@@ -312,7 +312,7 @@ StageController.prototype.endLevel = function () {
 	while (len--) {
 		b = this.buildings[len];
 		if (b.shop) {
-			b.shop.remove();
+			engine.purge(b.shop);
 			b.shop = false;
 		}
 	}
@@ -333,8 +333,8 @@ StageController.prototype.endLevel = function () {
 StageController.prototype.calculateLevelStats = function () {
 	var totalImpacts, totalFallDistance, stats, i, r;
 
-	totalImpacts = 0,
-	totalFallDistance = 0,
+	totalImpacts = 0;
+	totalFallDistance = 0;
 	stats = {};
 
 	for (i = 0; i < this.stats.rocks.length; i ++) {

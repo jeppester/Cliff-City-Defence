@@ -63,7 +63,7 @@ Rock.prototype.damage = function (dhp, damagedBy) {
 	}
 
 	if (this.life === 0) {
-		engine.purge(this);
+		this.remove();
 		player.rocksDestroyed ++;
 
 		// Calculate the points, based on how far the rock got
@@ -98,13 +98,25 @@ Rock.prototype.remove = function (time) {
 		// Animate removal
 		time = time  ?  time : 150;
 		animOpt = {'size': 1.5, 'opacity': 0};
-		this.animate(animOpt, {'dur': time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
-		this.dmgSprite.animate(animOpt, {'dur': time, callback: "engine.purge('" + this.dmgSprite.id + "')", 'layer': 1});
+		this.animate(animOpt, {
+			duration: time,
+			callback: function () {
+				engine.purge(this.id);
+			},
+			layer: 1,
+		});
+		this.dmgSprite.animate(animOpt, {
+			duration: time,
+			callback: function () {
+				engine.purge(this);
+			},
+			layer: 1,
+		});
 
 		// Save rock stats for level stat calculation
 		stageController.stats.rocks.push({
 			fallDistance: this.y,
-			impacted: this.impacted
+			impacted: this.impacted,
 		});
 
 		// Run custom onDestroy function (for rocks with special behaevior when destroyed)

@@ -11,7 +11,7 @@ FadeMessage = function (text, y, spawnTime, lifeTime, additionalProperties) {
 	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
 	this.loop = engine.currentRoom.loops.onRunning;
 
-	View.TextBlock.call(this, text, 300, y, 600, additionalProperties);
+	View.TextBlock.call(this, text, 0, y, 600, additionalProperties);
 	this.timeOfBirth = this.loop.time + spawnTime;
 	this.spawned = false;
 	this.timeOfDeath = this.loop.time + spawnTime + lifeTime - 300;

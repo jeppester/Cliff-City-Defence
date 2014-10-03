@@ -37,7 +37,7 @@ Editor = function () {
 	for (i in data.rocks) {
 		if (data.rocks.hasOwnProperty(i)) {
 			for (ii = 0; ii < data.rocks[i].levels.length; ii ++) {
-				btn = new View.SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", data.rocks[i].levels[ii].sprite);
+				btn = new SpriteButton(25, 27 + count * 55, onRockButtonClick, "Editor.RockButtonBackground", data.rocks[i].levels[ii].sprite);
 				btn.rockType = i;
 
 				// If the rocks size to fit the button
@@ -60,22 +60,22 @@ Editor = function () {
 	}
 
 	// Create selectorbox
-	this.selector = new View.Sprite("Editor.RockSelectorBox", -10, 27, 0, {offset: new Math.Vector(0, 'center')});
+	this.selector = new View.Sprite("Editor.RockSelectorBox", -10, 27, 0, {offset: OFFSET_MIDDLE_LEFT});
 
 	// Theme change button
-	this.btnChangeTheme = new View.SpriteButton(25, 558, function () {
+	this.btnChangeTheme = new SpriteButton(25, 558, function () {
 		main.setNightMode(engine.defaultTheme !== 'Night');
 	}, "Editor.RockButtonBackground", "Editor.NightDay");
 	this.btnChangeTheme.bg.offset.x += 5;
 
 	// Save button
-	this.btnSave = new View.SpriteButton(25, 613, function () {
+	this.btnSave = new SpriteButton(25, 613, function () {
 		editor.testBeforeSave();
 	}, "Editor.RockButtonBackground", "Editor.Floppy");
 	this.btnSave.bg.offset.x += 5;
 
 	// Test level button
-	this.btnTestMode = new View.SpriteButton(25, 668, function () {
+	this.btnTestMode = new SpriteButton(25, 668, function () {
 		if (editor.testModeStarted) {
 			editor.endTestMode();
 		} else {
@@ -85,7 +85,7 @@ Editor = function () {
 	this.btnTestMode.bg.offset.x += 5;
 
 	// Back to menu button
-	this.btnMainMenu = new View.SpriteButton(25, 723, function () {
+	this.btnMainMenu = new SpriteButton(25, 723, function () {
 		editor.remove();
 		main.spawnMainMenu();
 	}, "Editor.RockButtonBackground", "Editor.Quit");
@@ -136,7 +136,7 @@ Editor.prototype.remove = function () {
 };
 
 Editor.prototype.newSpawnArrow = function () {
-	this.spawnArrow = new View.Sprite("Editor.SpawnArrow", - 50, - 25, Math.PI / 2, {offset: new Math.Vector(-50, 'center'), opacity: 0});
+	this.spawnArrow = new View.Sprite("Editor.SpawnArrow", - 50, - 25, Math.PI / 2, {offset: new Math.Vector(-50, 22), opacity: 0});
 	this.spawnArrow.x = Math.max(100, Math.min(500, Math.round(pointer.mouse.x / data.editor.spawnPositionStepSize) * 50));
 	main.depths[8].addChildren(this.spawnArrow);
 };
@@ -363,7 +363,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		break;
 	}
 
-	up = new View.SpriteButton(560, 230, function () {
+	up = new SpriteButton(560, 230, function () {
 		var rock = editor.rocks[this.position];
 
 		editor.rocks.splice(this.position, 1);
@@ -371,7 +371,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		editor.updateRockQueue();
 	}, 'Editor.Up');
 
-	down = new View.SpriteButton(575, 230, function () {
+	down = new SpriteButton(575, 230, function () {
 		var rock;
 
 		// If the rock is the first rock, do nothing
@@ -386,7 +386,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		editor.updateRockQueue();
 	}, 'Editor.Down');
 
-	cross = new View.SpriteButton(590, 230, function () {
+	cross = new SpriteButton(590, 230, function () {
 		var markers = editor.rocks[this.position].markers,
 			i,
 			m,
@@ -406,9 +406,9 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 		editor.updateRockQueue();
 	}, 'Editor.Cross');
 
-	timer = new View.SpriteButton(571, 230, function (btn) {
+	timer = new SpriteButton(571, 230, function (btn) {
 		var t = parseFloat(this.text.string),
-			tMin = 0;
+			  tMin = 0;
 
 		if (btn === 1) {
 			t +=  0.5;
@@ -443,7 +443,7 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 	up.bg.opacity = down.bg.opacity = cross.bg.opacity = timer.bg.opacity = 0;
 	rock.opacity = up.opacity = down.opacity = cross.opacity = timer.opacity = 0;
 
-	timer.text = new View.TextBlock(editor.rocks.length === 0 ? '0.0': '1.0', 570, 230, 18, {opacity: 0, font: 'normal 9px Verdana', align: 'right', color: '#fff', offset: new Math.Vector('center', -1)});
+	timer.text = new View.TextBlock(editor.rocks.length === 0 ? '0.0': '1.0', -1, 3, 18, {opacity: 1, font: 'normal 9px Verdana', align: 'left', color: '#fff'});
 	timer.addChildren(timer.text);
 
 	this.rocks.push({
@@ -459,7 +459,6 @@ Editor.prototype.addRock = function (position, dir, type, level) {
 			up,
 			cross,
 			timer,
-			timer.text,
 			this.spawnArrow
 		]
 	});

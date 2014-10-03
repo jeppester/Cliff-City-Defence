@@ -55,10 +55,10 @@ SpecialUpgrades = function (upgrades, callback) {
 		}),
 
 		// Offer choose arrows
-		this.nextArrow = new View.SpriteButton(570, 355, function () {
+		this.nextArrow = new SpriteButton(570, 355, function () {
 			this.parent.selectUpgrade(this.parent.currentIndex + 2);
 		}, 'Dialog.NextOfferArrow'),
-		this.prevArrow = new View.SpriteButton(30, 355, function () {
+		this.prevArrow = new SpriteButton(30, 355, function () {
 			this.parent.selectUpgrade(this.parent.currentIndex);
 		}, 'Dialog.NextOfferArrow')
 	);

@@ -21,7 +21,7 @@ CustomLevelModeController.prototype.onLevelStart = function () {
 	var nightMode = this.levels[this.currentLevel].theme === 'Night',
 		messageColor = nightMode ? "#eeeeee" : "#000000",
 		levelTextBlock = "Prepare for\nincoming rocks",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor},
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor},
 		firstDelay;
 
 
@@ -62,7 +62,7 @@ CustomLevelModeController.prototype.onLevelSucceed = function () {
 	var nightMode = this.levels[this.currentLevel].theme === 'Night',
 		messageColor = nightMode ? "#eeeeee" : "#000000",
 		levelTextBlock = "Level\nCompleted!",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(300, 60), color: messageColor},
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', opacity: 0, offset: new Math.Vector(0, 60), color: messageColor},
 
 		// For building data collection loop
 		i,
@@ -141,7 +141,7 @@ CustomLevelModeController.prototype.onLevelSucceed = function () {
 CustomLevelModeController.prototype.onLevelFail = function () {
 	var nightMode = this.levels[this.currentLevel].theme === 'Night',
 		messageColor = nightMode ? "#eeeeee" : "#000000",
-		textOpt = {alignment: 'center', font: 'normal 58px Verdana', offset: new Math.Vector(300, 60), color: messageColor};
+		textOpt = {alignment: 'center', font: 'normal 58px Verdana', offset: new Math.Vector(0, 60), color: messageColor};
 
 	// Show level fail message
 	main.depths[8].addChildren(

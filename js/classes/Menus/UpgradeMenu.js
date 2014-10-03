@@ -41,7 +41,7 @@ UpgradeMenu = function (onContinue) {
 	this.btnNext = new Button(300, 710, 0, 'CONTINUE', function () {
 		pause = 0;
 		this.parent.onContinue();
-		this.parent.remove();
+		engine.purge(this.parent);
 	});
 
 	this.addChildren(this.headerBox, this.headerText, this.infoBox, this.infoHeader, this.infoText, this.btnBuy, this.btnNext);
@@ -62,7 +62,7 @@ UpgradeMenu.prototype.makeUpgradeTree = function (_animate) {
 	animate = _animate ? _animate : 0;
 
 	while (this.icons.length > 0) {
-		this.icons[0].remove();
+		engine.purge(this.icons[0]);
 		this.icons.splice(0, 1);
 	}
 	c = 0;

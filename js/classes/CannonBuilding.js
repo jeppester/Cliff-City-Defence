@@ -32,8 +32,7 @@ CannonBuilding = function () {
 CannonBuilding.prototype = Object.create(View.Container.prototype);
 
 CannonBuilding.prototype.remove = function () {
-	this.nightLight.remove();
-	this.removeAllChildren();
+	engine.purge(this.nightLight);
 	engine.purge(this);
 };
 
@@ -101,7 +100,7 @@ CannonBuilding.prototype.update = function () {
 
 		this.loadedAfter = engine.currentRoom.loops.onRunning.time + player.rocketReloadTime;
 		this.cannon.offset.x = 5;
-		this.cannon.offset.animate({'x': 0}, {'dur': 300});
+		this.cannon.offset.animate({'x': 0}, {duration: 300});
 	}
 };
 
@@ -121,7 +120,7 @@ CannonBuilding.prototype.cols = function () {
 		if (Math.sqrt(Math.pow(cObj.x - this.building.x, 2) + Math.pow(cObj.y - this.building.y, 2)) < cDist) {
 			this.die();
 			cObj.impacted = true;
-			cObj.remove();
+			engine.purge(cObj);
 		}
 	}
 };
@@ -142,15 +141,15 @@ CannonBuilding.prototype.revive = function () {
 	this.building.opacity = 1;
 	this.cannon.size = 0;
 	this.cannon.opacity = 1;
-	this.building.animate({"size": 1}, {'dur': 200});
-	this.cannon.animate({"size": 1}, {'dur': 200});
+	this.building.animate({"size": 1}, {duration: 200});
+	this.cannon.animate({"size": 1}, {duration: 200});
 	this.nightLight.opacity = 1;
 	this.alive = true;
 };
 
 CannonBuilding.prototype.die = function () {
-	this.building.animate({"size": 1.5, "opacity": 0}, {'dur': 200});
-	this.cannon.animate({"size": 1.5, "opacity": 0}, {'dur': 200});
+	this.building.animate({"size": 1.5, "opacity": 0}, {duration: 200});
+	this.cannon.animate({"size": 1.5, "opacity": 0}, {duration: 200});
 	this.cannon.alive = false;
 	this.nightLight.opacity = 0;
 	this.alive = false;
@@ -166,8 +165,8 @@ CannonBuilding.prototype.setCannon = function (alive) {
 		} else {
 			deadDir = -190 / 180 * Math.PI;
 		}
-		this.cannon.animate({'dir': deadDir}, {'dur': 200, 'easing': 'quadOut'});
-		this.cannon.offset.animate({'x': 7}, {'dur': 200, 'easing': 'quadOut'});
+		this.cannon.animate({'dir': deadDir}, {duration: 200, 'easing': 'quadOut'});
+		this.cannon.offset.animate({'x': 7}, {duration: 200, 'easing': 'quadOut'});
 	} else {
 		this.cannon.offset.animate({'x': 0, size: 1, opacity: 1}, {duration: 200});
 	}

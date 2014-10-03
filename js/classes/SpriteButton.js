@@ -38,7 +38,7 @@ SpriteButton.prototype.disable = function () {
 };
 
 SpriteButton.prototype.update = function () {
-	var sprX, sprY, pos, checkShape;
+	var sprX, sprY, pos, checkShape, pointers;
 
 	this.bg.opacity = this.opacity;
 
@@ -57,7 +57,9 @@ SpriteButton.prototype.update = function () {
 	pos = this.bg.getRoomPosition().subtract(this.bg.offset);
 	checkShape = new Math.Rectangle(pos.x, pos.y, this.bg.bm.width, this.bg.bm.height);
 
-	if (pointer.shapeIsPressed(MOUSE_TOUCH_ANY, checkShape)) {
-		this.onClick();
+	pointers = pointer.shapeIsPressed(MOUSE_TOUCH_ANY, checkShape);
+
+	if (pointers) {
+		this.onClick(pointers);
 	}
 };

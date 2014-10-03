@@ -21,14 +21,14 @@ ShopCircle.prototype.selectType = function () {
 
 	if (player.shieldsAvailable > 0) {
 		if (player.weaponsAvailable > 0) {
-			this.addChildren(new ShopIcon(data.upgradeTypes[1], 0, this.x, this.y, this.x + 15, this.y));
-			this.addChildren(new ShopIcon(data.upgradeTypes[0], 0, this.x, this.y, this.x - 15, this.y));
+			this.addChildren(new ShopIcon(data.upgradeTypes[1], 0, 0, 0, 15, 0));
+			this.addChildren(new ShopIcon(data.upgradeTypes[0], 0, 0, 0, -15, 0));
 		} else {
-			this.addChildren(new ShopIcon(data.upgradeTypes[1], 0, this.x, this.y, this.x, this.y));
+			this.addChildren(new ShopIcon(data.upgradeTypes[1], 0, 0, 0, 0, 0));
 		}
 	} else {
 		if (player.weaponsAvailable > 0) {
-			this.addChildren(new ShopIcon(data.upgradeTypes[0], 0, this.x, this.y, this.x, this.y));
+			this.addChildren(new ShopIcon(data.upgradeTypes[0], 0, 0, 0, 0, 0));
 		} else {
 			this.building = false;
 		}
@@ -51,15 +51,15 @@ ShopCircle.prototype.circleMenu = function (upgradeType) {
 
 	switch (player[u.lockVar]) {
 	case 4:
-		this.addChildren(new ShopIcon(u, 4, this.x, this.y, this.x + 15, this.y + 15));
+		this.addChildren(new ShopIcon(u, 4, 0, 0, 15, 15));
 	case 3:
-		this.addChildren(new ShopIcon(u, 1, this.x, this.y, this.x - 15, this.y - 15));
-		this.addChildren(new ShopIcon(u, 2, this.x, this.y, this.x + 15, this.y - 15));
-		this.addChildren(new ShopIcon(u, 3, this.x, this.y, this.x - 15, this.y + 15));
+		this.addChildren(new ShopIcon(u, 1, 0, 0, -15, -15));
+		this.addChildren(new ShopIcon(u, 2, 0, 0, 15, -15));
+		this.addChildren(new ShopIcon(u, 3, 0, 0, -15, 15));
 		break;
 	case 2:
-		this.addChildren(new ShopIcon(u, 1, this.x, this.y, this.x - 15, this.y));
-		this.addChildren(new ShopIcon(u, 2, this.x, this.y, this.x + 15, this.y));
+		this.addChildren(new ShopIcon(u, 1, 0, 0, -15, 0));
+		this.addChildren(new ShopIcon(u, 2, 0, 0, 15, 0));
 		break;
 	case 1:
 		this.addChildren(new ShopIcon(u, 1, this.x, this.y, this.x, this.y));

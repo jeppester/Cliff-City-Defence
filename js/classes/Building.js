@@ -61,11 +61,11 @@ Building = function (type, _x, _y, _dir) {
 	}
 
 	// Prepare upgrade sprites
-	this.gunStand = new View.Sprite('BuildingEnhancements.GunStand', this.x + this.spritePos.gunStand.x, this.y + this.spritePos.gunStand.y, this.spritePos.gunStand.direction, {opacity: 0});
+	this.gunStand = new View.Sprite('BuildingEnhancements.GunStand', this.spritePos.gunStand.x, this.spritePos.gunStand.y, this.spritePos.gunStand.direction, {opacity: 0});
 	this.gun = false;
 
 	// Extend View.Sprite
-	this.sprite = new View.GameObject('Buildings.Building' + this.type, this.x, this.y, _dir);
+	this.sprite = new View.GameObject('Buildings.Building' + this.type, 0, 0, _dir);
 
 	// Prepare shield
 	this.shield = new Shield(this.type, this.x, this.y);
@@ -86,13 +86,13 @@ Building.prototype.die = function (time) {
 	if (this.life) {
 		this.life = 0;
 		time = time  ?  time : 200;
-		this.sprite.animate({"size": 1.5, "opacity": 0}, {'dur': time});
+		this.sprite.animate({"size": 1.5, "opacity": 0}, {duration: time});
 
 		// Remove upgrades
-		this.gunStand.animate({"size": 1.5, "opacity": 0}, {'dur': time});
+		this.gunStand.animate({"size": 1.5, "opacity": 0}, {duration: time});
 		this.gunType = 0;
 		if (this.gun) {
-			this.gun.remove();
+			engine.purge(this.gun);
 			delete this.gun;
 		}
 
@@ -123,7 +123,7 @@ Building.prototype.setLife = function (life) {
 		break;
 	}
 
-	this.sprite.animate({"size": 1}, {'dur': 200});
+	this.sprite.animate({"size": 1}, {duration: 200});
 	this.life = life;
 };
 
@@ -135,14 +135,14 @@ Building.prototype.setShield = function (type) {
 Building.prototype.setGun = function (type) {
 	// If there is already a gun on the building, remove it
 	if (this.gun) {
-		this.gun.remove();
+		engine.purge(this.gun);
 	}
 
 	// Set the new gun type
 	this.gunType = type;
 
 	if (this.gunType === 0) {
-		this.gunStand.animate({'opacity': 0}, {'dur': 200});
+		this.gunStand.animate({'opacity': 0}, {duration: 200});
 		if (this.gun) {
 			delete this.gun;
 		}
@@ -152,7 +152,7 @@ Building.prototype.setGun = function (type) {
 	this.gun = new AiGun(type, this.x + this.spritePos.gun.x, this.y + this.spritePos.gun.y, this);
 	this.addChildren(this.gun);
 	this.gunStand.size = 1;
-	this.gunStand.animate({'opacity': 1}, {'dur': 200});
+	this.gunStand.animate({'opacity': 1}, {duration: 200});
 };
 
 Building.prototype.update = function () {
@@ -169,7 +169,7 @@ Building.prototype.update = function () {
 			while (len --) {
 				b = stageController.buildings[len];
 				if (b.shop) {
-					b.shop.remove();
+					engine.purge(b.shop);
 					b.shop = false;
 				}
 			}
@@ -202,7 +202,7 @@ Building.prototype.cols = function () {
 				this.setLife(this.life - 1);
 			}
 			cObj.impacted = true;
-			cObj.remove();
+			engine.purge(cObj);
 		}
 	}
 };

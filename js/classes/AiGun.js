@@ -69,7 +69,7 @@ AiGun = function (_type, _x, _y, _parent) {
 	}
 
 	// Extent sprite
-	View.Sprite.call(this, 'BuildingEnhancements.Gun' + this.type, _x, _y, -Math.random() * Math.PI, {offset: _offset});
+	View.Sprite.call(this, 'BuildingEnhancements.Gun' + this.type, 0, 0, -Math.random() * Math.PI, {offset: _offset});
 
 	// Add object in update array
 	engine.currentRoom.loops.onRunning.attachFunction(this, this.update);
@@ -346,7 +346,7 @@ AiGun.prototype.update = function () {
 					ly = t.y + 0 * Math.sin(tDir + Math.PI);
 					beam = new View.Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "size": 1.5});
 					main.depths[6].addChildren(beam);
-					beam.animate({"opacity": 1}, {'dur': 200, easing: 'quadIn', callback: function () {
+					beam.animate({"opacity": 1}, {duration: 200, easing: 'quadIn', callback: function () {
 						this.animate({"size": 0, "opacity": 0}, {"dur": 400, easing: 'quadOut', callback: function () {
 							engine.purge(this);
 						}});
@@ -357,7 +357,7 @@ AiGun.prototype.update = function () {
 					ly = this.y + 24 * Math.sin(tDir);
 					beam = new View.Sprite('Effects.Beam', lx, ly, 0, {"opacity": 0, "size": 0});
 					main.depths[8].addChildren(beam);
-					beam.animate({"size": 0.5, "opacity": 1}, {'dur': 100, easing: 'quadIn', callback: function () {
+					beam.animate({"size": 0.5, "opacity": 1}, {duration: 100, easing: 'quadIn', callback: function () {
 						this.animate({"size": 0, "opacity": 0}, {"dur": 100, easing: 'quadOut', callback: function () {
 							engine.purge(this);
 						}});
@@ -377,7 +377,7 @@ AiGun.prototype.remove = function (time) {
 	if (this.alive) {
 		this.alive = false;
 		time = time  ?  time : 200;
-		this.animate({"size": 0}, {'dur': time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
+		this.animate({"size": 0}, {duration: time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
 		this.parent.gun = false;
 		this.parent.gunType = 0;
 		return true;
@@ -400,7 +400,7 @@ AiGun.prototype.cols = function () {
 		if (!cObj.alive) {continue; }
 		cDist = this.bm.width / 2 + cObj.bm.width / 2;
 		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
-			cObj.remove();
+			engine.purge(cObj);
 			this.parent.setGun(0);
 			break;
 		}

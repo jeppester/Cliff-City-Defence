@@ -23,7 +23,7 @@ Destroyable.prototype.remove = function (time) {
 		time = time  ?  time : 200;
 
 		this.alive = false;
-		this.animate({"size": 1.5, "opacity": 0}, {'dur': time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
+		this.animate({"size": 1.5, "opacity": 0}, {duration: time, callback: "engine.purge('" + this.id + "')", 'layer': 1});
 
 		return true;
 	}
@@ -48,7 +48,7 @@ Destroyable.prototype.cols = function () {
 		if (Math.sqrt(Math.pow(cObj.x - this.x, 2) + Math.pow(cObj.y - this.y, 2)) < cDist) {
 			engine.purge(this);
 			cObj.impacted = true;
-			cObj.remove();
+			engine.purge(cObj);
 		}
 	}
 };
